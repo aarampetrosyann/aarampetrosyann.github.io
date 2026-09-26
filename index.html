@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Aram | Software Engineer</title>
+<meta name="description" content="Aram, UCLA Computer Science graduate and incoming M.S. Data Science Engineering student. Software, web, and hardware projects.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#128225;</text></svg>">
+
+<!-- FONTS: loaded from Google Fonts. Change families here AND in styles.css -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+<!-- STYLES: all colors, fonts, and spacing live in this one file -->
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+<div class="wrap">
+
+<!-- ============================================================
+     BLOCK 1: NAV
+     Add a menu item by copying one <li> line.
+     Links starting with # jump to a section on this page.
+     Links ending in .html go to another page.
+     This nav is repeated in games.html and blog.html. If you
+     change it here, change it there too.
+     ============================================================ -->
+<nav aria-label="Main">
+  <a class="home" href="#">Aram</a>
+  <ul>
+    <li><a href="games.html">Games</a></li>
+    <li><a href="blog.html">Blog</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- ============================================================
+     BLOCK 2: HERO
+     Your name, one-line intro, and a status pill.
+     ============================================================ -->
+<header class="hero">
+  <h1>Aram<br>[Last&nbsp;Name]</h1>
+  <p>I'm a UCLA Computer Science graduate who builds software across the stack, from web apps and automation tools to FPGA hardware.</p>
+  <span class="now">Starting an M.S. in Data Science Engineering at UCLA, Fall 2026</span>
+</header>
+
+<main>
+
+<!-- ============================================================
+     BLOCK 3: ABOUT
+     Plain paragraphs. Add or remove <p> tags freely.
+     ============================================================ -->
+<section class="about" aria-labelledby="about-h">
+  <h2 id="about-h">About</h2>
+  <p>My work has spanned software engineering, freelance web development, CAD design, and teaching. I like problems where the answer has to hold up in the real world: a client site people actually use, a tool that saves a legal team hours, or a model that gets checked against outcomes it didn't see.</p>
+  <p>Right now I'm focused on data science and machine learning, and I'm looking for new grad and internship roles in software and data engineering.</p>
+</section>
+
+<!-- ============================================================
+     BLOCK 4: EXPERIENCE
+     Each job is one <li>. To add one, copy this template:
+
+     <li>
+       <h3>Job title</h3>
+       <p class="org">Company, 2026</p>
+       <p>One sentence on what you built and its impact.</p>
+     </li>
+
+     Newest first. Anything in [brackets] is yours to fill in.
+     ============================================================ -->
+<section id="experience" aria-labelledby="exp-h">
+  <h2 id="exp-h">Experience</h2>
+  <ol class="timeline">
+
+    <li>
+      <h3>Software Engineering Intern</h3>
+      <p class="org">ITJ Group</p>
+      <p>[One sentence on what you built and its impact.]</p>
+    </li>
+
+    <li>
+      <h3>Patent Office Action Automation</h3>
+      <p class="org">IP law firm, 3-person team</p>
+      <p>Building a Python and FastAPI tool that automates patent Office Action workflows using OCR, LLMs, and Microsoft Graph integration.</p>
+    </li>
+
+    <li>
+      <h3>Freelance Web Developer</h3>
+      <p class="org">Self-employed</p>
+      <p>Build and maintain live client sites for businesses in the jewelry and legal services industries.</p>
+    </li>
+
+    <li>
+      <h3>CAD Engineer</h3>
+      <p class="org">Nik Diamond Setting</p>
+      <p>[One sentence on the CAD work you did.]</p>
+    </li>
+
+    <li>
+      <h3>Student Instructor</h3>
+      <p class="org">Glendale Community College</p>
+      <p>[One sentence on what you taught.]</p>
+    </li>
+
+  </ol>
+</section>
+
+<!-- ============================================================
+     BLOCK 5: PROJECTS
+     Each project is one <li>. To add one, copy this template:
+
+     <li>
+       <h3>Project name</h3>
+       <span class="links"><a href="https://github.com/you/repo">Code</a></span>
+       <p>One or two sentences on what it does and what you built.</p>
+       <span class="stack">Python, React, whatever you used</span>
+     </li>
+
+     Delete the <span class="links"> line if there's nothing to link.
+     For two links: <a href="#">Code</a> &middot; <a href="#">Demo</a>
+     ============================================================ -->
+<section id="projects" aria-labelledby="proj-h">
+  <h2 id="proj-h">Projects</h2>
+  <ul class="projects">
+
+    <li>
+      <h3>World Cup Match Prediction Engine</h3>
+      <span class="links"><a href="#">Code</a></span>
+      <p>A Poisson-based model with Monte Carlo simulation, validated prospectively: it called 19 of 22 knockout-stage outcomes before the matches were played.</p>
+      <span class="stack">Python, statistical modeling</span>
+    </li>
+
+    <li>
+      <h3>FairShare</h3>
+      <span class="links"><a href="#">Code</a></span>
+      <p>A group expense-splitting app built by a 7-person Agile team.</p>
+      <span class="stack">React, Vite, Node, Express, MongoDB</span>
+    </li>
+
+    <li>
+      <h3>PhishGuard Extension</h3>
+      <span class="links"><a href="#">Code</a></span>
+      <p>A browser extension for spotting phishing attempts, built at the 2024 AI Berkeley Hackathon.</p>
+      <span class="stack">[Stack]</span>
+    </li>
+
+    <li>
+      <h3>Nova Search Engine</h3>
+      <span class="links"><a href="#">Code</a></span>
+      <p>[What it searches and what you built.]</p>
+      <span class="stack">[Stack]</span>
+    </li>
+
+    <li>
+      <h3>Neural Decoder Optimization</h3>
+      <span class="links"><a href="#">Code</a></span>
+      <p>[What you optimized and the result.]</p>
+      <span class="stack">[Stack]</span>
+    </li>
+
+    <li>
+      <h3>XR Binary Analysis</h3>
+      <span class="links"><a href="#">Code</a></span>
+      <p>[What it analyzes and why.]</p>
+      <span class="stack">[Stack]</span>
+    </li>
+
+    <li>
+      <h3>FPGA Craps Game</h3>
+      <span class="links"><a href="#">Code</a></span>
+      <p>A playable craps game implemented in hardware on an FPGA.</p>
+      <span class="stack">Verilog, FPGA</span>
+    </li>
+
+  </ul>
+</section>
+
+<!-- ============================================================
+     BLOCK 6: EDUCATION
+     Each degree is one <div> with an <h3> and a <p>.
+     ============================================================ -->
+<section aria-labelledby="edu-h">
+  <h2 id="edu-h">Education</h2>
+  <div class="edu">
+
+    <div>
+      <h3>M.S. Data Science Engineering</h3>
+      <p>UCLA, starting Fall 2026</p>
+    </div>
+
+    <div>
+      <h3>B.S. Computer Science</h3>
+      <p>UCLA</p>
+    </div>
+
+    <div>
+      <h3>A.S. Mathematics</h3>
+      <p>Glendale Community College</p>
+    </div>
+
+    <div>
+      <h3>A.S. Physics</h3>
+      <p>Glendale Community College</p>
+    </div>
+
+    <div>
+      <h3>A.S. Computer Science</h3>
+      <p>Glendale Community College</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================================
+     BLOCK 7: CONTACT
+     Each button is one <li>. Replace the placeholder links.
+     Resume: put resume.pdf next to index.html.
+     ============================================================ -->
+<section id="contact" class="contact" aria-labelledby="contact-h">
+  <h2 id="contact-h">Contact</h2>
+  <p>The fastest way to reach me is email. I'm happy to talk about roles, projects, or anything on this page.</p>
+  <ul>
+    <li><a href="mailto:you@example.com">Email</a></li>
+    <li><a href="https://github.com/your-username">GitHub</a></li>
+    <li><a href="https://linkedin.com/in/your-profile">LinkedIn</a></li>
+    <li><a href="resume.pdf">Resume</a></li>
+  </ul>
+</section>
+
+</main>
+
+<!-- ============================================================
+     BLOCK 8: FOOTER
+     ============================================================ -->
+<footer>
+  <p>&copy; <span id="yr">2026</span> Aram</p>
+</footer>
+
+</div>
+
+<script>
+  // Keeps the footer year current on its own.
+  try { document.getElementById("yr").textContent = new Date().getFullYear(); } catch (e) {}
+</script>
+
+<!-- Hover scramble effect on the nav links -->
+<script src="scramble.js"></script>
+</body>
+</html>

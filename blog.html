@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Blog | Aram</title>
+<meta name="description" content="Writing by Aram on software, data science, and whatever else is holding my attention.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#128225;</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+<div class="wrap">
+
+<!-- NAV: same as index.html. Keep the three copies in sync. -->
+<nav aria-label="Main">
+  <a class="home" href="index.html">Aram</a>
+  <ul>
+    <li><a href="games.html">Games</a></li>
+    <li><a href="blog.html" aria-current="page">Blog</a></li>
+    <li><a href="index.html#experience">Experience</a></li>
+    <li><a href="index.html#projects">Projects</a></li>
+    <li><a href="index.html#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- PAGE HEADER -->
+<header class="page-head">
+  <h1>Blog</h1>
+  <p>Notes on things I'm working on or thinking about: software, data, and the occasional tangent.</p>
+</header>
+
+<main>
+<!-- ============================================================
+     POST LIST
+     Newest post first. To add one, copy this template:
+
+     <li>
+       <p class="date"><time datetime="2026-10-04">October 4, 2026</time></p>
+       <h3><a href="posts/short-slug.html">Post title</a></h3>
+       <p>One or two lines on what the post is about.</p>
+     </li>
+
+     Then copy posts/example-post.html, rename it to match the
+     link above, and write inside it. Two edits per post: this
+     list, and the post file itself.
+     ============================================================ -->
+<section aria-labelledby="posts-h">
+  <h2 id="posts-h">Posts</h2>
+  <ul class="posts">
+
+    <li>
+      <p class="date"><time datetime="2026-09-23">September 23, 2026</time></p>
+      <h3><a href="posts/example-post.html">Starting this thing</a></h3>
+      <p>Why I finally built a site, and what I plan to put on it.</p>
+    </li>
+
+  </ul>
+</section>
+
+</main>
+
+<footer>
+  <p><a href="index.html">Back to home</a></p>
+</footer>
+
+</div>
+
+<!-- Hover scramble effect on the nav links -->
+<script src="scramble.js"></script>
+</body>
+</html>

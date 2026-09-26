@@ -1,0 +1,392 @@
+/* ============================================================
+   1. DESIGN TOKENS
+   Change a color or font here and it updates everywhere.
+   The site is dark by default. A light palette is commented
+   out at the bottom of this section if you ever want it back.
+   ============================================================ */
+:root {
+  --paper:       #121212;  /* page background, neutral near-black */
+  --ink:         #ECECEC;  /* main text, neutral off-white */
+  --muted:       #9A9A9A;  /* secondary text: companies, stacks */
+  --line:        #2C2C2C;  /* dividers and the timeline rail */
+  --accent:      #A8CE8C;  /* links and timeline dots, pistachio */
+  --accent-soft: #24301C;  /* status pill and code block background */
+
+  --display: "Bricolage Grotesque", "Helvetica Neue", Arial, sans-serif;
+  --body:    "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --measure: 46rem;        /* max width of the whole page */
+
+  color-scheme: dark;      /* makes scrollbars and form fields match */
+
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* To switch back to the light version, delete the block above
+   and uncomment this one:
+
+:root {
+  --paper:       #EDEFEA;
+  --ink:         #24262B;
+  --muted:       #6A6E73;
+  --line:        #CFD2CA;
+  --accent:      #4C6B33;
+  --accent-soft: #DCE8CC;
+
+  --display: "Bricolage Grotesque", "Helvetica Neue", Arial, sans-serif;
+  --body:    "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --measure: 46rem;
+  color-scheme: light;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+*/
+
+/* ============================================================
+   2. BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: inherit; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: env(safe-area-inset-top, 0px);
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--accent);
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+a:hover { text-decoration-thickness: 2px; }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.wrap {
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* Every section gets the same rhythm and divider. */
+section {
+  padding: 3.5rem 0;
+  border-bottom: 1px solid var(--line);
+}
+section:last-of-type { border-bottom: 0; }
+
+h2 {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 1.75rem;
+  letter-spacing: -0.02em;
+  margin: 0 0 1.75rem;
+}
+
+h3 {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 1.2rem;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+/* ============================================================
+   3. NAV  (block 1)
+   ============================================================ */
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 0;
+  font-size: 0.95rem;
+}
+nav .home {
+  font-family: var(--display);
+  font-weight: 700;
+  color: var(--ink);
+  text-decoration: none;
+}
+nav ul {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;              /* breathing room for the hover scramble */
+  margin: 0;
+  padding: 0;
+}
+nav ul li { white-space: nowrap; }
+nav ul [aria-current="page"] { color: var(--ink); font-weight: 600; }
+nav ul a { color: var(--muted); text-decoration: none; }
+nav ul a:hover { color: var(--ink); }
+
+/* ============================================================
+   4. HERO  (block 2)
+   The one loud moment on the page. Keep everything else quiet.
+   ============================================================ */
+.hero {
+  padding: 4rem 0 3.5rem;
+  border-bottom: 1px solid var(--line);
+}
+.hero h1 {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: clamp(4.5rem, 18vw, 9.5rem); /* scales with screen width */
+  line-height: 0.85;
+  letter-spacing: -0.045em;
+  margin: 0 0 2rem -0.04em;
+}
+.hero p {
+  font-size: 1.3rem;
+  line-height: 1.5;
+  max-width: 34rem;
+  margin: 0 0 1.5rem;
+}
+.now {
+  display: inline-block;
+  background: var(--accent-soft);
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
+
+/* ============================================================
+   5. ABOUT  (block 3)
+   ============================================================ */
+.about p { margin: 0 0 1rem; max-width: 38rem; }
+
+/* ============================================================
+   6. EXPERIENCE  (block 4)
+   A vertical rail, since a career actually is a sequence.
+   ============================================================ */
+.timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 1.25rem;
+  border-left: 2px solid var(--line);
+}
+.timeline li { position: relative; padding-bottom: 1.75rem; }
+.timeline li:last-child { padding-bottom: 0; }
+.timeline li::before {           /* the dot on the rail */
+  content: "";
+  position: absolute;
+  left: calc(-1.25rem - 6px);
+  top: 0.45rem;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--paper);
+  border: 2px solid var(--accent);
+}
+.timeline p { margin: 0; }
+.org { color: var(--muted); margin: 0.1rem 0 0.35rem; }
+
+/* ============================================================
+   7. PROJECTS  (block 5)
+   Plain rows separated by rules, not boxed cards.
+   ============================================================ */
+.projects { list-style: none; margin: 0; padding: 0; }
+.projects li {
+  display: grid;
+  grid-template-columns: 1fr auto;  /* title left, links right */
+  gap: 0.25rem 1.5rem;
+  padding: 1.25rem 0;
+  border-top: 1px solid var(--line);
+}
+.projects li:first-child { border-top: 0; padding-top: 0; }
+.projects p {
+  grid-column: 1 / -1;
+  margin: 0.3rem 0 0;
+  max-width: 38rem;
+}
+.projects .links { font-size: 0.95rem; white-space: nowrap; }
+.stack {
+  grid-column: 1 / -1;
+  margin-top: 0.4rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+/* ============================================================
+   8. EDUCATION  (block 6)
+   ============================================================ */
+.edu { display: grid; gap: 1.25rem; }
+.edu p { margin: 0.1rem 0 0; color: var(--muted); }
+
+/* ============================================================
+   9. CONTACT  (block 7)
+   ============================================================ */
+.contact p { margin: 0 0 1.25rem; max-width: 34rem; }
+.contact ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+.contact ul a {
+  display: inline-block;
+  padding: 0.55rem 1rem;
+  border: 1.5px solid var(--ink);
+  border-radius: 999px;
+  color: var(--ink);
+  text-decoration: none;
+  font-weight: 500;
+}
+.contact ul a:hover { background: var(--ink); color: var(--paper); }
+
+/* ============================================================
+   10. FOOTER  (block 8)
+   ============================================================ */
+footer {
+  padding: 2rem 0 3rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+/* ============================================================
+   11. SMALL SCREENS
+   Everything above is mobile-safe already; these are tweaks.
+   ============================================================ */
+@media (max-width: 560px) {
+  nav ul { gap: 1.1rem; font-size: 0.9rem; }
+  .hero { padding-top: 2.5rem; }
+  .hero p { font-size: 1.15rem; }
+  .projects li { grid-template-columns: 1fr; }
+}
+
+/* ============================================================
+   12. SUBPAGE HEADER  (games.html, blog.html)
+   Smaller than the home hero so the home page stays the loudest.
+   ============================================================ */
+.page-head {
+  padding: 3rem 0 2.5rem;
+  border-bottom: 1px solid var(--line);
+}
+.page-head h1 {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: clamp(2.75rem, 9vw, 4.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.035em;
+  margin: 0 0 1rem -0.03em;
+}
+.page-head p {
+  font-size: 1.15rem;
+  max-width: 34rem;
+  margin: 0;
+}
+
+.note { color: var(--muted); margin: 0; }
+
+/* ============================================================
+   13. GAME LIST  (games.html)
+   Rows with a Play button, same rhythm as the project rows.
+   ============================================================ */
+.games { list-style: none; margin: 0; padding: 0; }
+.games li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.5rem 0;
+  border-top: 1px solid var(--line);
+}
+.games li:first-child { border-top: 0; padding-top: 0; }
+.games p { margin: 0.3rem 0 0; max-width: 32rem; }
+.games .stack { display: block; margin-top: 0.4rem; }
+
+.play {
+  flex: none;
+  padding: 0.6rem 1.4rem;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--paper);
+  font-weight: 600;
+  text-decoration: none;
+}
+.play:hover { background: var(--ink); }
+
+/* ============================================================
+   14. POST LIST  (blog.html)
+   ============================================================ */
+.posts { list-style: none; margin: 0; padding: 0; }
+.posts li {
+  padding: 1.5rem 0;
+  border-top: 1px solid var(--line);
+}
+.posts li:first-child { border-top: 0; padding-top: 0; }
+.posts h3 { margin: 0.2rem 0 0; font-size: 1.35rem; }
+.posts h3 a { color: var(--ink); text-decoration: none; }
+.posts h3 a:hover { color: var(--accent); }
+.posts p { margin: 0.4rem 0 0; max-width: 36rem; }
+
+.date {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* ============================================================
+   15. POST PAGE  (posts/*.html)
+   Longer line-height and tighter measure for reading.
+   ============================================================ */
+.post {
+  padding: 3rem 0 2rem;
+  max-width: 34rem;
+}
+.post h1 {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: clamp(2.25rem, 7vw, 3.25rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  margin: 0.5rem 0 2rem;
+}
+.post h2 {
+  font-size: 1.4rem;
+  margin: 2.5rem 0 0.75rem;
+}
+.post p { margin: 0 0 1.25rem; line-height: 1.7; }
+
+.post blockquote {
+  margin: 1.75rem 0;
+  padding-left: 1.25rem;
+  border-left: 3px solid var(--accent);
+  color: var(--muted);
+}
+.post blockquote p { margin: 0; }
+
+.post pre {
+  background: var(--accent-soft);
+  padding: 1rem 1.25rem;
+  border-radius: 8px;
+  overflow-x: auto;      /* long lines scroll inside the box */
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+.post code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+
+@media (max-width: 560px) {
+  .games li { flex-direction: column; align-items: flex-start; gap: 1rem; }
+}

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Games | Aram</title>
+<meta name="description" content="Small daily-puzzle style browser games built by Aram. Free to play, no sign up.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#128225;</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+<div class="wrap">
+
+<!-- NAV: same as index.html. Keep the three copies in sync. -->
+<nav aria-label="Main">
+  <a class="home" href="index.html">Aram</a>
+  <ul>
+    <li><a href="games.html" aria-current="page">Games</a></li>
+    <li><a href="blog.html">Blog</a></li>
+    <li><a href="index.html#experience">Experience</a></li>
+    <li><a href="index.html#projects">Projects</a></li>
+    <li><a href="index.html#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- PAGE HEADER -->
+<header class="page-head">
+  <h1>Games</h1>
+  <p>Small browser puzzles I build for fun. No sign up, no app, just open one and play.</p>
+</header>
+
+<main>
+<!-- ============================================================
+     GAME LIST
+     Each game is one <li>. To add one, copy this template:
+
+     <li>
+       <div>
+         <h3>Game name</h3>
+         <p>One line on how it plays and how long it takes.</p>
+         <span class="stack">Daily puzzle</span>
+       </div>
+       <a class="play" href="games/game-name/index.html">Play</a>
+     </li>
+
+     Put each game in its own folder: games/game-name/index.html
+     Then the link above just works, locally and once deployed.
+     ============================================================ -->
+<section aria-labelledby="games-h">
+  <h2 id="games-h">Play</h2>
+  <ul class="games">
+
+    <li>
+      <div>
+        <h3>[Game one]</h3>
+        <p>[One line on how it plays and how long a round takes.]</p>
+        <span class="stack">[Daily puzzle, word game, etc.]</span>
+      </div>
+      <a class="play" href="games/game-one/index.html">Play</a>
+    </li>
+
+    <li>
+      <div>
+        <h3>[Game two]</h3>
+        <p>[One line on how it plays and how long a round takes.]</p>
+        <span class="stack">[Type of game]</span>
+      </div>
+      <a class="play" href="games/game-two/index.html">Play</a>
+    </li>
+
+  </ul>
+</section>
+
+<!-- Delete this section once you have a few games up. -->
+<section aria-labelledby="soon-h">
+  <h2 id="soon-h">In progress</h2>
+  <p class="note">More on the way. If you have an idea for one, <a href="index.html#contact">send it over</a>.</p>
+</section>
+
+</main>
+
+<footer>
+  <p><a href="index.html">Back to home</a></p>
+</footer>
+
+</div>
+
+<!-- Hover scramble effect on the nav links -->
+<script src="scramble.js"></script>
+</body>
+</html>
