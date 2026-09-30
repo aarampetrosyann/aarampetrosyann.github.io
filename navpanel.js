@@ -115,6 +115,16 @@
       var inner2 = panel.querySelector(".navpanel-inner");
       setsEl.style.top = inner2.style.paddingTop;
       setsEl.style.left = (tabLeft - inner2.getBoundingClientRect().left) + "px";
+
+      // Size the labels so the choices start at the same x as the
+      // second tab, lining the On | Off column up under Blog.
+      var secondTab = nav.querySelectorAll("ul a")[1];
+      var row = setsEl.querySelector(".navset-row");
+      if (secondTab && row) {
+        var gap = parseFloat(getComputedStyle(row).columnGap) || 0;
+        var width = secondTab.getBoundingClientRect().left - tabLeft - gap;
+        setsEl.style.setProperty("--navset-label", width > 0 ? width + "px" : "auto");
+      }
     }
 
     function open(key) {

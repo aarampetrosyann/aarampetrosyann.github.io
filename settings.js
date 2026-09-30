@@ -19,7 +19,7 @@
   var DEFS = [
     { key: "theme",  label: "Theme",        options: [
       { value: "dark", label: "Dark" }, { value: "light", label: "Light" }] },
-    { key: "motion", label: "Hover effect", options: [
+    { key: "motion", label: "Hover",        options: [
       { value: "on", label: "On" }, { value: "off", label: "Off" }] }
   ];
   var DEFAULTS = { theme: "light", motion: "on" };

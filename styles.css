@@ -15,6 +15,15 @@
   --alert:       #D8293F;  /* the 404 number, cardinal red */
   --surface:     #C8C8C8;  /* nav hover panel, a neutral light gray */
 
+  /* Game tiles on games.html. Each game has a box color and a
+     text color picked for contrast on it. Same in both themes. */
+  --game-takuzu:      #93C572;  /* pistachio green */
+  --game-takuzu-ink:  #0D0D0D;
+  --game-kakuro:      #1E90FF;  /* dodger blue */
+  --game-kakuro-ink:  #0D0D0D;
+  --game-shikaku:     #C41E3A;  /* cardinal red */
+  --game-shikaku-ink: #0D0D0D;
+
   --display: "Bricolage Grotesque", "Helvetica Neue", Arial, sans-serif;
   --body:    "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
 
@@ -320,34 +329,6 @@ footer {
 .note { color: var(--muted); margin: 0; }
 
 /* ============================================================
-   13. GAME LIST  (games.html)
-   Rows with a Play button, same rhythm as the project rows.
-   ============================================================ */
-.games { list-style: none; margin: 0; padding: 0; }
-.games li {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1.5rem;
-  padding: 1.5rem 0;
-  border-top: 1px solid var(--line);
-}
-.games li:first-child { border-top: 0; padding-top: 0; }
-.games p { margin: 0.3rem 0 0; max-width: 32rem; }
-.games .stack { display: block; margin-top: 0.4rem; }
-
-.play {
-  flex: none;
-  padding: 0.6rem 1.4rem;
-  border-radius: 999px;
-  background: var(--accent);
-  color: var(--paper);
-  font-weight: 600;
-  text-decoration: none;
-}
-.play:hover { background: var(--ink); }
-
-/* ============================================================
    14. POST LIST  (blog.html)
    ============================================================ */
 .posts { list-style: none; margin: 0; padding: 0; }
@@ -406,10 +387,6 @@ footer {
   line-height: 1.5;
 }
 .post code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
-
-@media (max-width: 560px) {
-  .games li { flex-direction: column; align-items: flex-start; gap: 1rem; }
-}
 
 /* ============================================================
    16. 404 PAGE  (404.html)
@@ -590,7 +567,7 @@ nav {
 /* ============================================================
    19. SETTINGS INSIDE THE NAV PANEL
    Rows are placed by navpanel.js so the first one lines up
-   under the Games tab, with its choices to the right.
+   under the Games tab, with its choices lined up under Blog.
    ============================================================ */
 .navpanel-settings {
   position: absolute;
@@ -604,7 +581,7 @@ nav {
    rows showing on every tab instead of only under [...]. */
 .navpanel-settings[hidden] { display: none; }
 .navset-row { display: flex; align-items: baseline; gap: 1rem; }
-.navset-label { opacity: 0.7; }
+.navset-label { flex: 0 0 var(--navset-label, auto); opacity: 0.7; }
 .navset-opts { display: flex; align-items: baseline; gap: 0.4rem; }
 .navset-opts button {
   font: inherit;
