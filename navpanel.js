@@ -7,10 +7,19 @@
    EDIT DESCRIPTIONS HERE. Keys are matched against the tab's
    text, so they stay correct on every page without editing the
    nav markup six times. A tab with no entry gets no panel.
+
+   A tab can also list links in a column under the first tab.
+   Each link's path is relative to the site root; it's resolved
+   against the Games tab's href so it works from any page depth.
    ============================================================ */
 (function () {
   var COPY = {
-    "Games":      { title: "Games",     desc: "Browser puzzles I build for fun. Free to play, nothing to install." },
+    "Games":      { title: "Games",     desc: "Browser puzzles I build for fun. Free to play, nothing to install.",
+                    links: [
+                      { label: "Takuzu",  path: "games/takuzu/index.html" },
+                      { label: "Kakuro",  path: "games/kakuro/index.html" },
+                      { label: "Shikaku", path: "games/shikaku/index.html" }
+                    ] },
     "Blog":       { title: "Blog",      desc: "Notes on software, data, and whatever else has my attention." },
     "Experience": { title: "Experience", desc: "Internships, freelance client work, and teaching." },
     "Projects":   { title: "Projects",  desc: "Things I have built, from statistical models to FPGA hardware." },
@@ -44,6 +53,7 @@
         '<p class="navpanel-title"></p>' +
         '<p class="navpanel-desc"></p>' +
         '<div class="navpanel-settings" hidden></div>' +
+        '<ul class="navpanel-links" hidden></ul>' +
       '</div>';
     nav.parentNode.insertBefore(panel, nav.nextSibling);
 
@@ -88,6 +98,14 @@
       syncSets();
     }
 
+    // Link paths are relative to the site root. The Games tab's href
+    // is "games.html", "../games.html" or "/games.html" depending on
+    // the page, so whatever precedes "games.html" is the way back to
+    // the root from here.
+    var linksEl = panel.querySelector(".navpanel-links");
+    var gamesTab = nav.querySelector('ul a[href$="games.html"]');
+    var rootPrefix = gamesTab ? gamesTab.getAttribute("href").replace(/games\.html$/, "") : "";
+
     var titleEl = panel.querySelector(".navpanel-title");
     var descEl = panel.querySelector(".navpanel-desc");
     var timer = null;
@@ -115,6 +133,8 @@
       var inner2 = panel.querySelector(".navpanel-inner");
       setsEl.style.top = inner2.style.paddingTop;
       setsEl.style.left = (tabLeft - inner2.getBoundingClientRect().left) + "px";
+      linksEl.style.top = setsEl.style.top;
+      linksEl.style.left = setsEl.style.left;
 
       // Size the labels so the choices start at the same x as the
       // second tab, lining the On | Off column up under Blog.
@@ -136,6 +156,17 @@
       descEl.textContent = copy.desc;
       titleEl.textContent = copy.title;
       setsEl.hidden = key !== "[...]";
+      linksEl.innerHTML = "";
+      var items = copy.links || [];
+      for (var l = 0; l < items.length; l++) {
+        var li = document.createElement("li");
+        var a = document.createElement("a");
+        a.href = rootPrefix + items[l].path;
+        a.textContent = items[l].label;
+        li.appendChild(a);
+        linksEl.appendChild(li);
+      }
+      linksEl.hidden = !items.length;
       place();
 
       // Every tab opens to the same height, so the panel doesn't

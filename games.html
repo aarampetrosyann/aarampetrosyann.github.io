@@ -16,7 +16,8 @@
 
 <style>
 /* Game tiles: square boxes, each in its game's color, with the
-   game's icon in the center and its name in the bottom left.
+   game's icon in the top left and its name in the bottom left.
+   On hover an arrow appears in the bottom right.
    Colors are tokens in styles.css, icons live in icons/. */
 .games {
   list-style: none;
@@ -30,7 +31,9 @@
   position: relative;
   aspect-ratio: 1;
   display: flex;
-  align-items: flex-end;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
   padding: 1rem 1.1rem;
   border-radius: 4px;
   background: var(--tile);
@@ -40,20 +43,30 @@
   font-weight: 700;
   line-height: 1.1;
   text-decoration: none;
-  transition: transform 0.2s ease;
 }
-.games a:hover { transform: translateY(-3px); }
 .games img {
-  position: absolute;
-  top: 50%;
-  left: 50%;
   width: 45%;
   height: auto;
-  transform: translate(-50%, -50%);
+}
+/* Material Symbols "arrow_forward", inlined as SVG */
+.games .arrow {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  width: 1.75rem;
+  height: 1.75rem;
+  fill: currentColor;
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.games a:hover .arrow,
+.games a:focus-visible .arrow {
+  opacity: 1;
+  transform: translateX(0);
 }
 @media (prefers-reduced-motion: reduce) {
-  .games a { transition: none; }
-  .games a:hover { transform: none; }
+  .games .arrow { transition: none; transform: none; }
 }
 
 .games .takuzu  { --tile: var(--game-takuzu);  --tile-ink: var(--game-takuzu-ink); }
@@ -103,7 +116,9 @@
           .games .name { --tile: var(--game-name); --tile-ink: var(--game-name-ink); }
      3. Copy this template:
 
-     <li><a class="name" href="games/name/index.html"><img src="icons/name.png" alt="">Name</a></li>
+     <li><a class="name" href="games/name/index.html"><img src="icons/name.png" alt="">Name<svg class="arrow" viewBox="0 -960 960 960" aria-hidden="true"><path d="M647-440H160v-80h487L423-744l57-56 320 320-320 320-57-56 224-224Z"/></svg></a></li>
+
+     Also add the game to the Games list in navpanel.js (COPY).
 
      Put each game in its own folder: games/name/index.html
      and its icon (a square PNG) at icons/name.png
@@ -111,9 +126,9 @@
 <section aria-labelledby="games-h">
   <h2 id="games-h">Play</h2>
   <ul class="games">
-    <li><a class="takuzu" href="games/takuzu/index.html"><img src="icons/takuzu.png" alt="">Takuzu</a></li>
-    <li><a class="kakuro" href="games/kakuro/index.html"><img src="icons/kakuro.png" alt="">Kakuro</a></li>
-    <li><a class="shikaku" href="games/shikaku/index.html"><img src="icons/shikaku.png" alt="">Shikaku</a></li>
+    <li><a class="takuzu" href="games/takuzu/index.html"><img src="icons/takuzu.png" alt="">Takuzu<svg class="arrow" viewBox="0 -960 960 960" aria-hidden="true"><path d="M647-440H160v-80h487L423-744l57-56 320 320-320 320-57-56 224-224Z"/></svg></a></li>
+    <li><a class="kakuro" href="games/kakuro/index.html"><img src="icons/kakuro.png" alt="">Kakuro<svg class="arrow" viewBox="0 -960 960 960" aria-hidden="true"><path d="M647-440H160v-80h487L423-744l57-56 320 320-320 320-57-56 224-224Z"/></svg></a></li>
+    <li><a class="shikaku" href="games/shikaku/index.html"><img src="icons/shikaku.png" alt="">Shikaku<svg class="arrow" viewBox="0 -960 960 960" aria-hidden="true"><path d="M647-440H160v-80h487L423-744l57-56 320 320-320 320-57-56 224-224Z"/></svg></a></li>
   </ul>
 </section>
 

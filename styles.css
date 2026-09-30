@@ -534,6 +534,11 @@ nav {
   margin: 0 auto;
   /* padding-top is set by navpanel.js to clear the header */
   padding: 0 1.5rem 1.4rem;
+  /* One shared line height for everything in the panel, and no
+     gaps between rows, so each line of the description sits level
+     with the matching row in the columns beside it. */
+  font-size: 0.95rem;
+  line-height: 1.6;
   transform: translateY(-0.5rem);
   opacity: 0;
   transition: transform 0.52s cubic-bezier(0.22, 0.61, 0.25, 1), opacity 0.4s ease;
@@ -548,13 +553,12 @@ nav {
   font-weight: 700;
   font-size: 0.95rem;      /* same size as [AP] in the corner */
   color: var(--paper);     /* page background color, on the bright panel */
-  margin: 0 0 0.25rem;
+  margin: 0;
 }
 .navpanel-desc {
   margin: 0;
   color: var(--paper);
   opacity: 0.88;
-  font-size: 0.95rem;
   /* max-width is set by navpanel.js so the line stops short of the
      first tab. This value only applies before that runs. */
   max-width: 22rem;
@@ -572,9 +576,7 @@ nav {
 .navpanel-settings {
   position: absolute;
   display: grid;
-  gap: 0.4rem;
   color: var(--paper);
-  font-size: 0.95rem;
 }
 /* Needed because display: grid above overrides the browser's own
    rule for the hidden attribute, which is what kept the settings
@@ -599,6 +601,23 @@ nav {
 }
 .navset-sep { opacity: 0.35; }
 
+/* Link column under the first tab, e.g. the game list on Games.
+   Placed by navpanel.js the same way as the settings rows. */
+.navpanel-links {
+  position: absolute;
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.navpanel-links[hidden] { display: none; }
+.navpanel-links a {
+  color: var(--paper);
+  opacity: 0.7;
+  text-decoration: none;
+}
+.navpanel-links a:hover { opacity: 1; }
+
 /* ============================================================
    20. PAGE BLUR BEHIND THE PANEL
    Sits below the panel and the header, so both stay sharp.
@@ -617,7 +636,8 @@ nav {
 .navblur.on { opacity: 1; }
 
 @media (max-width: 560px) {
-  .navpanel-settings {
+  .navpanel-settings,
+  .navpanel-links {
     position: static;
     margin-top: 1rem;
   }
