@@ -12,7 +12,11 @@ games.html      list of games
 blog.html       list of posts
 404.html        not found page
 styles.css      all styling, shared by every page
-scramble.js     nav hover effect, shared by every page
+settings.js     theme and motion preferences, loaded in <head>
+scramble.js     hover text effects
+navpanel.js     the panel that slides down from the header
+marks.js        the + marks on the drafting grid
+files/          resume and any other downloads
 posts/          one file per blog post
 games/          one folder per game
 ```
@@ -22,7 +26,8 @@ games/          one folder per game
 Plain HTML and CSS with no build step. Open any file in an editor,
 or open `index.html` in a browser to see changes immediately.
 
-- Colors and fonts are the design tokens at the top of `styles.css`
+- Colors, fonts, and grid spacing are the design tokens at the top of `styles.css`
+- Nav panel wording lives in the `COPY` object at the top of `navpanel.js`
 - Each section of `index.html` is a labeled block with a template comment
 - New post: copy a file in `posts/`, then link it from `blog.html`
 - New game: add a folder under `games/`, then link it from `games.html`

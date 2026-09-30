@@ -14,9 +14,15 @@
 
 <!-- STYLES: all colors, fonts, and spacing live in this one file -->
 <link rel="stylesheet" href="styles.css">
+
+<!-- Applies saved theme before paint, then builds the settings panel -->
+<script src="settings.js"></script>
 </head>
 
 <body>
+
+<!-- The two vertical rules of the drafting grid -->
+<div class="page-rules" aria-hidden="true"></div>
 <div class="wrap">
 
 <!-- ============================================================
@@ -28,13 +34,14 @@
      change it here, change it there too.
      ============================================================ -->
 <nav aria-label="Main">
-  <a class="home" href="#">Aram</a>
+  <a class="home" href="#" data-hover-text="[Aram Petrosyan]">[AP]</a>
   <ul>
     <li><a href="games.html">Games</a></li>
     <li><a href="blog.html">Blog</a></li>
     <li><a href="#experience">Experience</a></li>
     <li><a href="#projects">Projects</a></li>
     <li><a href="#contact">Contact</a></li>
+    <li><a href="#" id="settings-btn" class="no-scramble" aria-haspopup="dialog" aria-expanded="false">[...]</a></li>
   </ul>
 </nav>
 
@@ -43,7 +50,7 @@
      Your name, one-line intro, and a status pill.
      ============================================================ -->
 <header class="hero">
-  <h1>Aram<br>[Petrosyan]</h1>
+  <h1>Aram<br>Petrosyan</h1>
   <p>I'm a UCLA Computer Science graduate who builds software across the stack, from web apps and automation tools to FPGA hardware.</p>
   <span class="now">Starting an M.S. in Data Science Engineering at UCLA, Fall 2026</span>
 </header>
@@ -218,7 +225,8 @@
 <!-- ============================================================
      BLOCK 7: CONTACT
      Each button is one <li>. Replace the placeholder links.
-     Resume: put resume.pdf next to index.html.
+     Resume: the PDF lives in files/. Update this path if
+     you rename the file.
      ============================================================ -->
 <section id="contact" class="contact" aria-labelledby="contact-h">
   <h2 id="contact-h">Contact</h2>
@@ -249,5 +257,7 @@
 
 <!-- Hover scramble effect on the nav links -->
 <script src="scramble.js"></script>
+<script src="navpanel.js"></script>
+<script src="marks.js"></script>
 </body>
 </html>
