@@ -285,12 +285,54 @@ body.nav-open nav ul [aria-current="page"] { color: var(--paper); }
 .contact ul a:hover { background: var(--ink); color: var(--paper); }
 
 /* ============================================================
-   10. FOOTER  (block 8)
+   10. FOOTER  (every page)
+   A full-width band below the content, in the same color as the
+   nav hover panel: dark gray in light mode, light gray in dark.
+   It sits outside .wrap so it can run edge to edge.
    ============================================================ */
-footer {
-  padding: 2rem 0 3rem;
-  color: var(--muted);
-  font-size: 0.9rem;
+.site-footer {
+  margin-top: 5rem;
+  background: var(--surface);
+  color: var(--paper);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+.footer-inner {
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: 3rem 1.5rem 2rem;
+}
+.footer-cols {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 2rem;
+}
+.footer-cols p { margin: 0; }
+.footer-cols ul { list-style: none; margin: 0; padding: 0; }
+.footer-name {
+  font-family: var(--display);
+  font-weight: 700;
+  text-decoration: none;
+}
+.footer-id p,
+.footer-h { opacity: 0.7; }
+.site-footer a { color: var(--paper); }
+.footer-cols ul a { text-decoration: none; opacity: 0.85; }
+.footer-cols ul a:hover { opacity: 1; text-decoration: underline; }
+.footer-copy {
+  margin: 2.5rem 0 0;
+  padding-top: 1.25rem;
+  border-top: 1px solid color-mix(in srgb, var(--paper) 20%, transparent);
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
+
+/* "Back to all posts" at the end of a post, above the footer */
+.back-link { margin: 3rem 0 0; font-size: 0.95rem; }
+
+@media (max-width: 560px) {
+  .footer-cols { grid-template-columns: 1fr 1fr; }
+  .footer-id { grid-column: 1 / -1; }
 }
 
 /* ============================================================
