@@ -10,20 +10,27 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
+
+<!-- Applies saved theme before paint, then builds the settings panel -->
+<script src="settings.js"></script>
 </head>
 
 <body>
+
+<!-- The two vertical rules of the drafting grid -->
+<div class="page-rules" aria-hidden="true"></div>
 <div class="wrap">
 
 <!-- NAV: same as index.html. Keep the three copies in sync. -->
 <nav aria-label="Main">
-  <a class="home" href="index.html">Aram</a>
+  <a class="home" href="index.html" data-hover-text="[Aram Petrosyan]">[AP]</a>
   <ul>
     <li><a href="games.html" aria-current="page">Games</a></li>
     <li><a href="blog.html">Blog</a></li>
     <li><a href="index.html#experience">Experience</a></li>
     <li><a href="index.html#projects">Projects</a></li>
     <li><a href="index.html#contact">Contact</a></li>
+    <li><a href="#" id="settings-btn" class="no-scramble" aria-haspopup="dialog" aria-expanded="false">[...]</a></li>
   </ul>
 </nav>
 
@@ -56,11 +63,11 @@
 
     <li>
       <div>
-        <h3>[Game one]</h3>
-        <p>[One line on how it plays and how long a round takes.]</p>
-        <span class="stack">[Daily puzzle, word game, etc.]</span>
+        <h3>Bitwise</h3>
+        <p>A binary logic puzzle. Fill the grid with 0s and 1s so no three match in a row and every line stays balanced. Three sizes, three difficulties, one answer per puzzle.</p>
+        <span class="stack">Logic puzzle</span>
       </div>
-      <a class="play" href="games/game-one/index.html">Play</a>
+      <a class="play" href="games/bitwise/index.html">Play</a>
     </li>
 
     <li>
@@ -91,5 +98,7 @@
 
 <!-- Hover scramble effect on the nav links -->
 <script src="scramble.js"></script>
+<script src="navpanel.js"></script>
+<script src="marks.js"></script>
 </body>
 </html>
