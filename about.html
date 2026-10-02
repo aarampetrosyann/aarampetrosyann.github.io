@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AP | About</title>
+<meta name="description" content="Aram Petrosyan's experience, projects, and education.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#128225;</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+
+<!-- Applies saved theme before paint, then builds the settings panel -->
+<script src="settings.js"></script>
+
+</head>
+
+<body>
+
+<!-- The two vertical rules of the drafting grid -->
+<div class="page-rules" aria-hidden="true"></div>
+<div class="wrap">
+
+<!-- NAV: same as index.html. Keep the three copies in sync. -->
+<nav aria-label="Main">
+  <a class="home" href="index.html" data-hover-text="[Aram Petrosyan]">[AP]</a>
+  <ul>
+    <li><a href="about.html" aria-current="page">About</a></li>
+    <li><a href="blog.html">Blog</a></li>
+    <li><a href="games.html">Games</a></li>
+    <li><a href="index.html#contact">Contact</a></li>
+    <li><a href="#" id="settings-btn" class="no-scramble" aria-haspopup="dialog" aria-expanded="false">[...]</a></li>
+  </ul>
+</nav>
+
+<!-- PAGE HEADER -->
+<header class="page-head">
+  <h1>About</h1>
+  <p>Where I've worked, what I've built, and where I've studied.</p>
+</header>
+
+<main>
+
+<!-- ============================================================
+     EXPERIENCE
+     Each job is one <li>. To add one, copy this template:
+
+     <li>
+       <h3>Job title</h3>
+       <p class="org">Company, 2026</p>
+       <p>One sentence on what you built and its impact.</p>
+     </li>
+
+     Newest first. Anything in [brackets] is yours to fill in.
+     ============================================================ -->
+<section id="experience" aria-labelledby="exp-h">
+  <h2 id="exp-h">Experience</h2>
+  <ol class="timeline">
+
+    <li>
+      <h3>Software Engineering Intern</h3>
+      <p class="org">ITJ Group</p>
+      <p>[One sentence on what you built and its impact.]</p>
+    </li>
+
+    <li>
+      <h3>Patent Office Action Automation</h3>
+      <p class="org">IP law firm, 3-person team</p>
+      <p>Building a Python and FastAPI tool that automates patent Office Action workflows using OCR, LLMs, and Microsoft Graph integration.</p>
+    </li>
+
+    <li>
+      <h3>Freelance Web Developer</h3>
+      <p class="org">Self-employed</p>
+      <p>Build and maintain live client sites for businesses in the jewelry and legal services industries.</p>
+    </li>
+
+    <li>
+      <h3>CAD Engineer</h3>
+      <p class="org">Nik Diamond Setting</p>
+      <p>[One sentence on the CAD work you did.]</p>
+    </li>
+
+    <li>
+      <h3>Student Instructor</h3>
+      <p class="org">Glendale Community College</p>
+      <p>[One sentence on what you taught.]</p>
+    </li>
+
+  </ol>
+</section>
+
+<!-- ============================================================
+     PROJECTS
+     Each project is one <li>. To add one, copy this template:
+
+     <li>
+       <h3>Project name</h3>
+       <span class="links"><a href="https://github.com/you/repo">Code</a></span>
+       <p>One or two sentences on what it does and what you built.</p>
+       <span class="stack">Python, React, whatever you used</span>
+     </li>
+
+     Delete the <span class="links"> line if there's nothing to link.
+     For two links: <a href="#">Code</a> &middot; <a href="#">Demo</a>
+     ============================================================ -->
+<section id="projects" aria-labelledby="proj-h">
+  <h2 id="proj-h">Projects</h2>
+  <ul class="projects">
+
+    <li>
+      <h3>World Cup Match Prediction Engine</h3>
+      <span class="links"><a href="#">Code</a></span>
+      <p>A Poisson-based model with Monte Carlo simulation, validated prospectively: it called 19 of 22 knockout-stage outcomes before the matches were played.</p>
+      <span class="stack">Python, statistical modeling</span>
+    </li>
+
+    <li>
+      <h3>FairShare</h3>
+      <span class="links"><a href="#">Code</a></span>
+      <p>A group expense-splitting app built by a 7-person Agile team.</p>
+      <span class="stack">React, Vite, Node, Express, MongoDB</span>
+    </li>
+
+    <li>
+      <h3>PhishGuard Extension</h3>
+      <span class="links"><a href="#">Code</a></span>
+      <p>A browser extension for spotting phishing attempts, built at the 2024 AI Berkeley Hackathon.</p>
+      <span class="stack">[Stack]</span>
+    </li>
+
+    <li>
+      <h3>Nova Search Engine</h3>
+      <span class="links"><a href="#">Code</a></span>
+      <p>[What it searches and what you built.]</p>
+      <span class="stack">[Stack]</span>
+    </li>
+
+    <li>
+      <h3>Neural Decoder Optimization</h3>
+      <span class="links"><a href="#">Code</a></span>
+      <p>[What you optimized and the result.]</p>
+      <span class="stack">[Stack]</span>
+    </li>
+
+    <li>
+      <h3>XR Binary Analysis</h3>
+      <span class="links"><a href="#">Code</a></span>
+      <p>[What it analyzes and why.]</p>
+      <span class="stack">[Stack]</span>
+    </li>
+
+    <li>
+      <h3>FPGA Craps Game</h3>
+      <span class="links"><a href="#">Code</a></span>
+      <p>A playable craps game implemented in hardware on an FPGA.</p>
+      <span class="stack">Verilog, FPGA</span>
+    </li>
+
+  </ul>
+</section>
+
+<!-- ============================================================
+     EDUCATION
+     Each degree is one <div> with an <h3> and a <p>.
+     ============================================================ -->
+<section id="education" aria-labelledby="edu-h">
+  <h2 id="edu-h">Education</h2>
+  <div class="edu">
+
+    <div>
+      <h3>M.S. Data Science Engineering</h3>
+      <p>UCLA, starting Fall 2026</p>
+    </div>
+
+    <div>
+      <h3>B.S. Computer Science</h3>
+      <p>UCLA</p>
+    </div>
+
+    <div>
+      <h3>A.S. Mathematics</h3>
+      <p>Glendale Community College</p>
+    </div>
+
+    <div>
+      <h3>A.S. Physics</h3>
+      <p>Glendale Community College</p>
+    </div>
+
+    <div>
+      <h3>A.S. Computer Science</h3>
+      <p>Glendale Community College</p>
+    </div>
+
+  </div>
+</section>
+
+</main>
+
+</div>
+
+<!-- FOOTER: same on every page. Keep the copies on every page in sync.
+     Links use this page's path back to the site root. -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-cols">
+      <div class="footer-id">
+        <a class="footer-name" href="index.html">Aram Petrosyan</a>
+        <p>Software Engineer</p>
+      </div>
+      <div>
+        <p class="footer-h">Site</p>
+        <ul>
+          <li><a href="about.html">About</a></li>
+          <li><a href="blog.html">Blog</a></li>
+          <li><a href="games.html">Games</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="footer-h">Contact</p>
+        <ul>
+          <li><a href="mailto:apetrosyan15@ucla.edu">Email</a></li>
+          <li><a href="https://github.com/aarampetrosyann">GitHub</a></li>
+          <li><a href="https://linkedin.com/in/a-petrosyan">LinkedIn</a></li>
+          <li><a href="files/aram-petrosyan-resume.pdf">Resume</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="footer-copy">&copy; <span class="yr">2026</span> Aram Petrosyan. All rights reserved.</p>
+  </div>
+</footer>
+
+<!-- Hover scramble effect on the nav links -->
+<script src="scramble.js"></script>
+<script src="navpanel.js"></script>
+<script src="marks.js"></script>
+<script src="footer.js"></script>
+</body>
+</html>

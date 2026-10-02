@@ -6,7 +6,7 @@
 
    EDIT DESCRIPTIONS HERE. Keys are matched against the tab's
    text, so they stay correct on every page without editing the
-   nav markup six times. A tab with no entry gets no panel.
+   nav markup on every page. A tab with no entry gets no panel.
 
    A tab can also list links in a column under the first tab.
    Each link's path is relative to the site root; it's resolved
@@ -21,8 +21,12 @@
                       { label: "Shikaku", path: "games/shikaku/index.html" }
                     ] },
     "Blog":       { title: "Blog",      desc: "Notes on software, data, and whatever else has my attention." },
-    "Experience": { title: "Experience", desc: "Internships, freelance client work, and teaching." },
-    "Projects":   { title: "Projects",  desc: "Things I have built, from statistical models to FPGA hardware." },
+    "About":      { title: "About",     desc: "Where I've worked, what I've built, and where I've studied.",
+                    links: [
+                      { label: "Experience", path: "about.html#experience" },
+                      { label: "Projects",   path: "about.html#projects" },
+                      { label: "Education",  path: "about.html#education" }
+                    ] },
     "Contact":    { title: "Contact",   desc: "Email, GitHub, LinkedIn, and my resume." },
     "[...]":      { title: "Settings",  desc: "Switch the theme, or turn the hover effect off." }
   };
@@ -30,6 +34,8 @@
   var CLOSE_DELAY = 120; // ms of grace before closing, so small
                          // pointer wobbles between tabs don't flicker
   var BODY_HEIGHT = 132; // px of panel below the header, same for every tab
+  var SWAP_FADE = 160;   // ms the old text takes to fade out when moving
+                         // between tabs, before the new text fades in
 
   // No hover means no way to trigger this, so don't build it at all.
   if (!window.matchMedia("(hover: hover)").matches) return;
@@ -129,7 +135,7 @@
       descEl.style.maxWidth = room > 160 ? room + "px" : "";
 
       // Settings rows start at the same x as the first tab, so the
-      // block sits directly under Games.
+      // block sits directly under the first tab (About).
       var inner2 = panel.querySelector(".navpanel-inner");
       setsEl.style.top = inner2.style.paddingTop;
       setsEl.style.left = (tabLeft - inner2.getBoundingClientRect().left) + "px";
@@ -147,10 +153,8 @@
       }
     }
 
-    function open(key) {
-      clearTimeout(timer);
-      if (current === key) return;
-      current = key;
+    // Puts a tab's title, description and columns into the panel.
+    function fill(key) {
       var copy = COPY[key];
       place();
       descEl.textContent = copy.desc;
@@ -168,6 +172,29 @@
       }
       linksEl.hidden = !items.length;
       place();
+    }
+
+    // Moving between tabs while the panel is already open fades the
+    // old text out, swaps it, and fades the new text in, instead of
+    // replacing it in one frame. The fade itself is CSS (.swapping).
+    var swapTimer = null;
+    function open(key) {
+      clearTimeout(timer);
+      if (current === key) return;
+      current = key;
+      var inner = panel.querySelector(".navpanel-inner");
+
+      clearTimeout(swapTimer);
+      if (panel.classList.contains("open")) {
+        inner.classList.add("swapping");
+        swapTimer = setTimeout(function () {
+          fill(key);
+          inner.classList.remove("swapping");
+        }, SWAP_FADE);
+      } else {
+        inner.classList.remove("swapping");
+        fill(key);
+      }
 
       // Every tab opens to the same height, so the panel doesn't
       // jump around as you move across the menu. BODY_HEIGHT is the
@@ -176,7 +203,6 @@
       // max-height only caps a box, it doesn't fill one, so a short
       // description used to give a shorter panel. Setting min-height
       // on the content is what actually makes every tab equal.
-      var inner = panel.querySelector(".navpanel-inner");
       var full = parseFloat(inner.style.paddingTop || 0) + BODY_HEIGHT;
       inner.style.minHeight = full + "px";
       panel.style.maxHeight = full + "px";
@@ -190,6 +216,8 @@
     function close() {
       clearTimeout(timer);
       timer = setTimeout(function () {
+        clearTimeout(swapTimer);
+        panel.querySelector(".navpanel-inner").classList.remove("swapping");
         current = null;
         panel.style.maxHeight = "0px";
         panel.classList.remove("open");
@@ -197,6 +225,17 @@
         document.body.classList.remove("nav-open");
         panel.setAttribute("aria-hidden", "true");
       }, CLOSE_DELAY);
+    }
+
+    // Losing focus only closes the panel when focus has really left
+    // both the tabs and the panel, and the pointer isn't over either.
+    // Clicking a setting inside the panel takes focus off the tab,
+    // which used to close the panel right under the pointer.
+    function closeOnFocusLoss(e) {
+      var to = e.relatedTarget;
+      if (to && (nav.contains(to) || panel.contains(to))) return;
+      if (nav.matches(":hover") || panel.matches(":hover")) return;
+      close();
     }
 
     var links = nav.querySelectorAll("ul a");
@@ -209,7 +248,7 @@
         }
         link.addEventListener("mouseenter", function () { open(key); });
         link.addEventListener("focus", function () { open(key); });
-        link.addEventListener("blur", close);
+        link.addEventListener("blur", closeOnFocusLoss);
       })(links[i]);
     }
 
@@ -218,6 +257,7 @@
     nav.addEventListener("mouseleave", close);
     panel.addEventListener("mouseenter", function () { clearTimeout(timer); });
     panel.addEventListener("mouseleave", close);
+    panel.addEventListener("focusout", closeOnFocusLoss);
 
     window.addEventListener("resize", place);
     place();

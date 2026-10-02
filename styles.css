@@ -327,9 +327,6 @@ body.nav-open nav ul [aria-current="page"] { color: var(--paper); }
   opacity: 0.7;
 }
 
-/* "Back to all posts" at the end of a post, above the footer */
-.back-link { margin: 3rem 0 0; font-size: 0.95rem; }
-
 @media (max-width: 560px) {
   .footer-cols { grid-template-columns: 1fr 1fr; }
   .footer-id { grid-column: 1 / -1; }
@@ -463,25 +460,6 @@ body.nav-open nav ul [aria-current="page"] { color: var(--paper); }
   max-width: 30rem;
   margin: 0 0 2rem;
 }
-.exits {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-}
-.exits a {
-  display: inline-block;
-  padding: 0.55rem 1rem;
-  border: 1.5px solid var(--ink);
-  border-radius: 999px;
-  color: var(--ink);
-  text-decoration: none;
-  font-weight: 500;
-}
-.exits a:hover { background: var(--ink); color: var(--paper); }
-
 /* ============================================================
    17. SETTINGS PANEL  (the [...] tab in the nav)
    ============================================================ */
@@ -590,6 +568,22 @@ nav {
   opacity: 1;
 }
 
+/* Crossfade when moving between tabs while the panel is open.
+   navpanel.js adds .swapping, waits for the fade out, swaps the
+   text, then removes it so the new text fades back in. */
+.navpanel-inner > * {
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+.navpanel-inner.swapping > * {
+  opacity: 0;
+  transform: translateY(-2px);
+  transition-duration: 0.16s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .navpanel-inner > * { transition: none; }
+  .navpanel-inner.swapping > * { transform: none; }
+}
+
 .navpanel-title {
   font-family: var(--display);
   font-weight: 700;
@@ -613,7 +607,7 @@ nav {
 /* ============================================================
    19. SETTINGS INSIDE THE NAV PANEL
    Rows are placed by navpanel.js so the first one lines up
-   under the Games tab, with its choices lined up under Blog.
+   under the first tab, with its choices lined up under Blog.
    ============================================================ */
 .navpanel-settings {
   position: absolute;
@@ -643,7 +637,8 @@ nav {
 }
 .navset-sep { opacity: 0.35; }
 
-/* Link column under the first tab, e.g. the game list on Games.
+/* Link column under the first tab, e.g. the game list on Games
+   or the section list on About.
    Placed by navpanel.js the same way as the settings rows. */
 .navpanel-links {
   position: absolute;
