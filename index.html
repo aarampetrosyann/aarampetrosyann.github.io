@@ -34,6 +34,9 @@
 .overview li:first-child { border-top: 0; padding-top: 0; }
 .overview h3 { font-size: 1.1rem; }
 .overview span { color: var(--muted); font-size: 0.95rem; }
+/* Education's school names are long, so they sit under the degree
+   instead of beside it, keeping both rows the same shape. */
+.overview.stacked li { flex-direction: column; }
 .more {
   display: inline-block;
   margin-top: 1.25rem;
@@ -117,9 +120,9 @@
 
 <section aria-labelledby="edu-h">
   <h2 id="edu-h">Education</h2>
-  <ul class="overview">
-    <li><h3>M.S. Data Science Engineering</h3><span>UCLA, starting Fall 2026</span></li>
-    <li><h3>B.S. Computer Science</h3><span>UCLA, 2024&ndash;2026</span></li>
+  <ul class="overview stacked">
+    <li><h3>M.S. Data Science Engineering</h3><span>University of California, Los Angeles (UCLA), starting Fall 2026</span></li>
+    <li><h3>B.S. Computer Science</h3><span>University of California, Los Angeles (UCLA), 2024&ndash;2026</span></li>
   </ul>
   <a class="more" href="about.html#education">All education &rarr;</a>
 </section>
