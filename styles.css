@@ -11,7 +11,7 @@
   --muted:       #9A9A9A;  /* secondary text: companies, stacks */
   --line:        #2C2C2C;  /* dividers and the timeline rail */
   --accent:      #1E90FF;  /* links and timeline dots, dodger blue */
-  --accent-soft: #10243C;  /* status pill and code block background */
+  --accent-soft: #10243C;  /* code block background */
   --alert:       #D8293F;  /* the 404 number, cardinal red */
   --surface:     #C8C8C8;  /* nav hover panel, a neutral light gray */
 
@@ -179,13 +179,6 @@ body.nav-open nav ul [aria-current="page"] { color: var(--paper); }
   line-height: 1.5;
   max-width: 34rem;
   margin: 0 0 1.5rem;
-}
-.now {
-  display: inline-block;
-  background: var(--accent-soft);
-  padding: 0.4rem 0.75rem;
-  border-radius: 6px;
-  font-size: 0.95rem;
 }
 
 /* ============================================================

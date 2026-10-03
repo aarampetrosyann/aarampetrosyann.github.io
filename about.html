@@ -16,6 +16,24 @@
 <!-- Applies saved theme before paint, then builds the settings panel -->
 <script src="settings.js"></script>
 
+<style>
+/* Education details: a small label column (GPA, Coursework, Honors)
+   beside the values, under each degree's school line. */
+.edu { gap: 2rem; }
+.edu-meta {
+  display: grid;
+  grid-template-columns: 6.5rem 1fr;
+  gap: 0.25rem 1rem;
+  margin: 0.6rem 0 0;
+  font-size: 0.95rem;
+}
+.edu-meta dt { color: var(--muted); }
+.edu-meta dd { margin: 0; }
+@media (max-width: 560px) {
+  .edu-meta { grid-template-columns: 1fr; gap: 0; }
+  .edu-meta dd { margin-bottom: 0.4rem; }
+}
+</style>
 </head>
 
 <body>
@@ -165,7 +183,9 @@
 
 <!-- ============================================================
      EDUCATION
-     Each degree is one <div> with an <h3> and a <p>.
+     Each degree is one <div>: an <h3>, a line with the school and
+     dates, then an optional <dl> of details. To add a detail, copy
+     one <dt>/<dd> pair. Leave out the <dl> if there's nothing to add.
      ============================================================ -->
 <section id="education" aria-labelledby="edu-h">
   <h2 id="edu-h">Education</h2>
@@ -173,26 +193,25 @@
 
     <div>
       <h3>M.S. Data Science Engineering</h3>
-      <p>University of California, Los Angeles (UCLA), starting Fall 2026</p>
+      <p>University of California, Los Angeles (UCLA), 2026&ndash;2028 (expected)</p>
+      <dl class="edu-meta">
+        <dt>GPA</dt><dd>4.00</dd>
+        <dt>Coursework</dt><dd>Machine Learning, Neural Networks, Automated Reasoning, Database Systems</dd>
+      </dl>
     </div>
 
     <div>
       <h3>B.S. Computer Science</h3>
       <p>University of California, Los Angeles (UCLA), 2024&ndash;2026</p>
+      <dl class="edu-meta">
+        <dt>GPA</dt><dd>3.86</dd>
+        <dt>Coursework</dt><dd>Data Structures, Computer Architecture, Operating Systems, Software Construction</dd>
+        <dt>Honors</dt><dd>Dean&rsquo;s Honors List</dd>
+      </dl>
     </div>
 
     <div>
-      <h3>A.S. Mathematics</h3>
-      <p>Glendale Community College, 2021&ndash;2024</p>
-    </div>
-
-    <div>
-      <h3>A.S. Physics</h3>
-      <p>Glendale Community College, 2021&ndash;2024</p>
-    </div>
-
-    <div>
-      <h3>A.S. Computer Science</h3>
+      <h3>A.S. Mathematics, Physics, and Computer Science</h3>
       <p>Glendale Community College, 2021&ndash;2024</p>
     </div>
 
