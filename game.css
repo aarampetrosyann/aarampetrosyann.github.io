@@ -1,0 +1,286 @@
+/* ============================================================
+   GAME.CSS
+   The start screen shared by every game page (games/<game>/index.html).
+   Only those pages load this file. Each card names its game with a
+   class, which picks that game's color tokens from styles.css; the
+   rest of this file only uses --game and --game-ink.
+
+   The card is a grid of squares: game.js sizes them and draws the
+   mosaic, and everything below is placed in whole squares.
+   ============================================================ */
+
+/* Per-game colors. To add a game, add its tokens to section 1 of
+   styles.css and one line here. */
+.game-card.takuzu  { --game: var(--game-takuzu);  --game-ink: var(--game-takuzu-ink); }
+.game-card.kakuro  { --game: var(--game-kakuro);  --game-ink: var(--game-kakuro-ink); }
+.game-card.shikaku { --game: var(--game-shikaku); --game-ink: var(--game-shikaku-ink); }
+
+.stage { padding: 6rem 0 0; }
+.back {
+  display: inline-block;
+  margin-bottom: 1.25rem;
+  font-size: 0.95rem;
+  color: var(--muted);
+  text-decoration: none;
+}
+.back:hover { color: var(--ink); }
+
+.band { position: relative; padding: 1px 0; }
+.band::before,
+.band::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100vw;
+  height: 1px;
+  background: var(--line);
+}
+.band::before { top: 0; }
+.band::after  { bottom: 0; }
+.band .xmark.top {
+  top: 0;
+  bottom: auto;
+  transform: translate(calc(-50% + 0.5px), calc(-50% + 0.5px));
+}
+
+/* The card is a grid of the same squares as the mosaic. The script
+   sets --cell (square size), --cols (always even, so centered items
+   spanning an even number of squares land on square edges) and
+   --rows. Everything inside is placed in whole squares. */
+.game-card {
+  --cell: 58px;
+  --u: 58px;                        /* one mosaic square */
+  --cols: 14;
+  --rows: 10;
+  --inset: 6px;                     /* gap between a button and its squares */
+  position: relative;
+  isolation: isolate;
+  margin-left: calc(50% - var(--edge) + 1px);
+  width: calc(2 * var(--edge) - 1px);
+  display: grid;
+  grid-template-columns: repeat(var(--cols), var(--cell));
+  grid-template-rows: repeat(var(--rows), var(--cell));
+  background: var(--game);
+  color: var(--game-ink);
+  text-align: center;
+}
+.game-card > * { grid-column: 1 / -1; justify-self: center; align-self: center; margin: 0; }
+.game-card :focus-visible { outline-color: var(--game-ink); }
+.mosaic {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+}
+
+/* Logo: exactly one big square (2 x 2 small ones). */
+.logo {
+  grid-row: 3 / span 2;
+  width: calc(var(--cell) * 2);
+  height: calc(var(--cell) * 2);
+}
+/* Title and description share one row of big squares, at the same
+   width as the sliders so the text lines up with them. */
+.intro {
+  grid-row: 5 / span 2;
+  width: calc(var(--cell) * 6);
+  padding: 0 var(--inset);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.intro h1 {
+  margin: 0 0 0.35rem;
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: calc(var(--cell) * 0.7);
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+.intro p { margin: 0; font-size: 0.95rem; line-height: 1.5; }
+
+/* Legends stay for screen readers; the choices explain themselves. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.game-card form { display: contents; }
+.options { border: 0; padding: 0; margin: 0; grid-column: 1 / -1; justify-self: center; }
+.options.size  { grid-row: 7; }
+.options.level { grid-row: 8; }
+/* Each option row is a slider: a dark track (a deep shade of the
+   game's color) covering 6 squares, inset slightly, split into
+   three equal choices, with a white thumb that slides behind
+   whichever one is picked. */
+.choices {
+  --track-border: 2.5px;
+  --thumb-gap: 3px;
+  position: relative;
+  display: flex;
+  width: calc(var(--cell) * 6 - var(--inset) * 2);
+  height: calc(var(--cell) - var(--inset) * 2);
+  margin: var(--inset);
+  /* A dark shade of the game's color: 60% of the way to its ink.
+     Play stays solid ink so it remains the strongest element. */
+  --track: color-mix(in srgb, var(--game), var(--game-ink) 60%);
+  border: var(--track-border) solid var(--track);
+  border-radius: 6px;
+  background: var(--track);
+  color: var(--game-button-ink);
+}
+.choices input { position: absolute; opacity: 0; pointer-events: none; }
+.choices::before {               /* the thumb */
+  content: "";
+  position: absolute;
+  top: var(--thumb-gap);
+  bottom: var(--thumb-gap);
+  left: var(--thumb-gap);
+  width: calc((100% - var(--thumb-gap) * 2) / 3);
+  border-radius: 3px;
+  background: var(--game-button-ink);
+  transition: transform 0.28s cubic-bezier(0.32, 0.12, 0.2, 1);
+}
+.choices:has(input:nth-of-type(2):checked)::before { transform: translateX(100%); }
+.choices:has(input:nth-of-type(3):checked)::before { transform: translateX(200%); }
+.choices label {
+  position: relative;            /* above the thumb */
+  flex: 1;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  font-weight: 500;
+  opacity: 0.7;
+  transition: opacity 0.28s ease, color 0.28s ease;
+}
+.choices label:hover { opacity: 1; }
+.choices input:checked + label { opacity: 1; font-weight: 600; color: var(--game-ink); }
+.choices:has(input:focus-visible) { outline: 2px solid var(--game-ink); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) {
+  .choices::before, .choices label { transition: none; }
+}
+
+/* Play covers 2 squares. */
+.play {
+  grid-row: 9;
+  grid-column: 1 / -1;
+  justify-self: center;
+  align-self: center;
+  width: calc(var(--cell) * 2 - var(--inset) * 2);
+  height: calc(var(--cell) - var(--inset) * 2);
+  border: 0;
+  border-radius: 4px;
+  background: var(--game-ink);
+  color: var(--game-button-ink);
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 1.15rem;
+  cursor: pointer;
+}
+.play:hover { opacity: 0.88; }
+
+/* Square icon buttons: one square each, inset like the others.
+   The help icon sits in row 2, column 2; the window's close icon
+   lands on the same square, so one spot opens and closes it. */
+.icon-btn {
+  width: calc(var(--cell) - var(--inset) * 2);
+  height: calc(var(--cell) - var(--inset) * 2);
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: var(--game-ink);
+  cursor: pointer;
+}
+.icon-btn:hover { opacity: 0.7; }
+/* Material Symbols "help" and "close" from Google Fonts at weight
+   700. A whole-pixel size keeps the glyph edges sharp. */
+.icon-btn .material-symbols-outlined {
+  font-family: "Material Symbols Outlined";
+  font-size: 34px;
+  line-height: 1;
+  font-weight: normal;
+  font-style: normal;
+  letter-spacing: normal;
+  text-transform: none;
+  white-space: nowrap;
+  font-variation-settings: "wght" 700, "opsz" 24;
+  -webkit-font-smoothing: antialiased;
+}
+.game-card > .help-btn {
+  grid-row: 2;
+  grid-column: 2;
+  justify-self: center;
+}
+/* With big squares, the help icon sits in big square (2, 2). */
+.game-card.big > .help-btn {
+  grid-row: 3 / span 2;
+  grid-column: 3 / span 2;
+}
+
+/* How to play window: covers every square but the outer ring.
+   --u is one mosaic square: one small square, or one big one. */
+.game-card.big > .help { grid-row: 3 / -3; grid-column: 3 / -3; }
+.game-card > .help {
+  grid-row: 2 / -2;
+  grid-column: 2 / -2;
+  justify-self: stretch;
+  align-self: stretch;
+  z-index: 1;
+  position: relative;
+  overflow: auto;
+  padding: var(--u) calc(var(--u) * 0.5) calc(var(--u) * 0.2);
+  isolation: isolate;               /* keeps the build canvas under the text */
+  background: var(--game-button-ink);
+  color: var(--game-ink);
+  text-align: left;
+}
+.game-card > .help[hidden] { display: none; }
+
+/* Opening: squares in five shades of white pop in, then settle to
+   solid white (drawn on .build by the script), and the content fades
+   in. While that runs the window itself is see-through. */
+.help .build {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.help.building { background: transparent; }
+.help > :not(.build) { transition: opacity 0.25s ease; }
+.help.building > :not(.build) { opacity: 0; }
+
+/* The close icon is centered in the window's first square, so it
+   lands on the same spot as the help icon. */
+.help .close {
+  position: absolute;
+  top: calc((var(--u) - var(--cell)) / 2 + var(--inset));
+  left: calc((var(--u) - var(--cell)) / 2 + var(--inset));
+}
+.help h2 {
+  position: absolute;
+  top: 0;
+  left: var(--u);
+  right: var(--u);
+  height: var(--u);
+  display: grid;
+  place-items: center;
+  margin: 0;
+  font-size: 1.35rem;
+}
+.help ol { margin: 0; padding-left: 1.5rem; max-width: 32rem; }
+.help li { margin-bottom: 0.5rem; }
+.help li::marker { font-family: var(--display); font-weight: 700; }
+
+@media (max-width: 52rem) {
+  .game-card { margin-left: calc(50% - 50vw); width: 100vw; }
+}

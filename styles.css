@@ -23,6 +23,7 @@
   --game-kakuro-ink:  #0D0D0D;
   --game-shikaku:     #C41E3A;  /* cardinal red */
   --game-shikaku-ink: #0D0D0D;
+  --game-button-ink:  #FFFFFF;  /* text on the dark game buttons and sliders */
 
   --display: "Bricolage Grotesque", "Helvetica Neue", Arial, sans-serif;
   --body:    "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;

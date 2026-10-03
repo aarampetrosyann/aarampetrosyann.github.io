@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AP | Shikaku</title>
+<meta name="description" content="Shikaku, a grid-splitting puzzle. Divide the grid into rectangles that match their numbers. Free to play in your browser.">
+<link rel="icon" href="../../icons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../../icons/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="../../icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<!-- Google's Material Symbols at bold weight, only the two icons used -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,700,0,0&icon_names=close,help&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="../../game.css">
+
+<!-- Applies saved theme before paint, then builds the settings panel -->
+<script src="../../settings.js"></script>
+
+</head>
+
+<body>
+
+<!-- The two vertical rules of the drafting grid -->
+<div class="page-rules" aria-hidden="true"></div>
+<div class="wrap">
+
+<!-- NAV: same on every page. Keep the copies in sync. -->
+<nav aria-label="Main">
+  <a class="home" href="../../index.html" data-hover-text="[Aram Petrosyan]">[AP]</a>
+  <ul>
+    <li><a href="../../about.html">About</a></li>
+    <li><a href="../../blog.html">Blog</a></li>
+    <li><a href="../../games.html" aria-current="page">Games</a></li>
+    <li><a href="../../index.html#contact">Contact</a></li>
+    <li><a href="#" id="settings-btn" class="no-scramble" aria-haspopup="dialog" aria-expanded="false">[...]</a></li>
+  </ul>
+</nav>
+
+<!-- ============================================================
+     START SCREEN
+     The game's card: icon, name, options, Play, and How to play.
+     Shared layout and behavior live in game.css and game.js; this
+     page only holds what's specific to the game.
+     ============================================================ -->
+<main class="stage">
+  <a class="back" href="../../games.html">&larr; All games</a>
+
+  <div class="band">
+  <span class="xmark left top" aria-hidden="true"></span>
+  <span class="xmark right top" aria-hidden="true"></span>
+  <div class="game-card shikaku">
+    <canvas class="mosaic" aria-hidden="true"></canvas>
+    <img class="logo" src="../../icons/shikaku.png" alt="">
+    <div class="intro">
+      <h1>Shikaku</h1>
+      <p>A grid-splitting puzzle. Divide the grid into rectangles that match the numbers inside them.</p>
+    </div>
+
+    <form id="setup">
+      <fieldset class="options size">
+        <legend class="sr-only">Grid size</legend>
+        <div class="choices">
+          <input type="radio" name="size" id="size-5" value="5" checked><label for="size-5">5&times;5</label>
+          <input type="radio" name="size" id="size-7" value="7"><label for="size-7">7&times;7</label>
+          <input type="radio" name="size" id="size-10" value="10"><label for="size-10">10&times;10</label>
+        </div>
+      </fieldset>
+      <fieldset class="options level">
+        <legend class="sr-only">Difficulty</legend>
+        <div class="choices">
+          <input type="radio" name="level" id="level-easy" value="Easy" checked><label for="level-easy">Easy</label>
+          <input type="radio" name="level" id="level-medium" value="Medium"><label for="level-medium">Medium</label>
+          <input type="radio" name="level" id="level-hard" value="Hard"><label for="level-hard">Hard</label>
+        </div>
+      </fieldset>
+      <button class="play" type="submit">Play</button>
+    </form>
+
+    <button class="icon-btn help-btn" type="button" aria-label="How to play" aria-expanded="false" aria-controls="help"><span class="material-symbols-outlined" aria-hidden="true">help</span></button>
+
+    <div class="help" id="help" role="dialog" aria-labelledby="help-h" hidden>
+      <canvas class="build" aria-hidden="true"></canvas>
+      <button class="icon-btn close" type="button" aria-label="Close"><span class="material-symbols-outlined" aria-hidden="true">close</span></button>
+      <h2 id="help-h">How to play</h2>
+      <ol>
+        <li>Divide the whole grid into rectangles. Squares count as rectangles too.</li>
+        <li>Every rectangle contains exactly one number.</li>
+        <li>That number is the rectangle’s area: how many cells it covers.</li>
+      </ol>
+    </div>
+  </div>
+  <span class="xmark left" aria-hidden="true"></span>
+  <span class="xmark right" aria-hidden="true"></span>
+  </div>
+</main>
+
+</div>
+
+<!-- FOOTER: same on every page. Keep the copies on every page in sync.
+     Links use this page's path back to the site root. -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-cols">
+      <div class="footer-id">
+        <a class="footer-name" href="../../index.html">Aram Petrosyan</a>
+        <p>Software Engineer</p>
+        <span class="footer-logo" aria-hidden="true"></span>
+      </div>
+      <div>
+        <p class="footer-h">Site</p>
+        <ul>
+          <li><a href="../../index.html">Home</a></li>
+          <li><a href="../../about.html">About</a></li>
+          <li><a href="../../blog.html">Blog</a></li>
+          <li><a href="../../games.html">Games</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="footer-h">Contact</p>
+        <ul>
+          <li><a href="mailto:apetrosyan15@ucla.edu">Email</a></li>
+          <li><a href="https://github.com/aarampetrosyann">GitHub</a></li>
+          <li><a href="https://linkedin.com/in/a-petrosyan">LinkedIn</a></li>
+          <li><a href="../../files/aram-petrosyan-resume.pdf">Resume</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="footer-copy">&copy; <span class="yr">2026</span> Aram Petrosyan. All rights reserved.</p>
+  </div>
+</footer>
+
+
+<!-- Start screen: grid, mosaic, How to play -->
+<script src="../../game.js"></script>
+
+<!-- Hover scramble effect on the nav links -->
+<script src="../../scramble.js"></script>
+<script src="../../navpanel.js"></script>
+<script src="../../marks.js"></script>
+<script src="../../footer.js"></script>
+</body>
+</html>
