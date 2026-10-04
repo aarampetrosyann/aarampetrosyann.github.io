@@ -179,30 +179,15 @@ var Takuzu = (function () {
 })();
 
 /* ---------- The board ----------
-   Squares are the card's small grid squares (--cell), so the board
-   lines up with the mosaic grid; on narrow screens they shrink to
-   fit the width. Click or tap cycles a square: empty, 0, 1, empty.
-   Arrow keys move, 0 and 1 fill, Backspace or Delete clears. */
+   The frame around it (header, timer, settings, Solved window)
+   comes from board.js; this draws the squares and plays Takuzu.
+   Click or tap cycles a square: empty, 0, 1, empty. Arrow keys
+   move, 0 and 1 fill, Backspace or Delete clears. */
 (function () {
   var S = window.GameScreen;
-  if (!S) return;
+  if (!S || !window.Board) return;
   var card = S.card, E = Takuzu.EMPTY;
-  var game = null;   // the puzzle in play, its state and its elements
-
-  // Show mistakes is remembered between visits (on unless turned off).
-  var showMistakes = true;
-  try { showMistakes = localStorage.getItem("takuzu-show-mistakes") !== "0"; } catch (err) {}
-
-  // A click anywhere outside the gear or the menu closes the menu.
-  document.addEventListener("click", function (e) {
-    if (game && !e.target.closest(".tz-settings, .tz-menu")) setMenu(false);
-  });
-
-  var STAR = '<svg viewBox="0 -960 960 960"><path d="M480-259.91 313.28-159.43q-12.67 7.95-26.35 6.83-13.67-1.12-23.86-9.07-10.2-7.96-15.8-20.01-5.6-12.06-2.12-26.73l44.24-189.72-147.72-127.72q-11.43-10.19-14.29-23.25-2.86-13.05 1.38-25.49 4.24-12.43 13.79-20.63 9.56-8.19 25.23-10.19l194.72-17 75.48-178.96q5.72-13.91 17.53-20.63 11.82-6.72 24.49-6.72 12.67 0 24.49 6.72 11.81 6.72 17.53 20.63l75.48 178.96 194.72 17q15.67 2 25.23 10.19 9.55 8.2 13.79 20.63 4.24 12.44 1.38 25.49-2.86 13.06-14.29 23.25L670.61-398.13l44.24 189.72q3.48 14.67-2.12 26.73-5.6 12.05-15.8 20.01-10.19 7.95-23.86 9.07-13.68 1.12-26.35-6.83L480-259.91Z"/></svg>';
-
-  function icon(name) {
-    return '<span class="material-symbols-outlined" aria-hidden="true">' + name + "</span>";
-  }
+  var game = null;   // the puzzle in play: state, squares, and its frame
 
   function label(i) {
     var n = game.n, r = Math.floor(i / n) + 1, c = (i % n) + 1, v = game.cur[i];
@@ -213,27 +198,18 @@ var Takuzu = (function () {
       (mark ? ", " + mark : "");
   }
 
-  function fit() {
-    if (!game) return;
-    var cell = parseFloat(card.style.getPropertyValue("--cell"));
-    var size = Math.min(cell, card.clientWidth / game.n);
-    game.els.board.style.setProperty("--tz", size + "px");
-    // Frame and gutters scale with the squares, like the icon's.
-    game.els.board.style.setProperty("--tz-gap", Math.max(3, Math.round(size * 0.08)) + "px");
-  }
-
   function paint() {
     var bad = Takuzu.errors(game.cur, game.n, game.lines);
-    game.els.cells.forEach(function (b, i) {
+    game.cells.forEach(function (b, i) {
       var v = game.cur[i], mark = game.check && game.check.get(i);
       b.textContent = v === E ? "" : v;
-      b.classList.toggle("error", showMistakes && bad.has(i) && editable(i));
+      b.classList.toggle("error", game.shell.showMistakes && bad.has(i) && editable(i));
       b.classList.toggle("hint", game.hints.has(i));
       b.classList.toggle("right", mark === "correct");
       b.classList.toggle("wrong", mark === "wrong");
       b.setAttribute("aria-label", label(i));
     });
-    if (!game.done && game.cur.indexOf(E) < 0 && bad.size === 0) solved();
+    if (!game.shell.done && game.cur.indexOf(E) < 0 && bad.size === 0) game.shell.finish();
   }
 
   // Squares the player can change: not given, not revealed by a hint.
@@ -242,100 +218,97 @@ var Takuzu = (function () {
   }
 
   function setCell(i, v) {
-    if (game.done || game.paused || !editable(i)) return;
+    if (game.shell.done || game.shell.paused || !editable(i)) return;
     game.cur[i] = v;
     if (game.check) game.check.delete(i);   // a changed square loses its check mark
     paint();
   }
 
   function focusCell(i) {
-    game.els.cells.forEach(function (b, k) { b.tabIndex = k === i ? 0 : -1; });
-    game.els.cells[i].focus();
+    game.cells.forEach(function (b, k) { b.tabIndex = k === i ? 0 : -1; });
+    game.cells[i].focus();
   }
 
-  function newGame(n, level, board) {
+  // Answers for every empty or wrong square the player can change.
+  function missing() {
+    return game.cur.map(function (v, i) { return i; }).filter(function (i) {
+      return editable(i) && game.cur[i] !== game.solution[i];
+    });
+  }
+
+  function newGame(n, level, container) {
     end();
     var made = Takuzu.make(n, level);
     game = {
       n: n, level: level, lines: made.lines,
       puzzle: made.puzzle, cur: made.puzzle.slice(), solution: made.solution,
-      hints: new Set(), check: null,
-      // Timer: `base` ms already counted, plus time since `since`
-      // while running (since is null while paused or solved).
-      base: 0, since: Date.now(), paused: false, done: false, els: {}
+      hints: new Set(), check: null, cells: []
     };
+    game.shell = Board.create({
+      name: "Takuzu", n: n, level: level, container: container,
+      storageKey: "takuzu-show-mistakes",
+      onNew: function () { newGame(n, level, container); },
+      onMistakes: paint,
 
-    var wrap = document.createElement("div");
-    wrap.className = "tz";
-    wrap.innerHTML =
-      '<button class="icon-btn tz-exit" type="button" aria-label="Back to options">' + icon("arrow_back") + "</button>" +
-      '<button class="icon-btn tz-again" type="button" aria-label="New puzzle" title="New puzzle" hidden>' + icon("extension") + "</button>" +
-      '<button class="icon-btn tz-settings" type="button" aria-label="Settings" aria-expanded="false" aria-controls="tz-menu">' + icon("settings") + "</button>" +
-      '<div class="tz-menu" id="tz-menu" role="menu" aria-label="Settings">' +
-        '<button type="button" role="menuitem" class="tz-check" aria-label="Check board" title="Check board">' + icon("check") + "</button>" +
-        '<button type="button" role="menuitem" class="tz-reset" aria-label="Reset board" title="Reset board">' + icon("restart_alt") + "</button>" +
-        '<button type="button" role="menuitem" class="tz-hint" aria-label="Hint" title="Hint">' + icon("lightbulb") + "</button>" +
-        '<button type="button" role="menuitem" class="tz-solve" aria-label="Solve puzzle" title="Solve puzzle">' + icon("auto_fix_high") + "</button>" +
-        '<button type="button" role="menuitemcheckbox" class="tz-mistakes" aria-label="Show mistakes" title="Show mistakes" aria-checked="true">' + icon("visibility") + "</button>" +
-      "</div>" +
-      '<div class="tz-board">' +
-        // Header row right above the board: size, name, pause and time.
-        '<div class="tz-head">' +
-          '<p class="tz-size">' + n + "\u00d7" + n + " \u00b7 " + level + "</p>" +
-          '<p class="tz-name">Takuzu</p>' +
-          '<div class="tz-clock">' +
-            '<button class="tz-pause" type="button" aria-label="Pause" aria-pressed="false">' + icon("pause") + "</button>" +
-            '<p class="tz-timer" role="timer" aria-label="Time">0:00</p>' +
-          "</div>" +
-        "</div>" +
-        '<div class="tz-grid" role="group" aria-label="Takuzu, ' + n + " by " + n + ", " + level + '"></div>' +
-      "</div>" +
-      '<div class="tz-win" role="dialog" aria-labelledby="tz-win-h" hidden>' +
-        '<canvas class="build" aria-hidden="true"></canvas>' +
-        // Material Symbols Rounded "star", filled, weight 500, as SVG.
-        '<div class="tz-stars" aria-hidden="true">' + STAR + STAR + STAR + "</div>" +
-        '<h2 id="tz-win-h">Solved</h2>' +
-        '<p class="tz-time"></p>' +
-        '<div class="tz-actions">' +
-          '<button class="tz-new" type="button">New puzzle</button>' +
-          '<button class="tz-back" type="button">Back to puzzle</button>' +
-          '<button class="tz-options" type="button">Change options</button>' +
-        "</div>" +
-      "</div>";
-    board.appendChild(wrap);
+      // Check: entries turn blue if right, red if wrong, until changed.
+      onCheck: function () {
+        game.check = new Map();
+        game.cur.forEach(function (v, i) {
+          if (editable(i) && v !== E) game.check.set(i, v === game.solution[i] ? "correct" : "wrong");
+        });
+        paint();
+      },
+      // Reset: starting numbers only, no hints or marks, clock at zero.
+      onReset: function () {
+        game.cur = game.puzzle.slice();
+        game.hints.clear();
+        game.check = null;
+        game.shell.resetClock();
+        paint();
+      },
+      // Hint: one random empty or wrong square gets its answer, fixed.
+      onHint: function () {
+        var options = missing();
+        if (!options.length) return;
+        var i = options[Math.floor(Math.random() * options.length)];
+        game.cur[i] = game.solution[i];
+        game.hints.add(i);
+        if (game.check) game.check.delete(i);
+        paint();
+        focusCell(i);
+      },
+      // Solve: every empty or wrong square gets its answer, like hints.
+      onSolve: function () {
+        missing().forEach(function (i) {
+          game.cur[i] = game.solution[i];
+          game.hints.add(i);
+        });
+        game.check = null;
+        paint();
+      }
+    });
 
-    var grid = wrap.querySelector(".tz-grid");
-    wrap.querySelector(".tz-board").style.setProperty("--tz-n", n);
-    var cells = [];
+    var grid = game.shell.grid;
     for (var i = 0; i < n * n; i++) {
       var b = document.createElement("button");
       b.type = "button";
-      b.className = "tz-cell" + (game.puzzle[i] !== E ? " given" : "");
+      b.className = "gb-cell" + (game.puzzle[i] !== E ? " given" : "");
       b.dataset.i = i;
       b.tabIndex = -1;
       grid.appendChild(b);
-      cells.push(b);
+      game.cells.push(b);
     }
-    game.els = {
-      wrap: wrap, board: wrap.querySelector(".tz-board"), grid: grid, cells: cells,
-      win: wrap.querySelector(".tz-win"), timer: wrap.querySelector(".tz-timer"),
-      pause: wrap.querySelector(".tz-pause"),
-      settings: wrap.querySelector(".tz-settings"), menu: wrap.querySelector(".tz-menu"),
-      mistakes: wrap.querySelector(".tz-mistakes")
-    };
-    showMistakesButton();
-    game.tick = setInterval(tick, 1000);
 
     grid.addEventListener("click", function (e) {
-      if (game.done) { if (game.els.win.hidden) openWin(false); return; }
-      var b = e.target.closest(".tz-cell");
+      if (game.shell.done) return;
+      var b = e.target.closest(".gb-cell");
       if (!b) return;
       var i = Number(b.dataset.i), v = game.cur[i];
       focusCell(i);
       setCell(i, v === E ? 0 : v === 0 ? 1 : E);
     });
     grid.addEventListener("keydown", function (e) {
-      var b = e.target.closest(".tz-cell");
+      var b = e.target.closest(".gb-cell");
       if (!b) return;
       var i = Number(b.dataset.i), r = Math.floor(i / n), c = i % n;
       var moves = { ArrowUp: [-1, 0], ArrowDown: [1, 0], ArrowLeft: [0, -1], ArrowRight: [0, 1] };
@@ -351,191 +324,15 @@ var Takuzu = (function () {
         setCell(i, E);
       }
     });
-    wrap.querySelector(".tz-exit").addEventListener("click", S.exit);
-    // Settings menu: a pill that slides down under the gear.
-    game.els.settings.addEventListener("click", function () {
-      setMenu(!game.els.menu.classList.contains("open"));
-    });
-    game.els.menu.addEventListener("keydown", function (e) {
-      if (e.key === "Escape") { setMenu(false); game.els.settings.focus(); }
-    });
-    wrap.querySelector(".tz-check").addEventListener("click", function () { checkBoard(); setMenu(false); });
-    wrap.querySelector(".tz-reset").addEventListener("click", function () { resetBoard(); setMenu(false); });
-    wrap.querySelector(".tz-hint").addEventListener("click", function () { hint(); setMenu(false); });
-    wrap.querySelector(".tz-solve").addEventListener("click", function () { setMenu(false); solveBoard(); });
-    game.els.mistakes.addEventListener("click", function () {
-      showMistakes = !showMistakes;
-      try { localStorage.setItem("takuzu-show-mistakes", showMistakes ? "1" : "0"); } catch (err) {}
-      showMistakesButton();
-      paint();
-    });
-    game.els.pause.addEventListener("click", function () {
-      if (!game.done) setPaused(!game.paused);
-    });
-    wrap.querySelector(".tz-again").addEventListener("click", function () {
-      newGame(game.n, game.level, board);
-    });
-    wrap.querySelector(".tz-new").addEventListener("click", function () {
-      newGame(game.n, game.level, board);
-    });
-    wrap.querySelector(".tz-options").addEventListener("click", S.exit);
-    // Back to puzzle (or Esc) closes the Solved window and leaves the
-    // finished board on screen.
-    function backToPuzzle() {
-      game.els.win.hidden = true;
-      game.els.cells[0].focus();
-    }
-    wrap.querySelector(".tz-back").addEventListener("click", backToPuzzle);
-    game.els.win.addEventListener("keydown", function (e) {
-      if (e.key === "Escape") backToPuzzle();
-    });
 
-    fit();
     paint();
     var first = game.puzzle.indexOf(E);
     focusCell(first < 0 ? 0 : first);
   }
 
-  // Solved: the board turns the game's color, then the Solved window
-  // builds in over it, like How to play.
-  function solved() {
-    game.done = true;
-    setMenu(false);
-    // The gear's square now starts a new puzzle (a puzzle-piece icon).
-    game.els.settings.hidden = true;
-    game.els.wrap.querySelector(".tz-again").hidden = false;
-    clearInterval(game.tick);
-    game.base = ms();
-    game.since = null;
-    tick();
-    game.els.pause.disabled = true;
-    var time = elapsed();
-    game.els.wrap.querySelector(".tz-time").textContent =
-      game.n + "×" + game.n + " · " + game.level + " · " + time;
-    game.els.grid.classList.add("solved");
-    var current = game;
-    setTimeout(function () {
-      if (game === current) openWin(true);
-    }, 700);
-  }
-
-  // Shows the Solved window, building it in the first time. Clicking
-  // the finished board brings it back after Back to puzzle.
-  function openWin(build) {
-    var win = game.els.win;
-    win.hidden = false;
-    var focusNew = function () { win.querySelector(".tz-new").focus(); };
-    if (!build || S.reduceMotion.matches) { focusNew(); return; }
-    win.classList.add("building");
-    S.buildIn(win.querySelector(".build"), S.hexRGB("--game-button-ink"), S.hexRGB("--game-ink"),
-      function () { win.classList.remove("building"); focusNew(); });
-  }
-
   function end() {
-    if (game) {
-      clearInterval(game.tick);
-      if (game.els.wrap) game.els.wrap.remove();
-    }
+    if (game) game.shell.destroy();
     game = null;
-  }
-
-  // Pause stops the clock, hides the numbers and ignores input, so a
-  // pause can't be used to keep thinking. Play picks up where it was.
-  function setPaused(paused) {
-    if (paused && !game.paused) { game.base = ms(); game.since = null; }
-    if (!paused && game.paused) { game.since = Date.now(); }
-    game.paused = paused;
-    if (paused) setMenu(false);
-    game.els.settings.disabled = paused;
-    game.els.grid.classList.toggle("paused", paused);
-    game.els.pause.innerHTML = icon(paused ? "play_arrow" : "pause");
-    game.els.pause.setAttribute("aria-label", paused ? "Resume" : "Pause");
-    game.els.pause.setAttribute("aria-pressed", paused ? "true" : "false");
-    tick();
-  }
-
-  function setMenu(open) {
-    if (!game) return;
-    if (open && (game.paused || game.done)) return;
-    game.els.menu.classList.toggle("open", open);
-    game.els.settings.classList.toggle("open", open);
-    game.els.settings.setAttribute("aria-expanded", open ? "true" : "false");
-    if (open) game.els.menu.querySelector("button").focus();
-  }
-
-  // Check: every square the player filled turns blue if right, red
-  // text if wrong. A mark clears when that square changes.
-  function checkBoard() {
-    game.check = new Map();
-    game.cur.forEach(function (v, i) {
-      if (editable(i) && v !== E) game.check.set(i, v === game.solution[i] ? "correct" : "wrong");
-    });
-    paint();
-  }
-
-  // Reset: back to the starting numbers, with no hints, no check
-  // marks, and the clock at zero.
-  function resetBoard() {
-    game.cur = game.puzzle.slice();
-    game.hints.clear();
-    game.check = null;
-    game.base = 0;
-    game.since = Date.now();
-    setPaused(false);
-    paint();
-  }
-
-  // Solve puzzle: every empty or wrong square gets its answer, shown
-  // like a hint, and the round ends with the Solved window as usual.
-  function solveBoard() {
-    if (game.done) return;
-    game.cur.forEach(function (v, i) {
-      if (editable(i) && v !== game.solution[i]) {
-        game.cur[i] = game.solution[i];
-        game.hints.add(i);
-      }
-    });
-    game.check = null;
-    paint();
-  }
-
-  // Hint: one random empty or wrong square gets its answer, in yellow,
-  // and stays fixed from then on.
-  function hint() {
-    var options = [];
-    game.cur.forEach(function (v, i) {
-      if (editable(i) && v !== game.solution[i]) options.push(i);
-    });
-    if (!options.length) return;
-    var i = options[Math.floor(Math.random() * options.length)];
-    game.cur[i] = game.solution[i];
-    game.hints.add(i);
-    if (game.check) game.check.delete(i);
-    paint();
-    focusCell(i);
-  }
-
-  function showMistakesButton() {
-    var b = game.els.mistakes;
-    b.innerHTML = icon(showMistakes ? "visibility" : "visibility_off");
-    b.setAttribute("aria-checked", showMistakes ? "true" : "false");
-    b.title = showMistakes ? "Show mistakes: on" : "Show mistakes: off";
-  }
-
-  // Milliseconds played so far, not counting pauses.
-  function ms() {
-    return game.base + (game.since ? Date.now() - game.since : 0);
-  }
-
-  // Time played, as m:ss (or h:mm:ss past an hour).
-  function elapsed() {
-    var secs = Math.floor(ms() / 1000);
-    var h = Math.floor(secs / 3600), m = Math.floor(secs / 60) % 60, sec = secs % 60;
-    var mm = h ? String(m).padStart(2, "0") : String(m);
-    return (h ? h + ":" : "") + mm + ":" + String(sec).padStart(2, "0");
-  }
-  function tick() {
-    if (game && game.els.timer) game.els.timer.textContent = elapsed();
   }
 
   card.addEventListener("gamestart", function (e) {
@@ -543,5 +340,5 @@ var Takuzu = (function () {
     newGame(e.detail.size, e.detail.level, e.detail.board);
   });
   card.addEventListener("gameend", end);
-  card.addEventListener("gamelayout", fit);
+  card.addEventListener("gamelayout", function () { if (game) game.shell.fit(); });
 })();
