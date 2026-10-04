@@ -35,37 +35,55 @@
 .board .tz-settings { grid-row: 1; grid-column: -2 / -1; justify-self: center; align-self: center; }
 .board .tz-settings:disabled { opacity: 0.35; cursor: default; }
 
-/* Settings menu: a vertical pill under the gear, in the nav panel's
-   colors, that slides down when opened. Closed, it's clipped away
-   and hidden from focus. */
+/* Settings menu: a vertical pill in the nav panel's colors that
+   grows down out of the gear, so the gear becomes its top button.
+   --btn is one button (a grid square, inset); --pad the pill's edge.
+   The clip uses a fixed corner radius of half the pill's width, so
+   the rounded ends keep their shape the whole way down. */
 .tz-menu {
-  grid-row: 2 / span 6;
+  --btn: calc(var(--cell) - var(--inset) * 2);
+  --pad: 0.35rem;
+  --radius: calc(var(--btn) / 2 + var(--pad));
+  grid-row: 1 / span 7;
   grid-column: -2 / -1;
   justify-self: center;
   align-self: start;
+  margin-top: calc(var(--inset) - var(--pad));
   z-index: 3;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-  padding: 0.4rem;
-  border-radius: 999px;
+  gap: 0.15rem;
+  /* the top slot is left for the gear, which sits over it */
+  padding: calc(var(--btn) + var(--pad) + 0.15rem) var(--pad) var(--pad);
+  border-radius: var(--radius);
   background: var(--surface);
   color: var(--paper);
   visibility: hidden;
-  clip-path: inset(0 0 100% 0 round 999px);
-  transition: clip-path 0.3s cubic-bezier(0.32, 0.12, 0.2, 1), visibility 0s linear 0.3s;
+  opacity: 0;
+  clip-path: inset(0 0 calc(100% - var(--btn) - var(--pad) * 2) 0 round var(--radius));
+  transition:
+    clip-path 0.32s cubic-bezier(0.32, 0.12, 0.2, 1),
+    opacity 0.2s ease,
+    visibility 0s linear 0.32s;
 }
 .tz-menu.open {
   visibility: visible;
-  clip-path: inset(0 round 999px);
-  transition: clip-path 0.3s cubic-bezier(0.32, 0.12, 0.2, 1), visibility 0s;
+  opacity: 1;
+  clip-path: inset(0 round var(--radius));
+  transition:
+    clip-path 0.32s cubic-bezier(0.32, 0.12, 0.2, 1),
+    opacity 0.15s ease,
+    visibility 0s;
 }
+/* The gear sits on top of the pill and takes its icon color. */
+.board .tz-settings { position: relative; z-index: 4; transition: color 0.2s ease; }
+.board .tz-settings.open { color: var(--paper); }
 @media (prefers-reduced-motion: reduce) {
-  .tz-menu, .tz-menu.open { transition: none; }
+  .tz-menu, .tz-menu.open, .board .tz-settings { transition: none; }
 }
 .tz-menu button {
-  width: 2.75rem;
-  height: 2.75rem;
+  width: var(--btn);
+  height: var(--btn);
   display: grid;
   place-items: center;
   padding: 0;
@@ -176,9 +194,9 @@
 }
 .tz-cell.error,
 .tz-cell.wrong { color: var(--alert); }
-/* Check: right answers turn the game color. */
-.tz-cell.right,
-.tz-cell.right:hover { background: var(--game); }
+/* Check: right answers in a deep shade of the game color (plain
+   game blue is too faint as text on white). */
+.tz-cell.right { color: color-mix(in srgb, var(--game), var(--game-ink) 40%); }
 /* Hint: the revealed number, in yellow, fixed in place. */
 .tz-cell.hint { color: var(--game-hint); cursor: default; }
 .tz-cell:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }

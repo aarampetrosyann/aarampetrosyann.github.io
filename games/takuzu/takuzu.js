@@ -431,6 +431,7 @@ var Takuzu = (function () {
     if (!game) return;
     if (open && (game.paused || game.done)) return;
     game.els.menu.classList.toggle("open", open);
+    game.els.settings.classList.toggle("open", open);
     game.els.settings.setAttribute("aria-expanded", open ? "true" : "false");
     if (open) game.els.menu.querySelector("button").focus();
   }
