@@ -201,8 +201,9 @@
   cursor: pointer;
 }
 .icon-btn:hover { opacity: 0.7; }
-/* Material Symbols "help" and "close" from Google Fonts at weight
-   700. A whole-pixel size keeps the glyph edges sharp. */
+/* Material Symbols "help" and "close" from Google Fonts at medium
+   weight (500), matching the weight of the text around them. A
+   whole-pixel size keeps the glyph edges sharp. */
 .icon-btn .material-symbols-outlined {
   font-family: "Material Symbols Outlined";
   font-size: 34px;
@@ -212,7 +213,7 @@
   letter-spacing: normal;
   text-transform: none;
   white-space: nowrap;
-  font-variation-settings: "wght" 700, "opsz" 24;
+  font-variation-settings: "wght" 500, "opsz" 24;
   -webkit-font-smoothing: antialiased;
 }
 /* Small squares (phones): the help icon sits in column 1, row 2. */
