@@ -233,7 +233,7 @@ var Takuzu = (function () {
       b.classList.toggle("wrong", mark === "wrong");
       b.setAttribute("aria-label", label(i));
     });
-    if (game.cur.indexOf(E) < 0 && bad.size === 0) solved();
+    if (!game.done && game.cur.indexOf(E) < 0 && bad.size === 0) solved();
   }
 
   // Squares the player can change: not given, not revealed by a hint.
@@ -275,6 +275,7 @@ var Takuzu = (function () {
         '<button type="button" role="menuitem" class="tz-check" aria-label="Check board" title="Check board">' + icon("check") + "</button>" +
         '<button type="button" role="menuitem" class="tz-reset" aria-label="Reset board" title="Reset board">' + icon("restart_alt") + "</button>" +
         '<button type="button" role="menuitem" class="tz-hint" aria-label="Hint" title="Hint">' + icon("lightbulb") + "</button>" +
+        '<button type="button" role="menuitem" class="tz-solve" aria-label="Solve puzzle" title="Solve puzzle">' + icon("auto_fix_high") + "</button>" +
         '<button type="button" role="menuitemcheckbox" class="tz-mistakes" aria-label="Show mistakes" title="Show mistakes" aria-checked="true">' + icon("visibility") + "</button>" +
       "</div>" +
       '<div class="tz-board">' +
@@ -326,7 +327,7 @@ var Takuzu = (function () {
     game.tick = setInterval(tick, 1000);
 
     grid.addEventListener("click", function (e) {
-      if (game.done) { if (game.els.win.hidden) openWin(false); return; }
+      if (game.done) { if (!game.revealed && game.els.win.hidden) openWin(false); return; }
       var b = e.target.closest(".tz-cell");
       if (!b) return;
       var i = Number(b.dataset.i), v = game.cur[i];
@@ -361,6 +362,7 @@ var Takuzu = (function () {
     wrap.querySelector(".tz-check").addEventListener("click", function () { checkBoard(); setMenu(false); });
     wrap.querySelector(".tz-reset").addEventListener("click", function () { resetBoard(); setMenu(false); });
     wrap.querySelector(".tz-hint").addEventListener("click", function () { hint(); setMenu(false); });
+    wrap.querySelector(".tz-solve").addEventListener("click", function () { setMenu(false); solveBoard(); });
     game.els.mistakes.addEventListener("click", function () {
       showMistakes = !showMistakes;
       try { localStorage.setItem("takuzu-show-mistakes", showMistakes ? "1" : "0"); } catch (err) {}
@@ -407,6 +409,7 @@ var Takuzu = (function () {
     game.since = null;
     tick();
     game.els.pause.disabled = true;
+    if (game.revealed) return;   // Solve puzzle: no Solved window or stars
     var time = elapsed();
     game.els.wrap.querySelector(".tz-time").textContent =
       game.n + "×" + game.n + " · " + game.level + " · " + time;
@@ -480,6 +483,21 @@ var Takuzu = (function () {
     game.base = 0;
     game.since = Date.now();
     setPaused(false);
+    paint();
+  }
+
+  // Solve puzzle: every empty or wrong square gets its answer, shown
+  // like a hint, and the round ends without the Solved window.
+  function solveBoard() {
+    if (game.done) return;
+    game.cur.forEach(function (v, i) {
+      if (editable(i) && v !== game.solution[i]) {
+        game.cur[i] = game.solution[i];
+        game.hints.add(i);
+      }
+    });
+    game.check = null;
+    game.revealed = true;
     paint();
   }
 
