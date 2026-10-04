@@ -13,7 +13,8 @@
   var card = document.querySelector(".game-card");
   var canvas = card.querySelector(".mosaic");
   var CELL = 58;                 // target square size in px
-  var ROWS = 10;                 // rows the layout uses
+  var ROWS = 10;                 // small-square rows on narrow screens
+  var BIG_ROWS = 7;              // big-square rows on desktop (7 x 7)
   var MIX = [[255, 0.22], [255, 0.11], [0, 0], [0, 0.06], [0, 0.12]];
 
   // Colors come from the card's --game, --game-ink and the shared
@@ -35,7 +36,7 @@
   // Content is placed on a grid of small squares. Where there's
   // room, the mosaic uses big squares (2 x 2 small ones), with an
   // odd number across so the logo can sit in the center square:
-  // 7 x 5 on a desktop. Narrow screens keep the small squares.
+  // 7 x 7 on a desktop. Narrow screens keep the small squares.
   function layout() {
     var w = card.clientWidth;
     var across = w / (CELL * 2);
@@ -44,7 +45,7 @@
     var bigMode = big >= 5;
     var cols = bigMode ? big * 2 : Math.max(6, 2 * Math.round(w / CELL / 2));
     var cell = w / cols;
-    var rows = ROWS;
+    var rows = bigMode ? BIG_ROWS * 2 : ROWS;
     var unit = bigMode ? 2 : 1;
     var u = cell * unit;
     card.classList.toggle("big", bigMode);
