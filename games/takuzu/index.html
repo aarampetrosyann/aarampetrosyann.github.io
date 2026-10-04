@@ -195,11 +195,10 @@
   background: color-mix(in srgb, var(--game-button-ink), var(--game-ink) 16%);
   cursor: default;
 }
+/* Mistakes and Check marks, in bright colors that read on white. */
 .tz-cell.error,
-.tz-cell.wrong { color: var(--alert); }
-/* Check: right answers in a deep shade of the game color (plain
-   game blue is too faint as text on white). */
-.tz-cell.right { color: color-mix(in srgb, var(--game), var(--game-ink) 40%); }
+.tz-cell.wrong { color: var(--game-wrong); }
+.tz-cell.right { color: var(--game-right); }
 /* Hint: the revealed number, in yellow, fixed in place. */
 .tz-cell.hint { color: var(--game-hint); cursor: default; }
 .tz-cell:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }
