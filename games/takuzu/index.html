@@ -22,8 +22,11 @@
 <style>
 /* ============================================================
    TAKUZU BOARD  (built by takuzu.js)
-   Board squares are --tz wide: the card's small grid square, or
-   less on narrow screens. Starting numbers sit on the game color.
+   Drawn like the game's icon: white squares on a near-black base
+   that shows as a frame and gutters. Starting numbers sit on light
+   gray. --tz is the board's square size (the card's small grid
+   square, or less on narrow screens) and --tz-gap the frame width.
+   The board looks the same in light and dark mode, like the icons.
    ============================================================ */
 .tz { display: contents; }
 
@@ -31,22 +34,53 @@
 .board .tz-exit    { grid-row: 1; grid-column: 1; justify-self: center; align-self: center; }
 .board .tz-restart { grid-row: 1; grid-column: -2 / -1; justify-self: center; align-self: center; }
 
+/* Name, size and level under Back; the timer under Restart. On a
+   desktop they sit in the side margins the board never reaches; on
+   phones, in the row above the board. */
+.board .tz-info,
+.board .tz-timer {
+  grid-row: 2;
+  align-self: center;
+  margin: 0;
+  padding: 0 var(--inset);
+  line-height: 1.25;
+}
+.board .tz-info  { grid-column: 1 / span 4; justify-self: start; text-align: left; }
+.board .tz-timer { grid-column: -5 / -1; justify-self: end; text-align: right; }
+.game-card.big .board .tz-info  { grid-column: 1 / span 2; }
+.game-card.big .board .tz-timer { grid-column: -3 / -1; }
+.tz-info p { margin: 0; }
+.tz-name { font-family: var(--display); font-weight: 700; font-size: 1.15rem; }
+.tz-meta { color: var(--muted); font-size: 0.9rem; white-space: nowrap; }
+.tz-timer {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 1.5rem;
+  font-variant-numeric: tabular-nums;
+}
+
 .tz-grid {
   grid-row: 1 / -1;
   grid-column: 1 / -1;
   justify-self: center;
   align-self: center;
+  width: calc(var(--tz) * var(--tz-n));
+  height: calc(var(--tz) * var(--tz-n));
   display: grid;
-  grid-template-columns: repeat(var(--tz-n), var(--tz));
-  grid-auto-rows: var(--tz);
+  grid-template-columns: repeat(var(--tz-n), 1fr);
+  grid-template-rows: repeat(var(--tz-n), 1fr);
+  gap: var(--tz-gap);
+  padding: var(--tz-gap);
+  border-radius: calc(var(--tz-gap) * 1.5);
+  background: var(--game-ink);
 }
 .tz-cell {
-  margin: 2px;
+  min-width: 0;
   padding: 0;
   border: 0;
   border-radius: 3px;
-  background: color-mix(in srgb, var(--paper), var(--ink) 8%);
-  color: var(--ink);
+  background: var(--game-button-ink);
+  color: var(--game-ink);
   font-family: var(--display);
   font-weight: 700;
   font-size: calc(var(--tz) * 0.45);
@@ -54,11 +88,14 @@
   cursor: pointer;
   transition: background-color 0.15s ease;
 }
-.tz-cell:hover { background: color-mix(in srgb, var(--paper), var(--ink) 15%); }
+.tz-cell:hover { background: color-mix(in srgb, var(--game-button-ink), var(--game-ink) 6%); }
 .tz-cell.given,
-.tz-cell.given:hover { background: var(--game); color: var(--game-ink); cursor: default; }
+.tz-cell.given:hover {
+  background: color-mix(in srgb, var(--game-button-ink), var(--game-ink) 16%);
+  cursor: default;
+}
 .tz-cell.error { color: var(--alert); }
-.tz-cell:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; position: relative; z-index: 1; }
+.tz-cell:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }
 
 /* Solved: every square turns the game color. */
 .tz-grid.solved .tz-cell {
