@@ -214,9 +214,10 @@
   font-variation-settings: "wght" 700, "opsz" 24;
   -webkit-font-smoothing: antialiased;
 }
+/* Small squares (phones): the help icon sits in column 1, row 2. */
 .game-card > .help-btn {
   grid-row: 2;
-  grid-column: 2;
+  grid-column: 1;
   justify-self: center;
 }
 /* With big squares, the help icon sits in big square (2, 2). */
@@ -225,12 +226,15 @@
   grid-column: 3 / span 2;
 }
 
-/* How to play window: covers every square but the outer ring.
+/* How to play window. With big squares it covers every square but
+   the outer ring. With small squares (phones) the card is too narrow
+   for that, so it spans the full width and skips only the top and
+   bottom rows. Its first square is always where the help icon is.
    --u is one mosaic square: one small square, or one big one. */
 .game-card.big > .help { grid-row: 3 / -3; grid-column: 3 / -3; }
 .game-card > .help {
   grid-row: 2 / -2;
-  grid-column: 2 / -2;
+  grid-column: 1 / -1;
   justify-self: stretch;
   align-self: stretch;
   z-index: 1;
