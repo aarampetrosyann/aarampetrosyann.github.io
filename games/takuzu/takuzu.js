@@ -269,7 +269,7 @@ var Takuzu = (function () {
     wrap.className = "tz";
     wrap.innerHTML =
       '<button class="icon-btn tz-exit" type="button" aria-label="Back to options">' + icon("arrow_back") + "</button>" +
-      '<button class="icon-btn tz-again" type="button" aria-label="New puzzle" title="New puzzle" hidden>' + icon("add") + "</button>" +
+      '<button class="icon-btn tz-again" type="button" aria-label="New puzzle" title="New puzzle" hidden>' + icon("extension") + "</button>" +
       '<button class="icon-btn tz-settings" type="button" aria-label="Settings" aria-expanded="false" aria-controls="tz-menu">' + icon("settings") + "</button>" +
       '<div class="tz-menu" id="tz-menu" role="menu" aria-label="Settings">' +
         '<button type="button" role="menuitem" class="tz-check" aria-label="Check board" title="Check board">' + icon("check") + "</button>" +
@@ -399,7 +399,7 @@ var Takuzu = (function () {
   function solved() {
     game.done = true;
     setMenu(false);
-    // The gear's square now starts a new puzzle.
+    // The gear's square now starts a new puzzle (a puzzle-piece icon).
     game.els.settings.hidden = true;
     game.els.wrap.querySelector(".tz-again").hidden = false;
     clearInterval(game.tick);
