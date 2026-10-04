@@ -292,6 +292,7 @@ var Takuzu = (function () {
         '<p class="tz-time"></p>' +
         '<div class="tz-actions">' +
           '<button class="tz-new" type="button">New puzzle</button>' +
+          '<button class="tz-back" type="button">Back to puzzle</button>' +
           '<button class="tz-options" type="button">Change options</button>' +
         "</div>" +
       "</div>";
@@ -367,8 +368,15 @@ var Takuzu = (function () {
       newGame(game.n, game.level, board);
     });
     wrap.querySelector(".tz-options").addEventListener("click", S.exit);
+    // Back to puzzle (or Esc) closes the Solved window and leaves the
+    // finished board on screen.
+    function backToPuzzle() {
+      game.els.win.hidden = true;
+      game.els.cells[0].focus();
+    }
+    wrap.querySelector(".tz-back").addEventListener("click", backToPuzzle);
     game.els.win.addEventListener("keydown", function (e) {
-      if (e.key === "Escape") S.exit();
+      if (e.key === "Escape") backToPuzzle();
     });
 
     fit();

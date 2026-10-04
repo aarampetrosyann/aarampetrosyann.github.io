@@ -240,7 +240,14 @@
 .tz-win.building > :not(.build) { opacity: 0; }
 .tz-win h2 { margin: 0; font-size: 2rem; }
 .tz-win p { margin: 0 0 0.75rem; }
-.tz-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; }
+/* Options stacked, all the same width: New puzzle is the solid one. */
+.tz-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.5rem;
+  width: min(15rem, 100%);
+}
 .tz-actions button {
   padding: 0.7rem 1.25rem;
   border: 0;
@@ -253,6 +260,7 @@
   cursor: pointer;
 }
 .tz-actions button:hover { opacity: 0.88; }
+.tz-actions .tz-back,
 .tz-actions .tz-options {
   background: none;
   color: var(--game-ink);
