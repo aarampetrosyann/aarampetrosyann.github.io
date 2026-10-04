@@ -288,3 +288,56 @@
 @media (max-width: 52rem) {
   .game-card { margin-left: calc(50% - 50vw); width: 100vw; }
 }
+
+/* ============================================================
+   PLAY
+   Play covers the card square by square (drawn on .cover by
+   game.js) in shades of the page background. Once covered, the
+   card turns into a plain cell in the page's own colors and the
+   board takes its place.
+   ============================================================ */
+.game-card > .cover {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  margin: 0;
+  pointer-events: none;
+}
+.game-card.covering { pointer-events: none; }  /* no double clicks mid-cover */
+
+.game-card.playing { background: var(--paper); color: var(--ink); }
+.game-card.playing > :not(.board):not(.cover) { visibility: hidden; }
+
+/* Placeholder board until the real one exists. */
+.game-card > .board {
+  grid-row: 1 / -1;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+.game-card.playing > .board { display: flex; }
+.board p { margin: 0; }
+.board-info {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 1.5rem;
+}
+.board-note { color: var(--muted); }
+.board-back {
+  margin-top: 1rem;
+  padding: 0.55rem 1.25rem;
+  border: 1.5px solid var(--ink);
+  border-radius: 4px;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+.board-back:hover { background: var(--ink); color: var(--paper); }
+.game-card.playing :focus-visible { outline-color: var(--accent); }
