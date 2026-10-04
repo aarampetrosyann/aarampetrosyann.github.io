@@ -15,7 +15,8 @@
 .game-card.kakuro  { --game: var(--game-kakuro);  --game-ink: var(--game-kakuro-ink); }
 .game-card.shikaku { --game: var(--game-shikaku); --game-ink: var(--game-shikaku-ink); }
 
-.stage { padding: 6rem 0 0; }
+/* Just enough room above the card for the open nav panel. */
+.stage { padding: 3.25rem 0 0; }
 .back {
   display: inline-block;
   margin-bottom: 1.25rem;

@@ -33,7 +33,9 @@
 
   var CLOSE_DELAY = 120; // ms of grace before closing, so small
                          // pointer wobbles between tabs don't flicker
-  var BODY_HEIGHT = 132; // px of panel below the header, same for every tab
+  var BODY_HEIGHT = 96;  // px of panel below the header, same for every tab:
+                         // fits the tallest content (title + 3 lines and the
+                         // panel's bottom padding), so no tab has to grow
   var SWAP_FADE = 160;   // ms the old text takes to fade out when moving
                          // between tabs, before the new text fades in
 
@@ -205,7 +207,9 @@
       // on the content is what actually makes every tab equal.
       var full = parseFloat(inner.style.paddingTop || 0) + BODY_HEIGHT;
       inner.style.minHeight = full + "px";
-      panel.style.maxHeight = full + "px";
+      // Never clip: if a tab's content ever needs more room (a long
+      // description, a narrow window), the panel grows to fit it.
+      panel.style.maxHeight = Math.max(full, inner.scrollHeight) + "px";
 
       panel.classList.add("open");
       blur.classList.add("on");
