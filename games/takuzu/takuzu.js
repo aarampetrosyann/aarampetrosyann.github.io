@@ -327,7 +327,7 @@ var Takuzu = (function () {
     game.tick = setInterval(tick, 1000);
 
     grid.addEventListener("click", function (e) {
-      if (game.done) { if (!game.revealed && game.els.win.hidden) openWin(false); return; }
+      if (game.done) { if (game.els.win.hidden) openWin(false); return; }
       var b = e.target.closest(".tz-cell");
       if (!b) return;
       var i = Number(b.dataset.i), v = game.cur[i];
@@ -409,7 +409,6 @@ var Takuzu = (function () {
     game.since = null;
     tick();
     game.els.pause.disabled = true;
-    if (game.revealed) return;   // Solve puzzle: no Solved window or stars
     var time = elapsed();
     game.els.wrap.querySelector(".tz-time").textContent =
       game.n + "×" + game.n + " · " + game.level + " · " + time;
@@ -487,7 +486,7 @@ var Takuzu = (function () {
   }
 
   // Solve puzzle: every empty or wrong square gets its answer, shown
-  // like a hint, and the round ends without the Solved window.
+  // like a hint, and the round ends with the Solved window as usual.
   function solveBoard() {
     if (game.done) return;
     game.cur.forEach(function (v, i) {
@@ -497,7 +496,6 @@ var Takuzu = (function () {
       }
     });
     game.check = null;
-    game.revealed = true;
     paint();
   }
 
