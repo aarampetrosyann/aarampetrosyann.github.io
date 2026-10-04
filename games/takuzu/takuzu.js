@@ -198,6 +198,8 @@ var Takuzu = (function () {
     if (game && !e.target.closest(".tz-settings, .tz-menu")) setMenu(false);
   });
 
+  var STAR = '<svg viewBox="0 -960 960 960"><path d="m233-120 65-281L80-590l288-25 112-265 112 265 288 25-218 189 65 281-247-149-247 149Z"/></svg>';
+
   function icon(name) {
     return '<span class="material-symbols-outlined" aria-hidden="true">' + name + "</span>";
   }
@@ -267,6 +269,7 @@ var Takuzu = (function () {
     wrap.className = "tz";
     wrap.innerHTML =
       '<button class="icon-btn tz-exit" type="button" aria-label="Back to options">' + icon("arrow_back") + "</button>" +
+      '<button class="icon-btn tz-again" type="button" aria-label="New puzzle" title="New puzzle" hidden>' + icon("add") + "</button>" +
       '<button class="icon-btn tz-settings" type="button" aria-label="Settings" aria-expanded="false" aria-controls="tz-menu">' + icon("settings") + "</button>" +
       '<div class="tz-menu" id="tz-menu" role="menu" aria-label="Settings">' +
         '<button type="button" role="menuitem" class="tz-check" aria-label="Check board" title="Check board">' + icon("check") + "</button>" +
@@ -288,6 +291,8 @@ var Takuzu = (function () {
       "</div>" +
       '<div class="tz-win" role="dialog" aria-labelledby="tz-win-h" hidden>' +
         '<canvas class="build" aria-hidden="true"></canvas>' +
+        // Material Symbols "star", filled, inlined as SVG.
+        '<div class="tz-stars" aria-hidden="true">' + STAR + STAR + STAR + "</div>" +
         '<h2 id="tz-win-h">Solved</h2>' +
         '<p class="tz-time"></p>' +
         '<div class="tz-actions">' +
@@ -321,6 +326,7 @@ var Takuzu = (function () {
     game.tick = setInterval(tick, 1000);
 
     grid.addEventListener("click", function (e) {
+      if (game.done) { if (game.els.win.hidden) openWin(false); return; }
       var b = e.target.closest(".tz-cell");
       if (!b) return;
       var i = Number(b.dataset.i), v = game.cur[i];
@@ -364,6 +370,9 @@ var Takuzu = (function () {
     game.els.pause.addEventListener("click", function () {
       if (!game.done) setPaused(!game.paused);
     });
+    wrap.querySelector(".tz-again").addEventListener("click", function () {
+      newGame(game.n, game.level, board);
+    });
     wrap.querySelector(".tz-new").addEventListener("click", function () {
       newGame(game.n, game.level, board);
     });
@@ -390,7 +399,9 @@ var Takuzu = (function () {
   function solved() {
     game.done = true;
     setMenu(false);
-    game.els.settings.disabled = true;
+    // The gear's square now starts a new puzzle.
+    game.els.settings.hidden = true;
+    game.els.wrap.querySelector(".tz-again").hidden = false;
     clearInterval(game.tick);
     game.base = ms();
     game.since = null;
@@ -400,16 +411,22 @@ var Takuzu = (function () {
     game.els.wrap.querySelector(".tz-time").textContent =
       game.n + "×" + game.n + " · " + game.level + " · " + time;
     game.els.grid.classList.add("solved");
-    var win = game.els.win, current = game;
+    var current = game;
     setTimeout(function () {
-      if (game !== current) return;
-      win.hidden = false;
-      var focusNew = function () { win.querySelector(".tz-new").focus(); };
-      if (S.reduceMotion.matches) { focusNew(); return; }
-      win.classList.add("building");
-      S.buildIn(win.querySelector(".build"), S.hexRGB("--game-button-ink"), S.hexRGB("--game-ink"),
-        function () { win.classList.remove("building"); focusNew(); });
+      if (game === current) openWin(true);
     }, 700);
+  }
+
+  // Shows the Solved window, building it in the first time. Clicking
+  // the finished board brings it back after Back to puzzle.
+  function openWin(build) {
+    var win = game.els.win;
+    win.hidden = false;
+    var focusNew = function () { win.querySelector(".tz-new").focus(); };
+    if (!build || S.reduceMotion.matches) { focusNew(); return; }
+    win.classList.add("building");
+    S.buildIn(win.querySelector(".build"), S.hexRGB("--game-button-ink"), S.hexRGB("--game-ink"),
+      function () { win.classList.remove("building"); focusNew(); });
   }
 
   function end() {
