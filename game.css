@@ -15,7 +15,8 @@
 .game-card.kakuro  { --game: var(--game-kakuro);  --game-ink: var(--game-kakuro-ink); }
 .game-card.shikaku { --game: var(--game-shikaku); --game-ink: var(--game-shikaku-ink); }
 
-.stage { padding: 6rem 0 0; }
+/* Just enough room above the card for the open nav panel. */
+.stage { padding: 3.25rem 0 0; }
 .back {
   display: inline-block;
   margin-bottom: 1.25rem;
@@ -225,6 +226,15 @@
   grid-row: 3 / span 2;
   grid-column: 3 / span 2;
 }
+
+/* Desktop (big squares) is 7 x 7, one big row taller at the top and
+   bottom than the content needs, so everything below moves down one
+   big square (two small rows) to stay centered. */
+.game-card.big .logo            { grid-row: 5 / span 2; }
+.game-card.big .intro           { grid-row: 7 / span 2; }
+.game-card.big .options.size    { grid-row: 9; }
+.game-card.big .options.level   { grid-row: 10; }
+.game-card.big .play            { grid-row: 11; }
 
 /* How to play window. With big squares it covers every square but
    the outer ring. With small squares (phones) the card is too narrow
