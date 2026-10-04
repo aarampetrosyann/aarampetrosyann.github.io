@@ -203,9 +203,9 @@ var Takuzu = (function () {
     if (!game) return;
     var cell = parseFloat(card.style.getPropertyValue("--cell"));
     var size = Math.min(cell, card.clientWidth / game.n);
-    game.els.grid.style.setProperty("--tz", size + "px");
+    game.els.board.style.setProperty("--tz", size + "px");
     // Frame and gutters scale with the squares, like the icon's.
-    game.els.grid.style.setProperty("--tz-gap", Math.max(3, Math.round(size * 0.08)) + "px");
+    game.els.board.style.setProperty("--tz-gap", Math.max(3, Math.round(size * 0.08)) + "px");
   }
 
   function paint() {
@@ -220,7 +220,7 @@ var Takuzu = (function () {
   }
 
   function setCell(i, v) {
-    if (game.done || game.puzzle[i] !== E) return;
+    if (game.done || game.paused || game.puzzle[i] !== E) return;
     game.cur[i] = v;
     paint();
   }
@@ -236,7 +236,9 @@ var Takuzu = (function () {
     game = {
       n: n, level: level, lines: made.lines,
       puzzle: made.puzzle, cur: made.puzzle.slice(),
-      start: Date.now(), done: false, els: {}
+      // Timer: `base` ms already counted, plus time since `since`
+      // while running (since is null while paused or solved).
+      base: 0, since: Date.now(), paused: false, done: false, els: {}
     };
 
     var wrap = document.createElement("div");
@@ -244,9 +246,18 @@ var Takuzu = (function () {
     wrap.innerHTML =
       '<button class="icon-btn tz-exit" type="button" aria-label="Back to options">' + icon("arrow_back") + "</button>" +
       '<button class="icon-btn tz-restart" type="button" aria-label="Start this puzzle over">' + icon("restart_alt") + "</button>" +
-      '<div class="tz-info"><p class="tz-name">Takuzu</p><p class="tz-meta">' + n + "\u00d7" + n + " \u00b7 " + level + "</p></div>" +
-      '<p class="tz-timer" role="timer" aria-label="Time">0:00</p>' +
-      '<div class="tz-grid" role="group" aria-label="Takuzu, ' + n + " by " + n + ", " + level + '"></div>' +
+      '<div class="tz-board">' +
+        // Header row right above the board: size, name, pause and time.
+        '<div class="tz-head">' +
+          '<p class="tz-size">' + n + "\u00d7" + n + "</p>" +
+          '<p class="tz-name">Takuzu</p>' +
+          '<div class="tz-clock">' +
+            '<button class="tz-pause" type="button" aria-label="Pause" aria-pressed="false">' + icon("pause") + "</button>" +
+            '<p class="tz-timer" role="timer" aria-label="Time">0:00</p>' +
+          "</div>" +
+        "</div>" +
+        '<div class="tz-grid" role="group" aria-label="Takuzu, ' + n + " by " + n + ", " + level + '"></div>' +
+      "</div>" +
       '<div class="tz-win" role="dialog" aria-labelledby="tz-win-h" hidden>' +
         '<canvas class="build" aria-hidden="true"></canvas>' +
         '<h2 id="tz-win-h">Solved</h2>' +
@@ -259,7 +270,7 @@ var Takuzu = (function () {
     board.appendChild(wrap);
 
     var grid = wrap.querySelector(".tz-grid");
-    grid.style.setProperty("--tz-n", n);
+    wrap.querySelector(".tz-board").style.setProperty("--tz-n", n);
     var cells = [];
     for (var i = 0; i < n * n; i++) {
       var b = document.createElement("button");
@@ -271,8 +282,9 @@ var Takuzu = (function () {
       cells.push(b);
     }
     game.els = {
-      wrap: wrap, grid: grid, cells: cells,
-      win: wrap.querySelector(".tz-win"), timer: wrap.querySelector(".tz-timer")
+      wrap: wrap, board: wrap.querySelector(".tz-board"), grid: grid, cells: cells,
+      win: wrap.querySelector(".tz-win"), timer: wrap.querySelector(".tz-timer"),
+      pause: wrap.querySelector(".tz-pause")
     };
     game.tick = setInterval(tick, 1000);
 
@@ -304,9 +316,13 @@ var Takuzu = (function () {
     wrap.querySelector(".tz-restart").addEventListener("click", function () {
       if (game.done) return;
       game.cur = game.puzzle.slice();
-      game.start = Date.now();
-      tick();
+      game.base = 0;
+      game.since = Date.now();
+      setPaused(false);
       paint();
+    });
+    game.els.pause.addEventListener("click", function () {
+      if (!game.done) setPaused(!game.paused);
     });
     wrap.querySelector(".tz-new").addEventListener("click", function () {
       newGame(game.n, game.level, board);
@@ -327,7 +343,10 @@ var Takuzu = (function () {
   function solved() {
     game.done = true;
     clearInterval(game.tick);
+    game.base = ms();
+    game.since = null;
     tick();
+    game.els.pause.disabled = true;
     var time = elapsed();
     game.els.wrap.querySelector(".tz-time").textContent =
       game.n + "×" + game.n + " · " + game.level + " · " + time;
@@ -352,9 +371,27 @@ var Takuzu = (function () {
     game = null;
   }
 
-  // Time since the puzzle started, as m:ss (or h:mm:ss past an hour).
+  // Pause stops the clock, hides the numbers and ignores input, so a
+  // pause can't be used to keep thinking. Play picks up where it was.
+  function setPaused(paused) {
+    if (paused && !game.paused) { game.base = ms(); game.since = null; }
+    if (!paused && game.paused) { game.since = Date.now(); }
+    game.paused = paused;
+    game.els.grid.classList.toggle("paused", paused);
+    game.els.pause.innerHTML = icon(paused ? "play_arrow" : "pause");
+    game.els.pause.setAttribute("aria-label", paused ? "Resume" : "Pause");
+    game.els.pause.setAttribute("aria-pressed", paused ? "true" : "false");
+    tick();
+  }
+
+  // Milliseconds played so far, not counting pauses.
+  function ms() {
+    return game.base + (game.since ? Date.now() - game.since : 0);
+  }
+
+  // Time played, as m:ss (or h:mm:ss past an hour).
   function elapsed() {
-    var secs = Math.floor((Date.now() - game.start) / 1000);
+    var secs = Math.floor(ms() / 1000);
     var h = Math.floor(secs / 3600), m = Math.floor(secs / 60) % 60, sec = secs % 60;
     var mm = h ? String(m).padStart(2, "0") : String(m);
     return (h ? h + ":" : "") + mm + ":" + String(sec).padStart(2, "0");
