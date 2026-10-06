@@ -196,6 +196,11 @@
 .gb-cell.error,
 .gb-cell.wrong { color: var(--game-wrong); }
 .gb-cell.right { color: var(--game-right); }
+/* The selected square, and lighter, the rest of its lines (its row
+   and column, or its runs), tinted with the game's color. Games
+   decide which squares get these. */
+.gb-cell.gb-line { background: color-mix(in srgb, var(--game-button-ink), var(--game) 14%); }
+.gb-cell.gb-sel  { background: color-mix(in srgb, var(--game-button-ink), var(--game) 38%); }
 /* Hint: the revealed number, in yellow, fixed in place. */
 .gb-cell.hint { color: var(--game-hint); cursor: default; }
 .gb-cell:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }

@@ -200,8 +200,15 @@ var Takuzu = (function () {
 
   function paint() {
     var bad = Takuzu.errors(game.cur, game.n, game.lines);
+    var n = game.n, sel = game.sel, sr = Math.floor(sel / n), sc = sel % n;
     game.cells.forEach(function (b, i) {
       var v = game.cur[i], mark = game.check && game.check.get(i);
+      // The selected square and its row and column, except starting
+      // numbers, which keep their gray.
+      var given = game.puzzle[i] !== E;
+      b.classList.toggle("gb-sel", sel >= 0 && i === sel && !given);
+      b.classList.toggle("gb-line", sel >= 0 && i !== sel && !given &&
+        (Math.floor(i / n) === sr || i % n === sc));
       b.textContent = v === E ? "" : v;
       b.classList.toggle("error", game.shell.showMistakes && bad.has(i) && editable(i));
       b.classList.toggle("hint", game.hints.has(i));
@@ -227,6 +234,8 @@ var Takuzu = (function () {
   function focusCell(i) {
     game.cells.forEach(function (b, k) { b.tabIndex = k === i ? 0 : -1; });
     game.cells[i].focus();
+    game.sel = i;
+    paint();
   }
 
   // Answers for every empty or wrong square the player can change.
@@ -242,7 +251,7 @@ var Takuzu = (function () {
     game = {
       n: n, level: level, lines: made.lines,
       puzzle: made.puzzle, cur: made.puzzle.slice(), solution: made.solution,
-      hints: new Set(), check: null, cells: []
+      hints: new Set(), check: null, cells: [], sel: -1
     };
     game.shell = Board.create({
       name: "Takuzu", n: n, level: level, container: container,
