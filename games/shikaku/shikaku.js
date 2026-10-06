@@ -238,6 +238,12 @@ var Shikaku = (function () {
     return best;
   }
 
+  // Placed only with exactly one number and at least two squares
+  // (no puzzle has a 1, so a single square is never right).
+  function placeable(t) {
+    return numbersIn(t) === 1 && Shikaku.area(t) >= 2;
+  }
+
   // How many numbers a rectangle holds; only exactly one can be placed.
   function numbersIn(t) {
     return game.p.clues.filter(function (cl) { return Shikaku.inside(t, cl.r, cl.c); }).length;
@@ -260,6 +266,7 @@ var Shikaku = (function () {
   // A ringed count of a rectangle's squares, in its middle, or in its
   // corner when the middle would sit on its number.
   function tally(t, kind) {
+    if (Shikaku.area(t) < 2) return;   // no shape is a single square, so no count of 1
     var el = document.createElement("div");
     var midR = (t.r0 + t.r1) / 2, midC = (t.c0 + t.c1) / 2;
     var onNumber = game.p.clues.some(function (cl) {
@@ -453,7 +460,7 @@ var Shikaku = (function () {
       var t = game.draft;
       game.draft = null;
       if (!moved) removeAt(start);              // a tap removes the rectangle under it
-      else if (numbersIn(t) === 1) place(t);    // none, or two or more: nothing is placed
+      else if (placeable(t)) place(t);          // otherwise nothing is placed
       start = -1;
       paint();
     }
@@ -477,7 +484,7 @@ var Shikaku = (function () {
           game.anchor = i;
           game.draft = span(i, i);
         } else {
-          if (numbersIn(game.draft) === 1) place(game.draft);
+          if (placeable(game.draft)) place(game.draft);
           game.anchor = -1;
           game.draft = null;
         }
