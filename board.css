@@ -241,7 +241,9 @@
 }
 .gb-win.building { background: transparent; }
 .gb-win > :not(.build) { transition: opacity 0.25s ease; }
-.gb-win.building > :not(.build) { opacity: 0; }
+/* Hidden at once while building (no fade out first, which looked
+   like the window opening twice); the fade is only on the way in. */
+.gb-win.building > :not(.build) { opacity: 0; transition: none; }
 /* Three stars above Solved, the middle one bigger, on one baseline. */
 .gb-stars { display: flex; align-items: flex-end; gap: 0.35rem; margin-bottom: 0.25rem; }
 .gb-stars svg { width: 2.25rem; height: 2.25rem; fill: var(--game-hint); }
