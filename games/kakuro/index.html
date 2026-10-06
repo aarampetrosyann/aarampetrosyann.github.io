@@ -83,10 +83,15 @@
   color: var(--game-button-ink);
 }
 
-/* Number pad under the board, drawn like the board: 1-9 and erase. */
+/* Number pad under the board, drawn like the board: 1-9 and erase.
+   Only on touch screens, where there's no keyboard to type digits;
+   with a mouse and keyboard, typing is quicker. */
+.kk-pad { display: none; }
+@media (hover: none), (pointer: coarse) {
+  .kk-pad { display: grid; }
+}
 .kk-pad {
   margin-top: calc(var(--sq-gap) * 2);
-  display: grid;
   grid-template-columns: repeat(10, 1fr);
   gap: var(--sq-gap);
   padding: var(--sq-gap);
