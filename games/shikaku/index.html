@@ -33,7 +33,7 @@
    outline on top of everything, shown only when using the keyboard. */
 .sk-grid .gb-cell:focus-visible { outline: none; }
 .sk-cursor {
-  z-index: 3;
+  z-index: 4;
   display: none;
   border-radius: 3px;
   box-shadow: inset 0 0 0 3px var(--accent);
@@ -59,15 +59,36 @@
 .sk-rect.wrong { box-shadow: inset 0 0 0 3px var(--game-wrong), inset 0 0 0 5px var(--game-button-ink); }
 .sk-rect.right { box-shadow: inset 0 0 0 3px var(--game-right), inset 0 0 0 5px var(--game-button-ink); }
 .sk-rect.hint  { box-shadow: inset 0 0 0 3px var(--game-hint), inset 0 0 0 5px var(--game-button-ink); }
-/* The rectangle being drawn. */
+/* The rectangle being drawn: a light wash with a dashed outline
+   inside, like the icon. Covering another number or a hint shows
+   darker red stripes that pulse slowly. */
 .sk-draft {
   z-index: 2;
-  background: color-mix(in srgb, var(--game) 25%, transparent);
-  box-shadow: inset 0 0 0 3px var(--game-ink);
+  position: relative;
+  background: color-mix(in srgb, var(--game) 18%, transparent);
+}
+.sk-draft::after {
+  content: "";
+  position: absolute;
+  inset: calc(var(--sq) * 0.1);
+  border: 2px dashed var(--game-ink);
+  border-radius: 2px;
+}
+.sk-draft.bad {
+  background:
+    repeating-linear-gradient(45deg,
+      color-mix(in srgb, var(--game), var(--game-ink) 30%) 0 5px,
+      transparent 5px 11px),
+    color-mix(in srgb, var(--game) 25%, transparent);
+  animation: sk-pulse 1.4s ease-in-out infinite alternate;
+}
+@keyframes sk-pulse { from { opacity: 1; } to { opacity: 0.45; } }
+@media (prefers-reduced-motion: reduce) {
+  .sk-draft.bad { animation: none; }
 }
 
 .sk-num {
-  z-index: 2;
+  z-index: 3;   /* above rectangles and the one being drawn */
   display: grid;
   place-items: center;
   pointer-events: none;
