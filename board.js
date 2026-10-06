@@ -7,7 +7,8 @@
    - back arrow (top left) and settings gear (top right), which
      becomes a puzzle piece for a new puzzle once the round is over,
    - the settings pill: Check board, Reset board, Hint, Solve puzzle,
-     Show mistakes (remembered per game between visits),
+     Show mistakes (remembered per game between visits), and
+     Highlight (the selected square's lines; one setting for all),
    - the header above the board: size and level, name, pause, timer,
    - the Solved window with three stars, built in like How to play.
 
@@ -38,6 +39,10 @@ var Board = (function () {
     var card = S.card, n = o.n;
     var showMistakes = true;
     try { showMistakes = localStorage.getItem(o.storageKey) !== "0"; } catch (err) {}
+    // Highlighting the selected square's lines is a matter of taste,
+    // so one setting covers every game.
+    var highlight = true;
+    try { highlight = localStorage.getItem("board-highlight") !== "0"; } catch (err) {}
 
     var wrap = document.createElement("div");
     wrap.className = "gb";
@@ -51,6 +56,7 @@ var Board = (function () {
         '<button type="button" role="menuitem" class="gb-hint" aria-label="Hint" title="Hint">' + icon("lightbulb") + "</button>" +
         '<button type="button" role="menuitem" class="gb-solve" aria-label="Solve puzzle" title="Solve puzzle">' + icon("auto_fix_high") + "</button>" +
         '<button type="button" role="menuitemcheckbox" class="gb-mistakes" aria-label="Show mistakes" title="Show mistakes" aria-checked="true">' + icon("visibility") + "</button>" +
+        '<button type="button" role="menuitemcheckbox" class="gb-highlight" aria-label="Highlight row and column" title="Highlight" aria-checked="true">' + icon("water_drop") + "</button>" +
       "</div>" +
       '<div class="gb-board">' +
         // Header right above the board: size and level, name, pause, time.
@@ -82,7 +88,8 @@ var Board = (function () {
     var els = {
       board: q(".gb-board"), grid: q(".gb-grid"), below: q(".gb-below"),
       settings: q(".gb-settings"), again: q(".gb-again"), menu: q(".gb-menu"),
-      mistakes: q(".gb-mistakes"), pause: q(".gb-pause"), timer: q(".gb-timer"),
+      mistakes: q(".gb-mistakes"), highlight: q(".gb-highlight"),
+      pause: q(".gb-pause"), timer: q(".gb-timer"),
       win: q(".gb-win")
     };
     els.board.style.setProperty("--sq-n", n);
@@ -141,6 +148,15 @@ var Board = (function () {
     }
     mistakesButton();
 
+    // Highlight on or off: the grid's class switches the tints off.
+    function highlightButton() {
+      els.highlight.innerHTML = icon(highlight ? "water_drop" : "format_color_reset");
+      els.highlight.setAttribute("aria-checked", highlight ? "true" : "false");
+      els.highlight.title = highlight ? "Highlight: on" : "Highlight: off";
+      els.grid.classList.toggle("no-highlight", !highlight);
+    }
+    highlightButton();
+
     // Shows the Solved window, building it in the first time.
     function openWin(build) {
       els.win.hidden = false;
@@ -181,7 +197,21 @@ var Board = (function () {
       showMistakes = !showMistakes;
       try { localStorage.setItem(o.storageKey, showMistakes ? "1" : "0"); } catch (err) {}
       mistakesButton();
+
+    // Highlight on or off: the grid's class switches the tints off.
+    function highlightButton() {
+      els.highlight.innerHTML = icon(highlight ? "water_drop" : "format_color_reset");
+      els.highlight.setAttribute("aria-checked", highlight ? "true" : "false");
+      els.highlight.title = highlight ? "Highlight: on" : "Highlight: off";
+      els.grid.classList.toggle("no-highlight", !highlight);
+    }
+    highlightButton();
       o.onMistakes(showMistakes);
+    });
+    els.highlight.addEventListener("click", function () {
+      highlight = !highlight;
+      try { localStorage.setItem("board-highlight", highlight ? "1" : "0"); } catch (err) {}
+      highlightButton();
     });
     // On a finished board, a click on it brings the Solved window back.
     els.grid.addEventListener("click", function () {

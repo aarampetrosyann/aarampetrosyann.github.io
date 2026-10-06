@@ -81,7 +81,8 @@
 }
 .gb-menu button:hover { background: color-mix(in srgb, var(--surface), var(--paper) 15%); }
 .gb-menu button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
-.gb-menu .gb-mistakes[aria-checked="false"] { opacity: 0.55; }
+.gb-menu .gb-mistakes[aria-checked="false"],
+.gb-menu .gb-highlight[aria-checked="false"] { opacity: 0.55; }
 .gb-menu .material-symbols-outlined,
 .gb-pause .material-symbols-outlined {
   font-family: "Material Symbols Outlined";
@@ -197,6 +198,9 @@
    decide which squares get these. */
 .gb-cell.gb-line { background: color-mix(in srgb, var(--game-button-ink), var(--game) 14%); }
 .gb-cell.gb-sel  { background: color-mix(in srgb, var(--game-button-ink), var(--game) 38%); }
+/* Highlight switched off in the settings pill. */
+.gb-grid.no-highlight .gb-cell.gb-line,
+.gb-grid.no-highlight .gb-cell.gb-sel { background: var(--game-button-ink); }
 /* Hint: the revealed number, in yellow, fixed in place. */
 .gb-cell.hint { color: var(--game-hint); cursor: default; }
 .gb-cell:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }
