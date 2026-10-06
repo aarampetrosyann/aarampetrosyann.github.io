@@ -158,18 +158,15 @@ var Shikaku = (function () {
    comes from board.js; this draws the squares and rectangles and
    plays Shikaku.
 
-   Rectangles grow from their number: press on a numbered square and
-   drag. Each direction you pull moves only that side of the number's
-   rectangle (pulling back toward the number shrinks it), so you can
-   drag left, let go, then drag down to make a rectangle with the
-   number anywhere inside. While it covers another number it shows
-   pulsing stripes, and letting go there starts that number over.
-   Tap a rectangle to remove it. Hint points one step in a direction
-   a number's rectangle still has to grow.
+   Drag from any square to any other to draw a rectangle (squares
+   count too); it replaces any rectangle it overlaps. While it covers
+   two or more numbers it shows pulsing stripes, and letting go there
+   places nothing. Tap a rectangle to remove it. Hint points one step
+   in a direction a number's rectangle still has to grow.
 
-   Keyboard: arrows move, Enter or Space on a number starts growing
-   it, arrows pull its sides, Enter or Space places it, Escape
-   cancels, Backspace or Delete removes the one under you. */
+   Keyboard: arrows move, Enter or Space starts a rectangle, arrows
+   stretch it, Enter or Space places it, Escape cancels, Backspace or
+   Delete removes the one under you. */
 (function () {
   var S = window.GameScreen;
   if (!S || !window.Board) return;
@@ -202,17 +199,10 @@ var Shikaku = (function () {
     return k >= 0 ? game.rects[k] : square(num);
   }
 
-  // Growing the number's rectangle toward square i: each direction
-  // pulled from the number moves that side; the others stay.
-  function grow(num, i) {
-    var n = game.n, b = base(num);
-    var nr = Math.floor(num / n), nc = num % n, r = Math.floor(i / n), c = i % n;
-    return {
-      r0: r < nr ? r : b.r0,
-      r1: r > nr ? r : b.r1,
-      c0: c < nc ? c : b.c0,
-      c1: c > nc ? c : b.c1
-    };
+  // The rectangle with squares a and b at opposite corners.
+  function span(a, b) {
+    var n = game.n, ar = Math.floor(a / n), ac = a % n, br = Math.floor(b / n), bc = b % n;
+    return { r0: Math.min(ar, br), c0: Math.min(ac, bc), r1: Math.max(ar, br), c1: Math.max(ac, bc) };
   }
 
   // A shade no touching rectangle uses (random among the free ones).
@@ -225,17 +215,14 @@ var Shikaku = (function () {
     return pool[Math.floor(Math.random() * pool.length)];
   }
 
-  // A rectangle growing from number `num` can't cover another number.
-  function blocked(t, num) {
-    var n = game.n;
-    return game.p.clues.some(function (cl) {
-      return cl.r * n + cl.c !== num && Shikaku.inside(t, cl.r, cl.c);
-    });
+  // A rectangle can't hold more than one number.
+  function blocked(t) {
+    return game.p.clues.filter(function (cl) { return Shikaku.inside(t, cl.r, cl.c); }).length > 1;
   }
 
-  // Drops this number's rectangle, so it starts over from its square.
-  function startOver(num) {
-    var k = at(num);
+  // Removes the rectangle covering square i, if any.
+  function removeAt(i) {
+    var k = at(i);
     if (k >= 0) game.rects.splice(k, 1);
   }
 
@@ -273,9 +260,9 @@ var Shikaku = (function () {
       grid.appendChild(el);
     });
 
-    // The rectangle being drawn, striped while it covers another number.
+    // The rectangle being drawn, striped while it covers two or more numbers.
     var draft = layer("sk-draft", game.draft);
-    if (draft) draft.classList.toggle("bad", blocked(game.draft, game.anchor));
+    if (draft) draft.classList.toggle("bad", blocked(game.draft));
     layer("sk-nudge", game.nudge);
     // Keyboard cursor (no row and column highlight in Shikaku: it
     // would muddle the shaded rectangles).
@@ -302,7 +289,7 @@ var Shikaku = (function () {
     game.sel = i;
     game.cells.forEach(function (b, k) { b.tabIndex = k === i ? 0 : -1; });
     game.cells[i].focus({ preventScroll: true, focusVisible: !fromPointer });
-    if (game.anchor >= 0) game.draft = grow(game.anchor, i);
+    if (game.anchor >= 0) game.draft = span(game.anchor, i);
     paint();
   }
 
@@ -384,7 +371,7 @@ var Shikaku = (function () {
 
     // Drag to draw. Pointer capture keeps the drag going if it leaves
     // the board; the square under the pointer is found by position.
-    var start = -1, moved = false, tap = -1;
+    var start = -1, moved = false;
     function cellAt(x, y) {
       var el = document.elementFromPoint(x, y);
       var b = el && el.closest && el.closest(".sk-grid .gb-cell");
@@ -399,12 +386,10 @@ var Shikaku = (function () {
       clearNudge();
       focusCell(i, true);
       game.anchor = -1;
-      if (!game.clueAt[i]) { tap = i; return; }   // not a number: maybe a tap to remove
       start = i;
       moved = false;
-      game.anchor = i;
       try { grid.setPointerCapture(e.pointerId); } catch (err) {}
-      game.draft = base(i);
+      game.draft = span(i, i);
       paint();
     });
     grid.addEventListener("pointermove", function (e) {
@@ -412,28 +397,21 @@ var Shikaku = (function () {
       var i = cellAt(e.clientX, e.clientY);
       if (i < 0) return;
       if (i !== start) moved = true;
-      game.draft = grow(start, i);
+      game.draft = span(start, i);
       game.sel = i;
       paint();
     });
-    function finishDrag(e) {
-      if (start < 0) {
-        // A tap off a number: remove the rectangle under it.
-        if (tap >= 0 && cellAt(e.clientX, e.clientY) === tap) { startOver(tap); paint(); }
-        tap = -1;
-        return;
-      }
+    function finishDrag() {
+      if (start < 0) return;
       var t = game.draft;
       game.draft = null;
-      game.anchor = -1;
-      if (!moved) startOver(start);                 // a tap on a number removes its rectangle
-      else if (blocked(t, start)) startOver(start); // let go over a number: start over
-      else place(t);
+      if (!moved) removeAt(start);        // a tap removes the rectangle under it
+      else if (!blocked(t)) place(t);     // over two numbers: nothing is placed
       start = -1;
       paint();
     }
     grid.addEventListener("pointerup", finishDrag);
-    grid.addEventListener("pointercancel", function () { start = -1; tap = -1; game.anchor = -1; game.draft = null; paint(); });
+    grid.addEventListener("pointercancel", function () { start = -1; game.draft = null; paint(); });
 
     grid.addEventListener("keydown", function (e) {
       var b = e.target.closest(".gb-cell");
@@ -449,12 +427,10 @@ var Shikaku = (function () {
         e.preventDefault();
         clearNudge();
         if (game.anchor < 0) {
-          if (!game.clueAt[i]) return;
           game.anchor = i;
-          game.draft = base(i);
+          game.draft = span(i, i);
         } else {
-          if (blocked(game.draft, game.anchor)) startOver(game.anchor);
-          else place(game.draft);
+          if (!blocked(game.draft)) place(game.draft);
           game.anchor = -1;
           game.draft = null;
         }
@@ -465,8 +441,8 @@ var Shikaku = (function () {
         paint();
       } else if (e.key === "Backspace" || e.key === "Delete") {
         e.preventDefault();
-        var k = at(i);
-        if (k >= 0) { game.rects.splice(k, 1); paint(); }
+        removeAt(i);
+        paint();
       }
     });
 
