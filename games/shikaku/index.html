@@ -83,26 +83,31 @@
 .sk-draft.empty { background: var(--sq-given); }
 @keyframes sk-pulse { from { opacity: 1; } to { opacity: 0.45; } }
 
-/* Live count of the drawn rectangle's squares, centered on it and
-   above the numbers so it's always readable. */
-.sk-count {
+/* Count of a rectangle's squares (while drawing and once placed):
+   a black number in a black ring, in the middle, or tucked in a
+   corner when the middle would sit on the number. Above the numbers
+   so it's always readable. */
+.sk-tally {
   z-index: 4;
   display: grid;
   place-items: center;
   pointer-events: none;
 }
-.sk-count span {
-  min-width: 1.6em;
-  padding: 0.15em 0.45em;
-  border-radius: 999px;
-  background: var(--game-ink);
-  color: var(--game-button-ink);
+.sk-tally.corner { place-items: end; padding: calc(var(--sq) * 0.08); }
+.sk-tally span {
+  display: grid;
+  place-items: center;
+  width: calc(var(--sq) * 0.38);
+  height: calc(var(--sq) * 0.38);
+  border: 2px solid var(--game-ink);
+  border-radius: 50%;
+  color: var(--game-ink);
   font-family: var(--display);
   font-weight: 700;
-  font-size: calc(var(--sq) * 0.28);
-  line-height: 1.2;
-  text-align: center;
+  font-size: calc(var(--sq) * 0.22);
+  line-height: 1;
 }
+.gb-grid.paused .sk-tally { visibility: hidden; }
 
 /* Hint: the next step for a number's rectangle, as a pulsing dashed
    outline over a light hint-yellow wash. */

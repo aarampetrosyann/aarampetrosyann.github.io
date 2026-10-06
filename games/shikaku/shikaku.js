@@ -159,12 +159,14 @@ var Shikaku = (function () {
    plays Shikaku.
 
    Drag from any square to any other to draw a rectangle (squares
-   count too); it replaces any rectangle it overlaps. A badge in its
-   middle counts its squares as it grows. It's placed only if it
-   holds exactly one number: with none it shows gray, with two or
-   more it shows pulsing stripes, and either way letting go places
-   nothing. Tap a rectangle to remove it. Hint points one step in a
-   direction a number's rectangle still has to grow.
+   count too). It stops at the edge of rectangles already placed;
+   starting inside one redraws it. A ringed count in the middle shows
+   its squares, and stays on placed rectangles so you can see if one
+   still needs to grow. It's placed only if it holds exactly one
+   number: with none it shows gray, with two or more it shows
+   pulsing stripes, and either way letting go places nothing. Tap a
+   rectangle to remove it. Hint points one step in a direction a
+   number's rectangle still has to grow.
 
    Keyboard: arrows move, Enter or Space starts a rectangle, arrows
    stretch it, Enter or Space places it, Escape cancels, Backspace or
@@ -217,6 +219,25 @@ var Shikaku = (function () {
     return pool[Math.floor(Math.random() * pool.length)];
   }
 
+  // The biggest rectangle from square `from` toward square `to` that
+  // doesn't enter any placed rectangle (except the one `from` is in,
+  // which is being redrawn). At least the starting square.
+  function fit(from, to) {
+    var n = game.n, fr = Math.floor(from / n), fc = from % n, tr = Math.floor(to / n), tc = to % n;
+    var others = game.rects.filter(function (o) { return !Shikaku.inside(o, fr, fc); });
+    var best = span(from, from), bestArea = 1, bestDist = Infinity;
+    var dr = tr >= fr ? 1 : -1, dc = tc >= fc ? 1 : -1;
+    for (var r = fr; r !== tr + dr; r += dr) {
+      for (var c = fc; c !== tc + dc; c += dc) {
+        var t = span(from, r * n + c);
+        if (others.some(function (o) { return overlaps(o, t); })) continue;
+        var a = Shikaku.area(t), d = Math.abs(tr - r) + Math.abs(tc - c);
+        if (a > bestArea || (a === bestArea && d < bestDist)) { best = t; bestArea = a; bestDist = d; }
+      }
+    }
+    return best;
+  }
+
   // How many numbers a rectangle holds; only exactly one can be placed.
   function numbersIn(t) {
     return game.p.clues.filter(function (cl) { return Shikaku.inside(t, cl.r, cl.c); }).length;
@@ -236,6 +257,22 @@ var Shikaku = (function () {
     game.rects.push(r);
   }
 
+  // A ringed count of a rectangle's squares, in its middle, or in its
+  // corner when the middle would sit on its number.
+  function tally(t, kind) {
+    var el = document.createElement("div");
+    var midR = (t.r0 + t.r1) / 2, midC = (t.c0 + t.c1) / 2;
+    var onNumber = game.p.clues.some(function (cl) {
+      return Shikaku.inside(t, cl.r, cl.c) && Math.abs(cl.r - midR) < 0.5 && Math.abs(cl.c - midC) < 0.5;
+    });
+    el.className = "sk-tally " + kind + (onNumber ? " corner" : "");
+    el.style.gridRow = (t.r0 + 1) + " / " + (t.r1 + 2);
+    el.style.gridColumn = (t.c0 + 1) + " / " + (t.c1 + 2);
+    el.setAttribute("aria-hidden", "true");
+    el.innerHTML = "<span>" + Shikaku.area(t) + "</span>";
+    game.shell.grid.appendChild(el);
+  }
+
   // An outline layer on the grid (draft, nudge, cursor), made once.
   function layer(cls, t) {
     var grid = game.shell.grid, el = grid.querySelector("." + cls);
@@ -248,7 +285,7 @@ var Shikaku = (function () {
 
   function paint() {
     var n = game.n, grid = game.shell.grid;
-    grid.querySelectorAll(".sk-rect").forEach(function (el) { el.remove(); });
+    grid.querySelectorAll(".sk-rect, .sk-tally.placed").forEach(function (el) { el.remove(); });
     var allValid = true, covered = 0;
     game.rects.forEach(function (t) {
       var ok = Shikaku.valid(game.p.clues, t);
@@ -260,17 +297,18 @@ var Shikaku = (function () {
       el.style.gridColumn = (t.c0 + 1) + " / " + (t.c1 + 2);
       el.setAttribute("aria-hidden", "true");
       grid.appendChild(el);
+      tally(t, "placed");
     });
 
     // The rectangle being drawn: gray with no number, striped with two
     // or more, and a badge counting its squares in the middle.
     var draft = layer("sk-draft", game.draft);
-    var count = layer("sk-count", game.draft);
+    grid.querySelectorAll(".sk-tally.drawing").forEach(function (el) { el.remove(); });
     if (draft) {
       var held = numbersIn(game.draft);
       draft.classList.toggle("empty", held === 0);
       draft.classList.toggle("bad", held > 1);
-      count.innerHTML = "<span>" + Shikaku.area(game.draft) + "</span>";
+      tally(game.draft, "drawing");
     }
     layer("sk-nudge", game.nudge);
     // Keyboard cursor (no row and column highlight in Shikaku: it
@@ -298,7 +336,7 @@ var Shikaku = (function () {
     game.sel = i;
     game.cells.forEach(function (b, k) { b.tabIndex = k === i ? 0 : -1; });
     game.cells[i].focus({ preventScroll: true, focusVisible: !fromPointer });
-    if (game.anchor >= 0) game.draft = span(game.anchor, i);
+    if (game.anchor >= 0) game.draft = fit(game.anchor, i);
     paint();
   }
 
@@ -406,7 +444,7 @@ var Shikaku = (function () {
       var i = cellAt(e.clientX, e.clientY);
       if (i < 0) return;
       if (i !== start) moved = true;
-      game.draft = span(start, i);
+      game.draft = fit(start, i);
       game.sel = i;
       paint();
     });
