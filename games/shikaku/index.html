@@ -57,12 +57,12 @@
 .sk-rect.error { box-shadow: inset 0 0 0 3px var(--game-wrong), inset 0 0 0 5px var(--game-button-ink); }
 
 /* The rectangle being drawn: a light wash with a dashed outline
-   inside, like the icon. Covering two or more numbers shows darker
-   red stripes that pulse slowly. */
+   inside, like the icon. With no number it turns gray; covering two
+   or more numbers shows darker red stripes that pulse slowly. */
 .sk-draft {
   z-index: 2;
   position: relative;
-  background: color-mix(in srgb, var(--game) 18%, transparent);
+  background: color-mix(in srgb, var(--game-button-ink), var(--game) 18%);   /* solid, so it reads as one shape over the gutters */
 }
 .sk-draft::after {
   content: "";
@@ -76,10 +76,33 @@
     repeating-linear-gradient(45deg,
       color-mix(in srgb, var(--game), var(--game-ink) 30%) 0 5px,
       transparent 5px 11px),
-    color-mix(in srgb, var(--game) 25%, transparent);
+    color-mix(in srgb, var(--game-button-ink), var(--game) 25%);
   animation: sk-pulse 1.4s ease-in-out infinite alternate;
 }
+/* No number inside yet: plain gray, and it won't be placed. */
+.sk-draft.empty { background: var(--sq-given); }
 @keyframes sk-pulse { from { opacity: 1; } to { opacity: 0.45; } }
+
+/* Live count of the drawn rectangle's squares, centered on it and
+   above the numbers so it's always readable. */
+.sk-count {
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+.sk-count span {
+  min-width: 1.6em;
+  padding: 0.15em 0.45em;
+  border-radius: 999px;
+  background: var(--game-ink);
+  color: var(--game-button-ink);
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: calc(var(--sq) * 0.28);
+  line-height: 1.2;
+  text-align: center;
+}
 
 /* Hint: the next step for a number's rectangle, as a pulsing dashed
    outline over a light hint-yellow wash. */

@@ -159,10 +159,12 @@ var Shikaku = (function () {
    plays Shikaku.
 
    Drag from any square to any other to draw a rectangle (squares
-   count too); it replaces any rectangle it overlaps. While it covers
-   two or more numbers it shows pulsing stripes, and letting go there
-   places nothing. Tap a rectangle to remove it. Hint points one step
-   in a direction a number's rectangle still has to grow.
+   count too); it replaces any rectangle it overlaps. A badge in its
+   middle counts its squares as it grows. It's placed only if it
+   holds exactly one number: with none it shows gray, with two or
+   more it shows pulsing stripes, and either way letting go places
+   nothing. Tap a rectangle to remove it. Hint points one step in a
+   direction a number's rectangle still has to grow.
 
    Keyboard: arrows move, Enter or Space starts a rectangle, arrows
    stretch it, Enter or Space places it, Escape cancels, Backspace or
@@ -215,9 +217,9 @@ var Shikaku = (function () {
     return pool[Math.floor(Math.random() * pool.length)];
   }
 
-  // A rectangle can't hold more than one number.
-  function blocked(t) {
-    return game.p.clues.filter(function (cl) { return Shikaku.inside(t, cl.r, cl.c); }).length > 1;
+  // How many numbers a rectangle holds; only exactly one can be placed.
+  function numbersIn(t) {
+    return game.p.clues.filter(function (cl) { return Shikaku.inside(t, cl.r, cl.c); }).length;
   }
 
   // Removes the rectangle covering square i, if any.
@@ -260,9 +262,16 @@ var Shikaku = (function () {
       grid.appendChild(el);
     });
 
-    // The rectangle being drawn, striped while it covers two or more numbers.
+    // The rectangle being drawn: gray with no number, striped with two
+    // or more, and a badge counting its squares in the middle.
     var draft = layer("sk-draft", game.draft);
-    if (draft) draft.classList.toggle("bad", blocked(game.draft));
+    var count = layer("sk-count", game.draft);
+    if (draft) {
+      var held = numbersIn(game.draft);
+      draft.classList.toggle("empty", held === 0);
+      draft.classList.toggle("bad", held > 1);
+      count.innerHTML = "<span>" + Shikaku.area(game.draft) + "</span>";
+    }
     layer("sk-nudge", game.nudge);
     // Keyboard cursor (no row and column highlight in Shikaku: it
     // would muddle the shaded rectangles).
@@ -405,8 +414,8 @@ var Shikaku = (function () {
       if (start < 0) return;
       var t = game.draft;
       game.draft = null;
-      if (!moved) removeAt(start);        // a tap removes the rectangle under it
-      else if (!blocked(t)) place(t);     // over two numbers: nothing is placed
+      if (!moved) removeAt(start);              // a tap removes the rectangle under it
+      else if (numbersIn(t) === 1) place(t);    // none, or two or more: nothing is placed
       start = -1;
       paint();
     }
@@ -430,7 +439,7 @@ var Shikaku = (function () {
           game.anchor = i;
           game.draft = span(i, i);
         } else {
-          if (!blocked(game.draft)) place(game.draft);
+          if (numbersIn(game.draft) === 1) place(game.draft);
           game.anchor = -1;
           game.draft = null;
         }
