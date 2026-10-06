@@ -23,24 +23,25 @@
 <style>
 /* ============================================================
    KAKURO BOARD  (built by kakuro.js; the frame is in board.css)
-   Black squares blend into the board's frame. Clue squares are
-   split by a diagonal like the game's icon: the across sum sits
-   in the top-right half, the down sum in the bottom-left half,
-   and a half without a sum stays black.
+   Squares that aren't played in are the shared light gray
+   (--sq-given, the same as Takuzu's starting numbers). Clue squares
+   are split by a diagonal like the game's icon: the across sum sits
+   in the white top-right half, the down sum in the white bottom-left
+   half, and a half without a sum stays gray. The diagonal is a real
+   line as thick as the board's gutters, so it joins the frame at
+   both corners. Starting digits sit on white, like printed Kakuro.
    ============================================================ */
 .kk-block {
+  position: relative;
+  overflow: hidden;
   border-radius: 3px;
-  background: var(--game-ink);
+  background: var(--sq-given);
   color: var(--game-ink);
 }
 .kk-clue {
-  --kk-a: var(--game-ink);
-  --kk-d: var(--game-ink);
-  position: relative;
-  background: linear-gradient(to top right,
-    var(--kk-d) calc(50% - 1px),
-    var(--game-ink) calc(50% - 1px) calc(50% + 1px),
-    var(--kk-a) calc(50% + 1px));
+  --kk-a: var(--sq-given);
+  --kk-d: var(--sq-given);
+  background: linear-gradient(to top right, var(--kk-d) 50%, var(--kk-a) 50%);
   font-family: var(--display);
   font-weight: 700;
   font-size: calc(var(--sq) * 0.27);
@@ -48,8 +49,26 @@
 }
 .kk-clue.has-a { --kk-a: var(--game-button-ink); }
 .kk-clue.has-d { --kk-d: var(--game-button-ink); }
+.kk-clue svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.kk-clue line {
+  stroke: var(--game-ink);
+  stroke-width: var(--sq-gap);
+  stroke-linecap: square;
+  vector-effect: non-scaling-stroke;
+}
+.gb-grid.paused .kk-clue svg { visibility: hidden; }
 .kk-a { position: absolute; top: 12%; right: 12%; }
 .kk-d { position: absolute; bottom: 12%; left: 12%; }
+
+/* Starting digits on white: locked in, like printed Kakuro. */
+.gb-cell.given,
+.gb-cell.given:hover { background: var(--game-button-ink); }
 
 /* The selected square, and lighter, the rest of its two runs. */
 .gb-cell.kk-run { background: color-mix(in srgb, var(--game-button-ink), var(--game) 14%); }

@@ -506,6 +506,7 @@ var Kakuro = (function () {
           // split by the diagonal; an unused half stays black.
           el.className += " kk-clue" + (p.across[i] ? " has-a" : "") + (p.down[i] ? " has-d" : "");
           el.innerHTML =
+            '<svg viewBox="0 0 100 100" preserveAspectRatio="none"><line x1="0" y1="0" x2="100" y2="100"/></svg>' +
             (p.across[i] ? '<span class="kk-a">' + p.across[i] + "</span>" : "") +
             (p.down[i] ? '<span class="kk-d">' + p.down[i] + "</span>" : "");
         }

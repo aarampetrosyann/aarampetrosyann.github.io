@@ -94,6 +94,10 @@
    The header sits directly above it, one grid square tall: size on
    the left, the name centered, pause and timer on the right. */
 .gb-board {
+  /* The light gray for squares that aren't for playing in (Takuzu's
+     starting numbers, Kakuro's empty squares): one shade for every
+     game, so they always match. */
+  --sq-given: color-mix(in srgb, var(--game-button-ink), var(--game-ink) 16%);
   grid-row: 1 / -1;
   grid-column: 1 / -1;
   justify-self: center;
@@ -185,7 +189,7 @@
 .gb-cell:hover { background: color-mix(in srgb, var(--game-button-ink), var(--game-ink) 6%); }
 .gb-cell.given,
 .gb-cell.given:hover {
-  background: color-mix(in srgb, var(--game-button-ink), var(--game-ink) 16%);
+  background: var(--sq-given);
   cursor: default;
 }
 /* Mistakes and Check marks, in bright colors that read on white. */
