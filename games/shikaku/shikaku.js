@@ -161,7 +161,8 @@ var Shikaku = (function () {
    Drag from any square to any other to draw a rectangle (squares
    count too). It stops at the edge of rectangles already placed;
    starting inside one redraws it. A ringed count in the middle shows
-   its squares, and stays on placed rectangles so you can see if one
+   its squares (moved half a square aside if the middle is its
+   number), and stays on placed rectangles so you can see if one
    still needs to grow. It's placed only if it holds exactly one
    number: with none it shows gray, with two or more it shows
    pulsing stripes, and either way letting go places nothing. Tap a
@@ -263,8 +264,9 @@ var Shikaku = (function () {
     game.rects.push(r);
   }
 
-  // A ringed count of a rectangle's squares, in its middle, or in its
-  // corner when the middle would sit on its number.
+  // A ringed count of a rectangle's squares, in its middle. When the
+  // middle sits on its number, it moves half a square to the next
+  // nearest middle: sideways in wide shapes, down in tall ones.
   function tally(t, kind) {
     if (Shikaku.area(t) < 2) return;   // no shape is a single square, so no count of 1
     var el = document.createElement("div");
@@ -272,7 +274,8 @@ var Shikaku = (function () {
     var onNumber = game.p.clues.some(function (cl) {
       return Shikaku.inside(t, cl.r, cl.c) && Math.abs(cl.r - midR) < 0.5 && Math.abs(cl.c - midC) < 0.5;
     });
-    el.className = "sk-tally " + kind + (onNumber ? " corner" : "");
+    var wide = t.c1 - t.c0 >= t.r1 - t.r0;
+    el.className = "sk-tally " + kind + (onNumber ? (wide ? " aside-x" : " aside-y") : "");
     el.style.gridRow = (t.r0 + 1) + " / " + (t.r1 + 2);
     el.style.gridColumn = (t.c0 + 1) + " / " + (t.c1 + 2);
     el.setAttribute("aria-hidden", "true");

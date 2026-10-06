@@ -84,16 +84,17 @@
 @keyframes sk-pulse { from { opacity: 1; } to { opacity: 0.45; } }
 
 /* Count of a rectangle's squares (while drawing and once placed):
-   a black number in a black ring, in the middle, or tucked in a
-   corner when the middle would sit on the number. Above the numbers
-   so it's always readable. */
+   a black number in a black ring, in the middle. When the middle
+   would sit on the number, it moves half a square to the next
+   nearest middle. Above the numbers so it's always readable. */
 .sk-tally {
   z-index: 4;
   display: grid;
   place-items: center;
   pointer-events: none;
 }
-.sk-tally.corner { place-items: end; padding: calc(var(--sq) * 0.08); }
+.sk-tally.aside-x span { transform: translateX(calc(var(--sq) / 2)); }
+.sk-tally.aside-y span { transform: translateY(calc(var(--sq) / 2)); }
 .sk-tally span {
   display: grid;
   place-items: center;
