@@ -6,8 +6,9 @@
    - opens and closes the How to play window, building it in from
      shades of white,
    - and, on Play, covers the start screen in shades of the page
-     background to clear a cell for the board (a placeholder until
-     the boards exist).
+     background to clear a cell for the board, then hands it to the
+     game (see "gamestart" below). Games without a board yet get a
+     placeholder.
    ============================================================ */
 (function () {
   var card = document.querySelector(".game-card");
@@ -53,6 +54,7 @@
     card.style.setProperty("--u", u + "px");
     card.style.setProperty("--cols", cols);
     card.style.setProperty("--rows", rows);
+    card.dispatchEvent(new CustomEvent("gamelayout"));
 
     var dc = cols / unit, dr = rows / unit;
     var h = rows * cell, dpr = window.devicePixelRatio || 1;
@@ -165,8 +167,14 @@
 
   // Play: the start screen is covered square by square in shades of
   // the page background (the theme's --paper, mixed toward --ink),
-  // leaving a plain cell of the grid where the board goes. Until the
-  // board exists, that cell shows the chosen options and a Back button.
+  // leaving a plain cell of the grid where the board goes.
+  //
+  // Games hook in through two events on the card:
+  //   "gamestart"  detail: { size, level, board }. A game that draws
+  //                its own board into `board` calls preventDefault();
+  //                otherwise a placeholder with a Back button shows.
+  //   "gameend"    fired when the player leaves the board.
+  // and through window.GameScreen (buildIn, hexRGB, exit, card).
   var form = document.getElementById("setup");
   var cover = document.createElement("canvas");
   cover.className = "cover";
@@ -174,20 +182,37 @@
   var board = document.createElement("div");
   board.className = "board";
   board.innerHTML =
-    '<p class="board-info" aria-live="polite"></p>' +
-    '<p class="board-note">The board goes here.</p>' +
-    '<button class="board-back" type="button">Back</button>';
+    '<div class="board-placeholder">' +
+      '<p class="board-info" aria-live="polite"></p>' +
+      '<p class="board-note">The board goes here.</p>' +
+      '<button class="board-back" type="button">Back</button>' +
+    '</div>';
   card.appendChild(cover);
   card.appendChild(board);
+  var placeholder = board.querySelector(".board-placeholder");
   var info = board.querySelector(".board-info");
   var back = board.querySelector(".board-back");
   var cancelCover = function () {};
 
   function startGame() {
-    var size = form.elements.size.value, level = form.elements.level.value;
-    info.textContent = size + "\u00d7" + size + " \u00b7 " + level;
+    var size = Number(form.elements.size.value), level = form.elements.level.value;
     card.classList.add("playing");
-    back.focus();
+    var ev = new CustomEvent("gamestart", {
+      cancelable: true,
+      detail: { size: size, level: level, board: board }
+    });
+    card.dispatchEvent(ev);
+    placeholder.hidden = ev.defaultPrevented;
+    if (!ev.defaultPrevented) {
+      info.textContent = size + "\u00d7" + size + " \u00b7 " + level;
+      back.focus();
+    }
+  }
+
+  function exitGame() {
+    card.classList.remove("playing");
+    card.dispatchEvent(new CustomEvent("gameend"));
+    form.querySelector(".play").focus();
   }
 
   form.addEventListener("submit", function (e) {
@@ -202,8 +227,13 @@
     });
   });
 
-  back.addEventListener("click", function () {
-    card.classList.remove("playing");
-    form.querySelector(".play").focus();
-  });
+  back.addEventListener("click", exitGame);
+
+  window.GameScreen = {
+    card: card,
+    buildIn: buildIn,
+    hexRGB: hexRGB,
+    reduceMotion: reduceMotion,
+    exit: exitGame
+  };
 })();

@@ -1,0 +1,279 @@
+/* ============================================================
+   BOARD.CSS
+   The in-game frame shared by every game's board (built by
+   board.js): corner buttons, the settings pill, the header with
+   pause and timer, the board's frame, the basic square and its
+   states, and the Solved window. Only game pages load this file.
+
+   Boards are drawn like the game icons: white squares on a
+   near-black base that shows as a frame and gutters. --sq is one
+   square (the card's small grid square, or less on narrow
+   screens), --sq-gap the frame width, --sq-n squares across. The
+   board looks the same in light and dark mode, like the icons.
+   ============================================================ */
+.gb { display: contents; }
+
+/* Back and settings sit in the top corner squares. */
+.board .gb-exit     { grid-row: 1; grid-column: 1; justify-self: center; align-self: center; }
+.board .gb-settings,
+.board .gb-again    { grid-row: 1; grid-column: -2 / -1; justify-self: center; align-self: center; }
+.board .gb-again[hidden],
+.board .gb-settings[hidden] { display: none; }
+.board .gb-settings:disabled { opacity: 0.35; cursor: default; }
+
+/* Settings menu: a vertical pill in the nav panel's colors that
+   grows down out of the gear, so the gear becomes its top button.
+   --btn is one button (a grid square, inset); --pad the pill's edge.
+   The clip uses a fixed corner radius of half the pill's width, so
+   the rounded ends keep their shape the whole way down. */
+.gb-menu {
+  --btn: calc(var(--cell) - var(--inset) * 2);
+  --pad: 0.35rem;
+  --radius: calc(var(--btn) / 2 + var(--pad));
+  grid-row: 1 / span 7;
+  grid-column: -2 / -1;
+  justify-self: center;
+  align-self: start;
+  margin-top: calc(var(--inset) - var(--pad));
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  /* the top slot is left for the gear, which sits over it */
+  padding: calc(var(--btn) + var(--pad) + 0.15rem) var(--pad) var(--pad);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--paper);
+  visibility: hidden;
+  opacity: 0;
+  clip-path: inset(0 0 calc(100% - var(--btn) - var(--pad) * 2) 0 round var(--radius));
+  transition:
+    clip-path 0.32s cubic-bezier(0.32, 0.12, 0.2, 1),
+    opacity 0.2s ease,
+    visibility 0s linear 0.32s;
+}
+.gb-menu.open {
+  visibility: visible;
+  opacity: 1;
+  clip-path: inset(0 round var(--radius));
+  transition:
+    clip-path 0.32s cubic-bezier(0.32, 0.12, 0.2, 1),
+    opacity 0.15s ease,
+    visibility 0s;
+}
+/* The gear sits on top of the pill and takes its icon color. */
+.board .gb-settings { position: relative; z-index: 4; transition: color 0.2s ease; }
+.board .gb-settings.open { color: var(--paper); }
+@media (prefers-reduced-motion: reduce) {
+  .gb-menu, .gb-menu.open, .board .gb-settings { transition: none; }
+}
+.gb-menu button {
+  width: var(--btn);
+  height: var(--btn);
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+.gb-menu button:hover { background: color-mix(in srgb, var(--surface), var(--paper) 15%); }
+.gb-menu button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.gb-menu .gb-mistakes[aria-checked="false"],
+.gb-menu .gb-highlight[aria-checked="false"] { opacity: 0.55; }
+.gb-menu .material-symbols-outlined,
+.gb-pause .material-symbols-outlined {
+  font-family: "Material Symbols Outlined";
+  font-size: 26px;
+  line-height: 1;
+  font-variation-settings: "wght" 500, "opsz" 24;
+}
+
+/* The board: centered on the card's grid, n squares of --sq wide.
+   The header sits directly above it, one grid square tall: size on
+   the left, the name centered, pause and timer on the right. */
+.gb-board {
+  /* The light gray for squares that aren't for playing in (Takuzu's
+     starting numbers, Kakuro's empty squares): one shade for every
+     game, so they always match. */
+  --sq-given: color-mix(in srgb, var(--game-button-ink), var(--game-ink) 16%);
+  grid-row: 1 / -1;
+  grid-column: 1 / -1;
+  justify-self: center;
+  align-self: center;
+  position: relative;
+  width: calc(var(--sq) * var(--sq-n));
+  height: calc(var(--sq) * var(--sq-n));
+}
+.gb-head {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 100%;
+  height: var(--cell);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0 var(--sq-gap);         /* lines up with the inside of the frame */
+  color: var(--ink);
+}
+.gb-head p { margin: 0; }
+.gb-size { justify-self: start; color: var(--muted); font-weight: 500; }
+.gb-name { font-family: var(--display); font-weight: 700; font-size: 1.35rem; }
+.gb-clock { justify-self: end; display: flex; align-items: center; gap: 0.25rem; }
+.gb-timer {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 1.35rem;
+  font-variant-numeric: tabular-nums;
+}
+.gb-pause {
+  width: 2.25rem;
+  height: 2.25rem;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: var(--ink);
+  cursor: pointer;
+}
+.gb-pause:hover { opacity: 0.7; }
+.gb-pause:disabled { visibility: hidden; }
+.gb-pause:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.gb-grid {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(var(--sq-n), 1fr);
+  grid-template-rows: repeat(var(--sq-n), 1fr);
+  gap: var(--sq-gap);
+  padding: var(--sq-gap);
+  border-radius: calc(var(--sq-gap) * 1.5);
+  background: var(--game-ink);
+}
+/* Paused: every square goes blank and ignores input until play is
+   pressed (games add their own rules for extra marks, like clues). */
+.gb-grid.paused > *,
+.gb-below.paused > * {
+  color: transparent;
+  background: color-mix(in srgb, var(--game-button-ink), var(--game-ink) 8%);
+  pointer-events: none;
+}
+
+/* Optional area under the board, e.g. a number pad. */
+.gb-below {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+}
+.gb-cell {
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background: var(--game-button-ink);
+  color: var(--game-ink);
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: calc(var(--sq) * 0.45);
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+.gb-cell:hover { background: color-mix(in srgb, var(--game-button-ink), var(--game-ink) 6%); }
+.gb-cell.given,
+.gb-cell.given:hover {
+  background: var(--sq-given);
+  cursor: default;
+}
+/* Mistakes and Check marks, in bright colors that read on white. */
+.gb-cell.error,
+.gb-cell.wrong { color: var(--game-wrong); }
+.gb-cell.right { color: var(--game-right); }
+/* The selected square, and lighter, the rest of its lines (its row
+   and column, or its runs), tinted with the game's color. Games
+   decide which squares get these. */
+.gb-cell.gb-line { background: color-mix(in srgb, var(--game-button-ink), var(--game) 14%); }
+.gb-cell.gb-sel  { background: color-mix(in srgb, var(--game-button-ink), var(--game) 38%); }
+/* Highlight switched off in the settings pill. */
+.gb-grid.no-highlight .gb-cell.gb-line,
+.gb-grid.no-highlight .gb-cell.gb-sel { background: var(--game-button-ink); }
+/* Hint: the revealed number, in yellow, fixed in place. */
+.gb-cell.hint { color: var(--game-hint); cursor: default; }
+.gb-cell:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }
+
+/* Solved: the board stays as it is; a click on it reopens the
+   Solved window. */
+.gb-grid.solved > * { cursor: pointer; }
+
+/* Solved window: same build-in and placement as How to play. */
+.gb-win {
+  grid-row: 2 / -2;
+  grid-column: 1 / -1;
+  z-index: 10;                      /* above everything a game draws on the board */
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: var(--game-button-ink);
+  color: var(--game-ink);
+  text-align: center;
+}
+.game-card.big .gb-win { grid-row: 3 / -3; grid-column: 3 / -3; }
+.gb-win[hidden] { display: none; }
+.gb-win .build {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.gb-win.building { background: transparent; }
+.gb-win > :not(.build) { transition: opacity 0.25s ease; }
+/* Hidden at once while building (no fade out first, which looked
+   like the window opening twice); the fade is only on the way in. */
+.gb-win.building > :not(.build) { opacity: 0; transition: none; }
+/* Three stars above Solved, the middle one bigger, on one baseline. */
+.gb-stars { display: flex; align-items: flex-end; gap: 0.35rem; margin-bottom: 0.25rem; }
+.gb-stars svg { width: 2.25rem; height: 2.25rem; fill: var(--game-hint); }
+.gb-stars svg:nth-child(2) { width: 3rem; height: 3rem; }
+.gb-win h2 { margin: 0; font-size: 2rem; }
+.gb-win p { margin: 0 0 0.75rem; }
+/* Options stacked, all the same width: New puzzle is the solid one. */
+.gb-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.5rem;
+  width: min(15rem, 100%);
+}
+.gb-actions button {
+  padding: 0.7rem 1.25rem;
+  border: 0;
+  border-radius: 4px;
+  background: var(--game-ink);
+  color: var(--game-button-ink);
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.gb-actions button:hover { opacity: 0.88; }
+.gb-actions .gb-back,
+.gb-actions .gb-options {
+  background: none;
+  color: var(--game-ink);
+  box-shadow: inset 0 0 0 2px var(--game-ink);
+}
+.gb-win :focus-visible { outline: 2px solid var(--game-ink); outline-offset: 3px; }

@@ -6,4 +6,5 @@
 - Nav panel wording lives in the `COPY` object in `navpanel.js`.
 - Page-specific CSS belongs in that page's `<style>` block; only shared styles go in `styles.css`.
 - Game pages (`games/<game>/index.html`) share their start-screen layout and behavior through `game.css` and `game.js` at the root, which only game pages load. Each game's colors are tokens in `styles.css`, mapped to a card class at the top of `game.css`.
+- Game boards share their frame (header, timer, pause, settings pill, Solved window) through `board.css` and `board.js` at the root; each game's own script (e.g. `games/takuzu/takuzu.js`) only draws its squares and plays its rules.
 - Post files sit one folder deep and link to `../styles.css`; games will be two deep and use `../../`.

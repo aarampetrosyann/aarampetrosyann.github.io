@@ -12,13 +12,111 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <!-- Google's Material Symbols at bold weight, only the two icons used -->
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,500,0,0&icon_names=close,help&display=block" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,500,0,0&icon_names=arrow_back,auto_fix_high,backspace,check,close,extension,format_color_reset,help,lightbulb,pause,play_arrow,restart_alt,settings,visibility,visibility_off,water_drop&display=block" rel="stylesheet">
 <link rel="stylesheet" href="../../styles.css">
 <link rel="stylesheet" href="../../game.css">
+<link rel="stylesheet" href="../../board.css">
 
 <!-- Applies saved theme before paint, then builds the settings panel -->
 <script src="../../settings.js"></script>
 
+<style>
+/* ============================================================
+   KAKURO BOARD  (built by kakuro.js; the frame is in board.css)
+   Squares that aren't played in are the shared light gray
+   (--sq-given, the same as Takuzu's starting numbers). Clue squares
+   are split by a diagonal like the game's icon: the across sum sits
+   in the white top-right half, the down sum in the white bottom-left
+   half, and a half without a sum stays gray. The diagonal is a real
+   line as thick as the board's gutters, so it joins the frame at
+   both corners. Starting digits sit on white, like printed Kakuro.
+   ============================================================ */
+.kk-block {
+  position: relative;
+  overflow: hidden;
+  border-radius: 3px;
+  background: var(--sq-given);
+  color: var(--game-ink);
+}
+.kk-clue {
+  --kk-a: var(--sq-given);
+  --kk-d: var(--sq-given);
+  background: linear-gradient(to top right, var(--kk-d) 50%, var(--kk-a) 50%);
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: calc(var(--sq) * 0.27);
+  line-height: 1;
+}
+.kk-clue.has-a { --kk-a: var(--game-button-ink); }
+.kk-clue.has-d { --kk-d: var(--game-button-ink); }
+.kk-clue svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.kk-clue line {
+  stroke: var(--game-ink);
+  stroke-width: var(--sq-gap);
+  stroke-linecap: square;
+  vector-effect: non-scaling-stroke;
+}
+.gb-grid.paused .kk-clue svg { visibility: hidden; }
+.kk-a { position: absolute; top: 12%; right: 12%; }
+.kk-d { position: absolute; bottom: 12%; left: 12%; }
+
+/* Starting digits on white: locked in, like printed Kakuro. */
+.gb-cell.given,
+.gb-cell.given:hover { background: var(--game-button-ink); }
+
+
+.kk-making {
+  grid-column: 1 / -1;
+  grid-row: 1 / -1;
+  align-self: center;
+  justify-self: center;
+  margin: 0;
+  color: var(--game-button-ink);
+}
+
+/* Number pad under the board, drawn like the board: 1-9 and erase.
+   Only on touch screens, where there's no keyboard to type digits;
+   with a mouse and keyboard, typing is quicker. */
+.kk-pad { display: none; }
+@media (hover: none), (pointer: coarse) {
+  .kk-pad { display: grid; }
+}
+.kk-pad {
+  margin-top: calc(var(--sq-gap) * 2);
+  grid-template-columns: repeat(10, 1fr);
+  gap: var(--sq-gap);
+  padding: var(--sq-gap);
+  border-radius: calc(var(--sq-gap) * 1.5);
+  background: var(--game-ink);
+}
+.kk-pad button {
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background: var(--game-button-ink);
+  color: var(--game-ink);
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: calc(var(--sq) * var(--sq-n) / 10 * 0.5);   /* half a key */
+  cursor: pointer;
+}
+.kk-pad button:hover { background: color-mix(in srgb, var(--game-button-ink), var(--game-ink) 8%); }
+.kk-pad button:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }
+.kk-pad .material-symbols-outlined {
+  font-family: "Material Symbols Outlined";
+  font-size: calc(var(--sq) * var(--sq-n) / 10 * 0.55);
+  font-variation-settings: "wght" 500, "opsz" 24;
+}
+</style>
 </head>
 
 <body>
@@ -63,9 +161,9 @@
       <fieldset class="options size">
         <legend class="sr-only">Grid size</legend>
         <div class="choices">
-          <input type="radio" name="size" id="size-5" value="5" checked><label for="size-5">5&times;5</label>
-          <input type="radio" name="size" id="size-7" value="7"><label for="size-7">7&times;7</label>
-          <input type="radio" name="size" id="size-9" value="9"><label for="size-9">9&times;9</label>
+          <input type="radio" name="size" id="size-6" value="6" checked><label for="size-6">6&times;6</label>
+          <input type="radio" name="size" id="size-8" value="8"><label for="size-8">8&times;8</label>
+          <input type="radio" name="size" id="size-10" value="10"><label for="size-10">10&times;10</label>
         </div>
       </fieldset>
       <fieldset class="options level">
@@ -135,6 +233,9 @@
 
 <!-- Start screen: grid, mosaic, How to play -->
 <script src="../../game.js"></script>
+<!-- Board frame shared by all games, then the Kakuro board itself -->
+<script src="../../board.js"></script>
+<script src="kakuro.js"></script>
 
 <!-- Hover scramble effect on the nav links -->
 <script src="../../scramble.js"></script>

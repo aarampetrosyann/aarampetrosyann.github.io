@@ -12,13 +12,137 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <!-- Google's Material Symbols at bold weight, only the two icons used -->
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,500,0,0&icon_names=close,help&display=block" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,500,0,0&icon_names=arrow_back,close,extension,help,lightbulb,pause,play_arrow,restart_alt,settings,visibility,visibility_off&display=block" rel="stylesheet">
 <link rel="stylesheet" href="../../styles.css">
 <link rel="stylesheet" href="../../game.css">
+<link rel="stylesheet" href="../../board.css">
 
 <!-- Applies saved theme before paint, then builds the settings panel -->
 <script src="../../settings.js"></script>
 
+<style>
+/* ============================================================
+   SHIKAKU BOARD  (built by shikaku.js; the frame is in board.css)
+   Each placed rectangle is one block laid over its squares and the
+   gutters between them, so it reads as a single shape. Blocks use
+   five tints of the game's red, and touching blocks never share a
+   tint. Numbers sit above the blocks so they always show.
+   ============================================================ */
+.sk-grid { touch-action: none; user-select: none; }   /* dragging draws, not scrolls or selects */
+/* Squares sit under the rectangles, so the keyboard cursor is its own
+   outline on top of everything, shown only when using the keyboard. */
+.sk-grid .gb-cell:focus-visible { outline: none; }
+.sk-cursor {
+  z-index: 4;
+  display: none;
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 3px var(--accent);
+  pointer-events: none;
+}
+.sk-grid:has(.gb-cell:focus-visible) .sk-cursor { display: block; }
+
+.sk-rect,
+.sk-draft {
+  z-index: 1;
+  border-radius: 3px;
+  pointer-events: none;
+}
+.sk-rect.shade-0 { background: color-mix(in srgb, var(--game-button-ink), var(--game) 22%); }
+.sk-rect.shade-1 { background: color-mix(in srgb, var(--game-button-ink), var(--game) 34%); }
+.sk-rect.shade-2 { background: color-mix(in srgb, var(--game-button-ink), var(--game) 46%); }
+.sk-rect.shade-3 { background: color-mix(in srgb, var(--game-button-ink), var(--game) 58%); }
+.sk-rect.shade-4 { background: color-mix(in srgb, var(--game-button-ink), var(--game) 70%); }
+/* Rule breaks (Show mistakes): a red ring with a thin white ring
+   inside, so it shows on the red tints. */
+.sk-rect.error { box-shadow: inset 0 0 0 3px var(--game-wrong), inset 0 0 0 5px var(--game-button-ink); }
+
+/* The rectangle being drawn: a light wash with a dashed outline
+   inside, like the icon. With no number it turns gray; covering two
+   or more numbers shows darker red stripes that pulse slowly. */
+.sk-draft {
+  z-index: 2;
+  position: relative;
+  background: color-mix(in srgb, var(--game-button-ink), var(--game) 18%);   /* solid, so it reads as one shape over the gutters */
+}
+.sk-draft::after {
+  content: "";
+  position: absolute;
+  inset: calc(var(--sq) * 0.1);
+  border: 2px dashed var(--game-ink);
+  border-radius: 2px;
+}
+.sk-draft.bad {
+  background:
+    repeating-linear-gradient(45deg,
+      color-mix(in srgb, var(--game), var(--game-ink) 30%) 0 5px,
+      transparent 5px 11px),
+    color-mix(in srgb, var(--game-button-ink), var(--game) 25%);
+  animation: sk-pulse 1.4s ease-in-out infinite alternate;
+}
+/* No number inside yet: plain gray, and it won't be placed. */
+.sk-draft.empty { background: var(--sq-given); }
+@keyframes sk-pulse { from { opacity: 1; } to { opacity: 0.45; } }
+
+/* Count of a rectangle's squares (while drawing and once placed):
+   a black number in a black ring, in the middle. When the middle
+   would sit on the number, it moves half a square to the next
+   nearest middle. Above the numbers so it's always readable. */
+.sk-tally {
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+.sk-tally.aside-x span { transform: translateX(calc(var(--sq) / 2)); }
+.sk-tally.aside-y span { transform: translateY(calc(var(--sq) / 2)); }
+.sk-tally span {
+  display: grid;
+  place-items: center;
+  width: calc(var(--sq) * 0.3);
+  height: calc(var(--sq) * 0.3);
+  border: 1.5px solid var(--game-ink);
+  border-radius: 50%;
+  color: var(--game-ink);
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: calc(var(--sq) * 0.17);
+  line-height: 1;
+}
+.gb-grid.paused .sk-tally { visibility: hidden; }
+
+/* Hint: the next step for a number's rectangle, as a pulsing dashed
+   outline over a light hint-yellow wash. */
+.sk-nudge {
+  z-index: 2;
+  position: relative;
+  border-radius: 3px;
+  pointer-events: none;
+  background: color-mix(in srgb, var(--game-hint) 30%, transparent);
+  animation: sk-pulse 0.8s ease-in-out infinite alternate;
+}
+.sk-nudge::after {
+  content: "";
+  position: absolute;
+  inset: calc(var(--sq) * 0.1);
+  border: 2px dashed var(--game-ink);
+  border-radius: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sk-draft.bad, .sk-nudge { animation: none; }
+}
+
+.sk-num {
+  z-index: 3;   /* above rectangles and the one being drawn */
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  color: var(--game-ink);
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: calc(var(--sq) * 0.45);
+  line-height: 1;
+}
+</style>
 </head>
 
 <body>
@@ -63,8 +187,8 @@
       <fieldset class="options size">
         <legend class="sr-only">Grid size</legend>
         <div class="choices">
-          <input type="radio" name="size" id="size-5" value="5" checked><label for="size-5">5&times;5</label>
-          <input type="radio" name="size" id="size-7" value="7"><label for="size-7">7&times;7</label>
+          <input type="radio" name="size" id="size-6" value="6" checked><label for="size-6">6&times;6</label>
+          <input type="radio" name="size" id="size-8" value="8"><label for="size-8">8&times;8</label>
           <input type="radio" name="size" id="size-10" value="10"><label for="size-10">10&times;10</label>
         </div>
       </fieldset>
@@ -135,6 +259,9 @@
 
 <!-- Start screen: grid, mosaic, How to play -->
 <script src="../../game.js"></script>
+<!-- Board frame shared by all games, then the Shikaku board itself -->
+<script src="../../board.js"></script>
+<script src="shikaku.js"></script>
 
 <!-- Hover scramble effect on the nav links -->
 <script src="../../scramble.js"></script>

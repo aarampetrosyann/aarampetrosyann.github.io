@@ -324,16 +324,31 @@
 .game-card.playing { background: var(--paper); color: var(--ink); }
 .game-card.playing > :not(.board):not(.cover) { visibility: hidden; }
 
-/* Placeholder board until the real one exists. */
+/* The board area covers the whole card with the same grid of
+   squares, so a game can place things on exactly those squares. */
 .game-card > .board {
   grid-row: 1 / -1;
+  justify-self: stretch;
+  align-self: stretch;
   display: none;
+  grid-template-columns: repeat(var(--cols), var(--cell));
+  grid-template-rows: repeat(var(--rows), var(--cell));
+}
+.game-card.playing > .board { display: grid; }
+/* Icons on the board follow the page's text color, not the game's. */
+.game-card.playing .icon-btn { color: var(--ink); }
+
+/* Placeholder for games whose board doesn't exist yet. */
+.board-placeholder {
+  grid-column: 1 / -1;
+  grid-row: 1 / -1;
+  display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
 }
-.game-card.playing > .board { display: flex; }
+.board-placeholder[hidden] { display: none; }
 .board p { margin: 0; }
 .board-info {
   font-family: var(--display);
