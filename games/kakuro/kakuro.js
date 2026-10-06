@@ -384,8 +384,8 @@ var Kakuro = (function () {
       b.classList.toggle("hint", game.hints.has(i));
       b.classList.toggle("right", mark === "correct");
       b.classList.toggle("wrong", mark === "wrong");
-      b.classList.toggle("kk-sel", i === sel);
-      b.classList.toggle("kk-run", i !== sel && runs.some(function (r) { return r.cells.indexOf(i) >= 0; }));
+      b.classList.toggle("gb-sel", i === sel);
+      b.classList.toggle("gb-line", i !== sel && runs.some(function (r) { return r.cells.indexOf(i) >= 0; }));
       b.setAttribute("aria-label", label(i));
     });
     if (!game.shell.done && full && bad.size === 0) game.shell.finish();
