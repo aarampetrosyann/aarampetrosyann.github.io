@@ -17,7 +17,7 @@
 
   /* Game tiles on games.html. Each game has a box color and a
      text color picked for contrast on it. Same in both themes. */
-  --game-takuzu:      #68CAFF;  /* light sky blue */
+  --game-takuzu:      #FFDA03;  /* bright yellow */
   --game-takuzu-ink:  #0D0D0D;
   --game-kakuro:      #1E90FF;  /* dodger blue */
   --game-kakuro-ink:  #0D0D0D;
