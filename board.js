@@ -162,7 +162,9 @@ var Board = (function () {
     highlightButton();
 
     // Shows the Solved window, building it in the first time.
+    var winShown = false;   // the window has opened once (so a click may bring it back)
     function openWin(build) {
+      winShown = true;
       els.win.hidden = false;
       var focusNew = function () { q(".gb-new").focus(); };
       if (!build || S.reduceMotion.matches) { focusNew(); return; }
@@ -218,9 +220,11 @@ var Board = (function () {
       try { localStorage.setItem("board-highlight", highlight ? "1" : "0"); } catch (err) {}
       highlightButton();
     });
-    // On a finished board, a click on it brings the Solved window back.
+    // On a finished board, a click on it brings the Solved window back,
+    // but only after it has opened once: the click that ends a drag
+    // solving the puzzle would otherwise open it early, with no build.
     els.grid.addEventListener("click", function () {
-      if (done && els.win.hidden) openWin(false);
+      if (done && winShown && els.win.hidden) openWin(false);
     });
 
     var shell = {
