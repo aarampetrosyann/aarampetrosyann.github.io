@@ -18,7 +18,8 @@
        storageKey: "takuzu-show-mistakes",
        onCheck, onReset, onHint, onSolve,   // settings pill
        onMistakes(on),                       // Show mistakes toggled
-       onNew                                 // New puzzle / puzzle piece
+       onNew,                                // New puzzle / puzzle piece
+       highlight: false                      // optional: no Highlight switch
      });
    then draw squares into shell.grid (and optionally shell.below),
    read shell.paused / shell.done / shell.showMistakes, and call
@@ -56,7 +57,8 @@ var Board = (function () {
         '<button type="button" role="menuitem" class="gb-hint" aria-label="Hint" title="Hint">' + icon("lightbulb") + "</button>" +
         '<button type="button" role="menuitem" class="gb-solve" aria-label="Solve puzzle" title="Solve puzzle">' + icon("auto_fix_high") + "</button>" +
         '<button type="button" role="menuitemcheckbox" class="gb-mistakes" aria-label="Show mistakes" title="Show mistakes" aria-checked="true">' + icon("visibility") + "</button>" +
-        '<button type="button" role="menuitemcheckbox" class="gb-highlight" aria-label="Highlight row and column" title="Highlight" aria-checked="true">' + icon("water_drop") + "</button>" +
+        (o.highlight === false ? "" :
+          '<button type="button" role="menuitemcheckbox" class="gb-highlight" aria-label="Highlight row and column" title="Highlight" aria-checked="true">' + icon("water_drop") + "</button>") +
       "</div>" +
       '<div class="gb-board">' +
         // Header right above the board: size and level, name, pause, time.
@@ -150,6 +152,7 @@ var Board = (function () {
 
     // Highlight on or off: the grid's class switches the tints off.
     function highlightButton() {
+      if (!els.highlight) return;
       els.highlight.innerHTML = icon(highlight ? "water_drop" : "format_color_reset");
       els.highlight.setAttribute("aria-checked", highlight ? "true" : "false");
       els.highlight.title = highlight ? "Highlight: on" : "Highlight: off";
@@ -200,6 +203,7 @@ var Board = (function () {
 
     // Highlight on or off: the grid's class switches the tints off.
     function highlightButton() {
+      if (!els.highlight) return;
       els.highlight.innerHTML = icon(highlight ? "water_drop" : "format_color_reset");
       els.highlight.setAttribute("aria-checked", highlight ? "true" : "false");
       els.highlight.title = highlight ? "Highlight: on" : "Highlight: off";
@@ -208,7 +212,7 @@ var Board = (function () {
     highlightButton();
       o.onMistakes(showMistakes);
     });
-    els.highlight.addEventListener("click", function () {
+    if (els.highlight) els.highlight.addEventListener("click", function () {
       highlight = !highlight;
       try { localStorage.setItem("board-highlight", highlight ? "1" : "0"); } catch (err) {}
       highlightButton();
