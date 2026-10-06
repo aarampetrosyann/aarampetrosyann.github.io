@@ -272,7 +272,9 @@
 }
 .help.building { background: transparent; }
 .help > :not(.build) { transition: opacity 0.25s ease; }
-.help.building > :not(.build) { opacity: 0; }
+/* Hidden at once while building (no fade out first, which looked
+   like the window opening twice); the fade is only on the way in. */
+.help.building > :not(.build) { opacity: 0; transition: none; }
 
 /* The close icon is centered in the window's first square, so it
    lands on the same spot as the help icon. */
