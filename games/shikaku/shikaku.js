@@ -129,9 +129,16 @@ var Shikaku = (function () {
       // Try a few placements of the numbers before a fresh split.
       for (var tries = 0; tries < 8; tries++) {
         var clues = rects.map(function (t) {
-          var r = t.r0 + Math.floor(Math.random() * (t.r1 - t.r0 + 1));
-          var c = t.c0 + Math.floor(Math.random() * (t.c1 - t.c0 + 1));
-          return { r: r, c: c, value: area(t) };
+          // Any square but the exact center (only odd-by-odd shapes have
+          // one), so a rectangle's count can always sit in its middle.
+          var spots = [];
+          for (var r = t.r0; r <= t.r1; r++) {
+            for (var c = t.c0; c <= t.c1; c++) {
+              if (r * 2 !== t.r0 + t.r1 || c * 2 !== t.c0 + t.c1) spots.push({ r: r, c: c });
+            }
+          }
+          var spot = spots[Math.floor(Math.random() * spots.length)];
+          return { r: spot.r, c: spot.c, value: area(t) };
         });
         var sols = solve(n, clues, 2);
         if (sols && sols.length === 1) {
