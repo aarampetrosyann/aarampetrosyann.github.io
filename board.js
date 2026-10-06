@@ -16,7 +16,8 @@
      var shell = Board.create({
        name: "Takuzu", n: 8, level: "Easy", container: board,
        storageKey: "takuzu-show-mistakes",
-       onCheck, onReset, onHint, onSolve,   // settings pill
+       onCheck, onReset, onHint, onSolve,   // settings pill (leave out
+                                            // onCheck or onSolve to drop it)
        onMistakes(on),                       // Show mistakes toggled
        onNew,                                // New puzzle / puzzle piece
        highlight: false                      // optional: no Highlight switch
@@ -52,10 +53,10 @@ var Board = (function () {
       '<button class="icon-btn gb-again" type="button" aria-label="New puzzle" title="New puzzle" hidden>' + icon("extension") + "</button>" +
       '<button class="icon-btn gb-settings" type="button" aria-label="Settings" aria-expanded="false" aria-controls="gb-menu">' + icon("settings") + "</button>" +
       '<div class="gb-menu" id="gb-menu" role="menu" aria-label="Settings">' +
-        '<button type="button" role="menuitem" class="gb-check" aria-label="Check board" title="Check board">' + icon("check") + "</button>" +
+        (o.onCheck ? '<button type="button" role="menuitem" class="gb-check" aria-label="Check board" title="Check board">' + icon("check") + "</button>" : "") +
         '<button type="button" role="menuitem" class="gb-reset" aria-label="Reset board" title="Reset board">' + icon("restart_alt") + "</button>" +
         '<button type="button" role="menuitem" class="gb-hint" aria-label="Hint" title="Hint">' + icon("lightbulb") + "</button>" +
-        '<button type="button" role="menuitem" class="gb-solve" aria-label="Solve puzzle" title="Solve puzzle">' + icon("auto_fix_high") + "</button>" +
+        (o.onSolve ? '<button type="button" role="menuitem" class="gb-solve" aria-label="Solve puzzle" title="Solve puzzle">' + icon("auto_fix_high") + "</button>" : "") +
         '<button type="button" role="menuitemcheckbox" class="gb-mistakes" aria-label="Show mistakes" title="Show mistakes" aria-checked="true">' + icon("visibility") + "</button>" +
         (o.highlight === false ? "" :
           '<button type="button" role="menuitemcheckbox" class="gb-highlight" aria-label="Highlight row and column" title="Highlight" aria-checked="true">' + icon("water_drop") + "</button>") +
@@ -192,10 +193,10 @@ var Board = (function () {
     els.menu.addEventListener("keydown", function (e) {
       if (e.key === "Escape") { setMenu(false); els.settings.focus(); }
     });
-    q(".gb-check").addEventListener("click", function () { setMenu(false); o.onCheck(); });
+    if (o.onCheck) q(".gb-check").addEventListener("click", function () { setMenu(false); o.onCheck(); });
     q(".gb-reset").addEventListener("click", function () { setMenu(false); o.onReset(); });
     q(".gb-hint").addEventListener("click", function () { setMenu(false); o.onHint(); });
-    q(".gb-solve").addEventListener("click", function () { setMenu(false); o.onSolve(); });
+    if (o.onSolve) q(".gb-solve").addEventListener("click", function () { setMenu(false); o.onSolve(); });
     els.mistakes.addEventListener("click", function () {
       showMistakes = !showMistakes;
       try { localStorage.setItem(o.storageKey, showMistakes ? "1" : "0"); } catch (err) {}
