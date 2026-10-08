@@ -28,6 +28,11 @@
                       { label: "Education",  path: "about.html#education" }
                     ] },
     "Contact":    { title: "Contact",   desc: "Email, GitHub, LinkedIn, and my resume." },
+                    links: [
+                      { label: "Email", path: "mailto:apetrosyan15@ucla.edu" },
+                      { label: "Github",   path: "https://github.com/aarampetrosyann" },
+                      { label: "LinkedIn",  path: "https://linkedin.com/in/a-petrosyan" }
+                    ] },
     "[...]":      { title: "Settings",  desc: "Switch the theme, or turn the hover effect off." }
   };
 
