@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AP | Contact</title>
+<meta name="description" content="Email, links, and a week of office hours you can book a call from.">
+<link rel="icon" href="icons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="icons/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+
+<!-- Applies saved theme before paint, then builds the settings panel -->
+<script src="settings.js"></script>
+<style>
+/* ============================================================
+   CONTACT PAGE
+   A live status line in the header, ways to reach me, then a
+   week of office hours. The schedule itself is the SCHEDULE
+   list in the script at the bottom of this page.
+   ============================================================ */
+.page-head .status {
+  margin-top: 1.75rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.status::before {
+  content: "";
+  display: inline-block;
+  width: 0.45rem;
+  height: 0.45rem;
+  margin-right: 0.6rem;
+  border-radius: 50%;
+  background: var(--muted);
+  vertical-align: 0.05rem;
+}
+.status.open::before { background: var(--status); }
+.status b { font-weight: 500; color: var(--ink); }
+
+/* Reach me */
+.email {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.5rem 1.75rem;
+  border-radius: 14px;
+  background: var(--card);
+}
+.email-label { margin: 0 0 0.2rem; font-size: 0.8rem; color: var(--muted); }
+.email-addr {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(1.25rem, 4.5vw, 1.75rem);
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+.email-addr:hover { color: var(--accent); }
+.email-actions { display: flex; gap: 0.5rem; }
+
+.pill {
+  display: inline-block;
+  padding: 0.45rem 1rem;
+  border: 1.5px solid var(--ink);
+  border-radius: 999px;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+}
+.pill:hover,
+.pill.solid { background: var(--ink); color: var(--paper); }
+.pill.solid:hover { opacity: 0.85; }
+
+.links {
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+.links a {
+  position: relative;
+  display: block;
+  height: 100%;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--ink);
+  text-decoration: none;
+  transition: background-color 0.15s;
+}
+.links a:hover { background: var(--card); }
+.links a::after {
+  content: "\2197";
+  position: absolute;
+  top: 0.9rem;
+  right: 1rem;
+  color: var(--muted);
+}
+.links b {
+  display: block;
+  font-family: var(--display);
+  font-size: 1.1rem;
+}
+.links span { display: block; margin-top: 0.2rem; font-size: 0.8rem; color: var(--muted); }
+
+.reasons-h { margin: 2.25rem 0 0.75rem; font-size: 0.85rem; font-weight: 600; }
+.reasons { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.reasons li {
+  padding: 0.3rem 0.85rem;
+  border-radius: 999px;
+  background: var(--chip);
+  font-size: 0.8rem;
+}
+
+/* Office hours */
+.hours-intro { margin: 0 0 1.5rem; max-width: 34rem; }
+.cal-bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+.week { display: flex; align-items: center; gap: 0.5rem; font-weight: 500; font-size: 0.9rem; }
+.week button,
+.zones button {
+  border: 0;
+  border-radius: 999px;
+  background: var(--chip);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.week button { width: 2rem; height: 2rem; }
+.week button:disabled { opacity: 0.35; cursor: default; }
+.week-label { min-width: 8.5rem; text-align: center; }
+.zones { display: flex; gap: 0.3rem; }
+.zones[hidden] { display: none; }
+.zones button { padding: 0.3rem 0.8rem; }
+.zones button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+
+.cal {
+  --hour: 2.6rem;
+  display: grid;
+  grid-template-columns: 2.6rem repeat(7, minmax(0, 1fr));
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+  font-size: 0.75rem;
+}
+.cal-day {
+  padding: 0.5rem 0.25rem;
+  border-bottom: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+  text-align: center;
+  color: var(--muted);
+  line-height: 1.25;
+}
+.cal-day b { display: block; font-size: 1rem; font-family: var(--display); color: var(--ink); }
+.cal-day.today b {
+  display: grid;
+  place-items: center;
+  margin: 0.1rem auto 0;
+  width: 1.7rem;
+  height: 1.7rem;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--paper);
+}
+.cal-times { position: relative; }
+.cal-times span {
+  position: absolute;
+  right: 0.4rem;
+  transform: translateY(-50%);
+  color: var(--muted);
+  font-size: 0.65rem;
+  white-space: nowrap;
+}
+.cal-col {
+  position: relative;
+  border-left: 1px solid var(--line);
+  /* one faint line per hour */
+  background: repeating-linear-gradient(to bottom,
+    transparent 0, transparent calc(var(--hour) - 1px),
+    color-mix(in srgb, var(--line) 60%, transparent) calc(var(--hour) - 1px),
+    color-mix(in srgb, var(--line) 60%, transparent) var(--hour));
+}
+.cal-col.past { background-color: color-mix(in srgb, var(--ink) 3%, transparent); }
+
+.busy,
+.slot {
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  border-radius: 5px;
+  overflow: hidden;
+}
+.busy {
+  padding: 0.2rem 0.35rem;
+  background: var(--chip);
+  color: var(--muted);
+  font-size: 0.65rem;
+  line-height: 1.2;
+}
+.slot {
+  border: 0;
+  padding: 0;
+  background: color-mix(in srgb, var(--status) 22%, var(--paper));
+  box-shadow: inset 0 -1px 0 var(--paper);
+  cursor: pointer;
+  transition: background-color 0.12s;
+}
+.gone {
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  border: 1px dashed color-mix(in srgb, var(--status) 45%, transparent);
+  border-radius: 5px;
+}
+.slot:hover { background: color-mix(in srgb, var(--status) 45%, var(--paper)); }
+.slot[aria-pressed="true"] { background: var(--status); }
+.now {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--alert);
+  pointer-events: none;
+}
+.now::before {
+  content: "";
+  position: absolute;
+  left: -4px;
+  top: -3px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--alert);
+}
+
+.legend { display: flex; gap: 1.25rem; margin: 0.75rem 0 0; font-size: 0.75rem; color: var(--muted); }
+.legend span::before {
+  content: "";
+  display: inline-block;
+  width: 0.7rem;
+  height: 0.7rem;
+  margin-right: 0.4rem;
+  border-radius: 3px;
+  vertical-align: -0.05rem;
+}
+.legend .l-open::before { background: color-mix(in srgb, var(--status) 22%, var(--paper)); }
+.legend .l-busy::before { background: var(--chip); }
+.legend .l-gone::before { border: 1px dashed color-mix(in srgb, var(--status) 45%, transparent); }
+
+/* The picked time */
+.pick {
+  margin-top: 1.5rem;
+  padding: 1.25rem 1.5rem;
+  border-radius: 14px;
+  background: var(--card);
+}
+.pick[hidden] { display: none; }
+.pick-when {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+.pick-mine { margin: 0.15rem 0 0; font-size: 0.8rem; color: var(--muted); }
+.pick-h { margin: 1rem 0 0.5rem; font-size: 0.8rem; color: var(--muted); }
+.topics { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.topics button {
+  padding: 0.3rem 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.topics button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.pick-go { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; margin-top: 1.25rem; }
+.pick-go small { color: var(--muted); }
+
+@media (max-width: 640px) {
+  .links { grid-template-columns: 1fr; }
+  .cal { --hour: 2.4rem; grid-template-columns: 2.2rem repeat(7, minmax(0, 1fr)); }
+  .busy { padding: 0; font-size: 0; }   /* no room for labels */
+  .cal-day b { font-size: 0.9rem; }
+  .cal-day.today b { width: 1.5rem; height: 1.5rem; }
+}
+</style>
+</head>
+
+
+<body>
+
+<!-- The two vertical rules of the drafting grid -->
+<div class="page-rules" aria-hidden="true"></div>
+<div class="wrap">
+
+<!-- NAV: same as index.html. Keep the three copies in sync. -->
+<nav aria-label="Main">
+  <a class="home" href="index.html" data-hover-text="[Aram Petrosyan]">[AP]</a>
+  <ul>
+    <li><a href="about.html">About</a></li>
+    <li><a href="blog.html">Blog</a></li>
+    <li><a href="games.html">Games</a></li>
+    <li><a href="contact.html" aria-current="page">Contact</a></li>
+    <li><a href="#" id="settings-btn" class="no-scramble" aria-haspopup="dialog" aria-expanded="false">[...]</a></li>
+  </ul>
+</nav>
+
+<!-- PAGE HEADER -->
+<header class="page-head">
+  <h1>Contact</h1>
+  <p>Email is the fastest way to reach me. If you'd rather talk, pick a time from my office hours below.</p>
+  <!-- Filled in by the script: my local time and whether I'm free -->
+  <p class="status" aria-live="polite">Based in Los Angeles. I usually reply within a day.</p>
+</header>
+
+<main>
+<section id="reach" aria-labelledby="reach-h">
+  <h2 id="reach-h">Reach me</h2>
+
+  <div class="email">
+    <div>
+      <p class="email-label">Email</p>
+      <a class="email-addr" href="mailto:apetrosyan15@ucla.edu">apetrosyan15@ucla.edu</a>
+    </div>
+    <div class="email-actions">
+      <button type="button" class="pill" id="copy-email">Copy</button>
+      <a class="pill solid" href="mailto:apetrosyan15@ucla.edu">Write</a>
+    </div>
+  </div>
+
+  <ul class="links">
+    <li><a href="https://github.com/aarampetrosyann"><b>GitHub</b><span id="gh-latest">Code for this site, the games and other projects.</span></a></li>
+    <li><a href="https://linkedin.com/in/a-petrosyan"><b>LinkedIn</b><span>Work history, the long version.</span></a></li>
+    <li><a href="files/aram-petrosyan-resume.pdf"><b>Resume</b><span>One page, as a PDF.</span></a></li>
+  </ul>
+
+  <!-- Edit freely. These are also the topics offered when someone
+       picks a time below (TOPICS in the script). -->
+  <p class="reasons-h">Good reasons to write</p>
+  <ul class="reasons">
+    <li>New grad and internship roles</li>
+    <li>Software and data engineering</li>
+    <li>Freelance web projects</li>
+    <li>Ideas for a puzzle game</li>
+    <li>Anything on the blog</li>
+  </ul>
+</section>
+
+<section id="hours" aria-labelledby="hours-h">
+  <h2 id="hours-h">Office hours</h2>
+  <p class="hours-intro">Green times are open for a 30 minute call. Pick one and it'll start an email asking for it, and I'll confirm with a link.</p>
+
+  <div class="cal-bar">
+    <div class="week">
+      <button type="button" id="week-prev" aria-label="Previous week">&larr;</button>
+      <span class="week-label" id="week-label" aria-live="polite"></span>
+      <button type="button" id="week-next" aria-label="Next week">&rarr;</button>
+    </div>
+    <div class="zones" role="group" aria-label="Show times in" hidden>
+      <button type="button" data-zone="yours" aria-pressed="true"></button>
+      <button type="button" data-zone="mine" aria-pressed="false"></button>
+    </div>
+  </div>
+
+  <div class="cal" id="cal"></div>
+  <p class="legend"><span class="l-open">Open</span><span class="l-busy">Busy</span><span class="l-gone">Open, too soon to book</span></p>
+
+  <div class="pick" id="pick" hidden>
+    <p class="pick-when" id="pick-when"></p>
+    <p class="pick-mine" id="pick-mine"></p>
+    <p class="pick-h">What's it about? (optional)</p>
+    <div class="topics" id="topics"></div>
+    <div class="pick-go">
+      <a class="pill solid" id="pick-send" href="mailto:apetrosyan15@ucla.edu">Request this time</a>
+      <small>Opens your email app with the details filled in.</small>
+    </div>
+  </div>
+</section>
+
+</main>
+
+
+</div>
+
+<!-- FOOTER: same on every page. Keep the copies on every page in sync.
+     Links use this page's path back to the site root. -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-cols">
+      <div class="footer-id">
+        <a class="footer-name" href="index.html">Aram Petrosyan</a>
+        <p>Software Engineer</p>
+        <span class="footer-logo" aria-hidden="true"></span>
+      </div>
+      <div>
+        <p class="footer-h">Site</p>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="blog.html">Blog</a></li>
+          <li><a href="games.html">Games</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="footer-h">Contact</p>
+        <ul>
+          <li><a href="mailto:apetrosyan15@ucla.edu">Email</a></li>
+          <li><a href="https://github.com/aarampetrosyann">GitHub</a></li>
+          <li><a href="https://linkedin.com/in/a-petrosyan">LinkedIn</a></li>
+          <li><a href="files/aram-petrosyan-resume.pdf">Resume</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="footer-copy">&copy; <span class="yr">2026</span> Aram Petrosyan. All rights reserved.</p>
+  </div>
+</footer>
+
+<!-- Hover scramble effect on the nav links -->
+<script src="scramble.js"></script>
+<script src="navpanel.js"></script>
+<script src="marks.js"></script>
+<script src="footer.js"></script>
+<script>
+/* ============================================================
+   OFFICE HOURS
+   Edit SCHEDULE to change the week. Times are my local time in
+   Los Angeles, 24 hour, and the grid converts them to each
+   visitor's time zone.
+
+   Each day is a list of blocks:
+     { from: "11:00", to: "12:30" }                  open for calls
+     { from: "09:00", to: "10:50", busy: "Class" }   busy, labeled
+
+   away: dates with no open times at all (trips, exams).
+   ============================================================ */
+var SCHEDULE = {
+  timeZone: "America/Los_Angeles",
+  slotMinutes: 30,
+  noticeHours: 12,       // how soon the earliest bookable slot is
+  weeksAhead: 3,         // how many weeks past this one to show
+  away: ["2026-11-26", "2026-11-27"],
+  week: {
+    mon: [
+      { from: "09:00", to: "10:50", busy: "Class" },
+      { from: "11:00", to: "12:30" },
+      { from: "14:00", to: "16:00", busy: "Research" },
+      { from: "16:30", to: "18:00" }
+    ],
+    tue: [
+      { from: "10:00", to: "11:50", busy: "Class" },
+      { from: "13:00", to: "15:00" },
+      { from: "15:30", to: "17:00", busy: "Office hours (TA)" }
+    ],
+    wed: [
+      { from: "09:00", to: "10:50", busy: "Class" },
+      { from: "11:00", to: "12:30" },
+      { from: "14:00", to: "16:00", busy: "Research" }
+    ],
+    thu: [
+      { from: "10:00", to: "11:50", busy: "Class" },
+      { from: "13:00", to: "15:00" },
+      { from: "16:00", to: "17:30", busy: "Gym" }
+    ],
+    fri: [
+      { from: "10:00", to: "12:00" },
+      { from: "13:00", to: "15:00", busy: "Projects" }
+    ],
+    sat: [],
+    sun: []
+  }
+};
+
+var EMAIL = "apetrosyan15@ucla.edu";
+var TOPICS = ["A role", "A project", "Freelance work", "Just saying hi"];
+
+(function () {
+  var MINE = SCHEDULE.timeZone;
+  var YOURS = Intl.DateTimeFormat().resolvedOptions().timeZone || MINE;
+  var DAY_KEYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
+  var MIN = 60000;
+
+  /* ---------- Time zone helpers ---------- */
+  var fmts = {};
+  function parts(t, tz) {
+    if (!fmts[tz]) {
+      fmts[tz] = new Intl.DateTimeFormat("en-US", {
+        timeZone: tz, hourCycle: "h23", year: "numeric", month: "numeric",
+        day: "numeric", hour: "numeric", minute: "numeric", second: "numeric"
+      });
+    }
+    var o = {};
+    fmts[tz].formatToParts(new Date(t)).forEach(function (p) { o[p.type] = +p.value; });
+    return { y: o.year, m: o.month, d: o.day, h: o.hour % 24, mi: o.minute, s: o.second };
+  }
+  function offset(t, tz) {
+    var p = parts(t, tz);
+    return Math.round((Date.UTC(p.y, p.m - 1, p.d, p.h, p.mi, p.s) - t) / MIN) * MIN;
+  }
+  // The instant when it's this date and time in this zone.
+  function at(day, hhmm, tz) {
+    var hm = hhmm.split(":");
+    var guess = Date.UTC(day.y, day.m - 1, day.d, +hm[0], +hm[1]);
+    var t = guess - offset(guess, tz);
+    var again = guess - offset(t, tz);
+    return again === t ? t : again;
+  }
+  // Calendar dates as {y, m, d}, stepped in whole days.
+  function addDays(day, n) {
+    var u = new Date(Date.UTC(day.y, day.m - 1, day.d + n));
+    return { y: u.getUTCFullYear(), m: u.getUTCMonth() + 1, d: u.getUTCDate() };
+  }
+  function weekday(day) { return new Date(Date.UTC(day.y, day.m - 1, day.d)).getUTCDay(); }
+  function iso(day) {
+    return day.y + "-" + String(day.m).padStart(2, "0") + "-" + String(day.d).padStart(2, "0");
+  }
+  function today(tz) { var p = parts(Date.now(), tz); return { y: p.y, m: p.m, d: p.d }; }
+  function minutesInto(t, tz) { var p = parts(t, tz); return p.h * 60 + p.mi; }
+
+  function time(t, tz) {
+    return new Intl.DateTimeFormat("en-US", { timeZone: tz, hour: "numeric", minute: "2-digit" }).format(t);
+  }
+  function zoneName(tz, t) {
+    var p = new Intl.DateTimeFormat("en-US", { timeZone: tz, timeZoneName: "short" }).formatToParts(t || Date.now());
+    for (var i = 0; i < p.length; i++) if (p[i].type === "timeZoneName") return p[i].value;
+    return tz;
+  }
+  function longDate(t, tz) {
+    return new Intl.DateTimeFormat("en-US", { timeZone: tz, weekday: "long", month: "long", day: "numeric" }).format(t);
+  }
+
+  // Every block of my schedule on one of my dates, as instants.
+  function blocksOn(day) {
+    var list = SCHEDULE.week[DAY_KEYS[weekday(day)]] || [];
+    var away = SCHEDULE.away.indexOf(iso(day)) >= 0;
+    var out = [];
+    list.forEach(function (b) {
+      if (!b.busy && away) return;
+      out.push({ start: at(day, b.from, MINE), end: at(day, b.to, MINE), busy: b.busy || null });
+    });
+    return out;
+  }
+
+  /* ---------- Status line ---------- */
+  var statusEl = document.querySelector(".status");
+  function status() {
+    var now = Date.now();
+    var blocks = blocksOn(today(MINE));
+    var current = null, next = null;
+    blocks.forEach(function (b) {
+      if (b.start <= now && now < b.end) current = b;
+      if (!b.busy && b.start > now && (!next || b.start < next.start)) next = b;
+    });
+    var h = parts(now, MINE).h;
+    var clock = "It's <b>" + time(now, MINE) + "</b> for me in Los Angeles. ";
+    var open = current && !current.busy;
+    var text;
+    if (open) text = "I'm free for a call right now.";
+    else if (current) text = "In " + current.busy.toLowerCase() + " until " + time(current.end, MINE) + ".";
+    else if (h >= 23 || h < 7) text = "Probably asleep, but email anyway.";
+    else if (next) text = "Next open at " + time(next.start, MINE) + ".";
+    else text = "I usually reply within a day.";
+    statusEl.innerHTML = clock + text;
+    statusEl.classList.toggle("open", !!open);
+  }
+  status();
+  setInterval(status, 30000);
+
+  /* ---------- Copy email ---------- */
+  var copyBtn = document.getElementById("copy-email");
+  copyBtn.addEventListener("click", function () {
+    navigator.clipboard.writeText(EMAIL).then(function () {
+      copyBtn.textContent = "Copied";
+      setTimeout(function () { copyBtn.textContent = "Copy"; }, 1500);
+    });
+  });
+
+  /* ---------- Latest GitHub push ---------- */
+  fetch("https://api.github.com/users/aarampetrosyann/events/public?per_page=20")
+    .then(function (r) { return r.ok ? r.json() : []; })
+    .then(function (events) {
+      var push = events.filter(function (e) { return e.type === "PushEvent"; })[0];
+      if (!push) return;
+      var mins = Math.round((new Date(push.created_at) - Date.now()) / MIN);
+      var rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
+      var ago = Math.abs(mins) < 60 ? rtf.format(mins, "minute")
+              : Math.abs(mins) < 1440 ? rtf.format(Math.round(mins / 60), "hour")
+              : rtf.format(Math.round(mins / 1440), "day");
+      document.getElementById("gh-latest").textContent =
+        "Last pushed " + ago + ".";
+    })
+    .catch(function () {});
+
+  /* ---------- Office hours grid ---------- */
+  var cal = document.getElementById("cal");
+  var zoneBtns = document.querySelectorAll(".zones button");
+  var view = YOURS, weekOffset = 0, picked = null, topic = null;
+
+  if (offset(Date.now(), YOURS) !== offset(Date.now(), MINE)) {
+    zoneBtns[0].textContent = "Your time (" + zoneName(YOURS) + ")";
+    zoneBtns[1].textContent = "My time (" + zoneName(MINE) + ")";
+    document.querySelector(".zones").hidden = false;
+  }
+  for (var z = 0; z < zoneBtns.length; z++) {
+    zoneBtns[z].addEventListener("click", function () {
+      view = this.dataset.zone === "mine" ? MINE : YOURS;
+      for (var k = 0; k < zoneBtns.length; k++) zoneBtns[k].setAttribute("aria-pressed", zoneBtns[k] === this ? "true" : "false");
+      render();
+    });
+  }
+  document.getElementById("week-prev").addEventListener("click", function () { weekOffset--; render(); });
+  document.getElementById("week-next").addEventListener("click", function () { weekOffset++; render(); });
+
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  function render() {
+    var now = Date.now();
+    var earliest = now + SCHEDULE.noticeHours * 60 * MIN;
+    var t0 = today(view);
+    var monday = addDays(t0, -((weekday(t0) + 6) % 7) + weekOffset * 7);
+    var days = [];
+    for (var i = 0; i < 7; i++) days.push(addDays(monday, i));
+
+    document.getElementById("week-prev").disabled = weekOffset <= 0;
+    document.getElementById("week-next").disabled = weekOffset >= SCHEDULE.weeksAhead;
+    var md = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
+    document.getElementById("week-label").textContent =
+      md.format(Date.UTC(days[0].y, days[0].m - 1, days[0].d)) + " – " +
+      md.format(Date.UTC(days[6].y, days[6].m - 1, days[6].d));
+
+    // Each of my blocks, cut to the visitor's days, in minutes from midnight.
+    var cols = days.map(function (day) {
+      var start = at(day, "00:00", view), end = at(addDays(day, 1), "00:00", view);
+      var pieces = [];
+      [-1, 0, 1].forEach(function (k) {
+        blocksOn(addDays(day, k)).forEach(function (b) {
+          var s = Math.max(b.start, start), e = Math.min(b.end, end);
+          if (e <= s) return;
+          pieces.push({ start: s, end: e, busy: b.busy,
+                        top: minutesInto(s, view), bottom: e >= end ? 1440 : minutesInto(e, view) });
+        });
+      });
+      return { day: day, start: start, end: end, pieces: pieces };
+    });
+
+    // Hours shown: from the earliest block to the latest, or 9 to 5
+    // for a week with nothing in it.
+    var first = 1440, last = 0;
+    cols.forEach(function (c) {
+      c.pieces.forEach(function (p) { first = Math.min(first, p.top); last = Math.max(last, p.bottom); });
+    });
+    if (first >= last) { first = 9 * 60; last = 17 * 60; }
+    first = Math.floor(first / 60) * 60;
+    last = Math.ceil(last / 60) * 60;
+    var hours = (last - first) / 60;
+    function y(m) { return "calc(var(--hour) * " + ((m - first) / 60) + ")"; }
+
+    var bookable = 0;
+    cal.textContent = "";
+    cal.appendChild(el("div", "cal-day"));
+    var short = new Intl.DateTimeFormat("en-US", { weekday: "short", timeZone: "UTC" });
+    cols.forEach(function (c) {
+      var head = el("div", "cal-day");
+      var isToday = iso(c.day) === iso(t0);
+      if (isToday) head.classList.add("today");
+      head.appendChild(document.createTextNode(short.format(Date.UTC(c.day.y, c.day.m - 1, c.day.d))));
+      head.appendChild(el("b", null, c.day.d));
+      cal.appendChild(head);
+    });
+
+    var times = el("div", "cal-times");
+    times.style.height = y(last);
+    for (var h = 1; h < hours; h++) {
+      var label = el("span", null, time(Date.UTC(2026, 0, 1, (first / 60 + h) % 24), "UTC").replace(":00", ""));
+      label.style.top = y(first + h * 60);
+      times.appendChild(label);
+    }
+    cal.appendChild(times);
+
+    cols.forEach(function (c) {
+      var col = el("div", "cal-col");
+      col.style.height = y(last);
+      if (c.end <= now) col.classList.add("past");
+
+      c.pieces.forEach(function (p) {
+        if (p.busy) {
+          var b = el("div", "busy", p.busy);
+          b.style.top = y(p.top);
+          b.style.height = y(first + p.bottom - p.top);
+          b.title = p.busy + ", " + time(p.start, view) + " – " + time(p.end, view);
+          col.appendChild(b);
+          return;
+        }
+        var step = SCHEDULE.slotMinutes * MIN;
+        // Open time that's already gone or too soon to book stays as
+        // an outline, so the shape of the week still shows.
+        if (p.start < earliest) {
+          // up to the first slot that can still be booked
+          var cut = Math.min(p.end, p.start + Math.ceil((earliest - p.start) / step) * step);
+          var g = el("div", "gone");
+          g.style.top = y(p.top);
+          g.style.height = y(first + (cut >= p.end ? p.bottom : minutesInto(cut, view)) - p.top);
+          col.appendChild(g);
+        }
+        for (var s = p.start; s + step <= p.end; s += step) {
+          if (s < earliest) continue;
+          bookable++;
+          var top = minutesInto(s, view);
+          var slot = el("button", "slot");
+          slot.type = "button";
+          slot.style.top = y(top);
+          slot.style.height = y(first + SCHEDULE.slotMinutes);
+          slot.setAttribute("aria-pressed", s === picked ? "true" : "false");
+          slot.setAttribute("aria-label", longDate(s, view) + ", " + time(s, view) + " " + zoneName(view, s));
+          slot.title = time(s, view) + " – " + time(s + step, view);
+          slot.dataset.start = s;
+          col.appendChild(slot);
+        }
+      });
+
+      if (c.start <= now && now < c.end) {
+        var line = el("div", "now");
+        line.style.top = y(minutesInto(now, view));
+        col.appendChild(line);
+      }
+      cal.appendChild(col);
+    });
+
+    describe();
+    return bookable;
+  }
+
+  cal.addEventListener("click", function (e) {
+    var slot = e.target.closest(".slot");
+    if (!slot) return;
+    picked = +slot.dataset.start;
+    var all = cal.querySelectorAll(".slot");
+    for (var i = 0; i < all.length; i++) all[i].setAttribute("aria-pressed", all[i] === slot ? "true" : "false");
+    describe();
+    document.getElementById("pick").scrollIntoView({ block: "nearest", behavior: "smooth" });
+  });
+
+  /* ---------- The picked time ---------- */
+  var topicsEl = document.getElementById("topics");
+  TOPICS.forEach(function (t) {
+    var b = el("button", null, t);
+    b.type = "button";
+    b.setAttribute("aria-pressed", "false");
+    b.addEventListener("click", function () {
+      topic = topic === t ? null : t;
+      var bs = topicsEl.querySelectorAll("button");
+      for (var i = 0; i < bs.length; i++) bs[i].setAttribute("aria-pressed", bs[i].textContent === topic ? "true" : "false");
+      describe();
+    });
+    topicsEl.appendChild(b);
+  });
+
+  function describe() {
+    var box = document.getElementById("pick");
+    if (picked === null) { box.hidden = true; return; }
+    box.hidden = false;
+    var end = picked + SCHEDULE.slotMinutes * MIN;
+    var yours = longDate(picked, YOURS) + ", " + time(picked, YOURS) + " – " + time(end, YOURS);
+    var mine = time(picked, MINE) + " " + zoneName(MINE, picked);
+    var sameZone = offset(picked, YOURS) === offset(picked, MINE);
+
+    document.getElementById("pick-when").textContent = yours;
+    document.getElementById("pick-mine").textContent = sameZone
+      ? zoneName(YOURS, picked) + ", " + SCHEDULE.slotMinutes + " minutes"
+      : zoneName(YOURS, picked) + " (" + mine + " for me), " + SCHEDULE.slotMinutes + " minutes";
+
+    var subject = "Call on " + longDate(picked, MINE) + " at " + mine;
+    var body = "Hi Aram,\n\nCould we talk on " + longDate(picked, YOURS) + " at " +
+      time(picked, YOURS) + " " + zoneName(YOURS, picked) +
+      (sameZone ? "" : " (" + mine + " for you)") + "?\n\n" +
+      (topic ? "It's about: " + topic + "\n\n" : "") + "Thanks,\n";
+    document.getElementById("pick-send").href =
+      "mailto:" + EMAIL + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+  }
+
+  // Nothing left to book this week: open on next week instead.
+  if (!render() && SCHEDULE.weeksAhead > 0) { weekOffset = 1; render(); }
+  // Keep the red now line and past slots current.
+  setInterval(render, 5 * 60000);
+})();
+</script>
+</body>
+
+</html>

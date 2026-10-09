@@ -28,7 +28,7 @@
                       { label: "Projects",   path: "about.html#projects" },
                       { label: "Education",  path: "about.html#education" }
                     ] },
-    "Contact":    { title: "Contact",   desc: "Email, GitHub, LinkedIn, and my resume.",
+    "Contact":    { title: "Contact",   desc: "Email, links, and office hours to book a call.",
                     links: [
                       { label: "Email",    path: "mailto:apetrosyan15@ucla.edu" },
                       { label: "GitHub",   path: "https://github.com/aarampetrosyann" },
