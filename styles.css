@@ -4,26 +4,28 @@
    Two palettes. Which one is used comes from the Theme setting
    in the nav panel, which defaults to light and is remembered
    per visitor. settings.js writes data-theme on <html>.
+   The whites, blacks and grays are the warm palette anthropic.com
+   uses (#FAF9F5 and #141413).
    ============================================================ */
 :root {
-  --paper:       #0D0D0D;  /* page background, neutral near-black */
-  --ink:         #ECECEC;  /* main text, neutral off-white */
-  --muted:       #9A9A9A;  /* secondary text: companies, stacks */
-  --line:        #2C2C2C;  /* dividers and the timeline rail */
+  --paper:       #141413;  /* page background, a warm near-black */
+  --ink:         #FAF9F5;  /* main text, a warm off-white */
+  --muted:       #B0AEA5;  /* secondary text: companies, stacks */
+  --line:        #30302E;  /* dividers and the timeline rail */
   --accent:      #1E90FF;  /* links and timeline dots, dodger blue */
   --accent-soft: #10243C;  /* code block background */
   --alert:       #D8293F;  /* the 404 number, cardinal red */
-  --surface:     #C8C8C8;  /* nav hover panel, a neutral light gray */
+  --surface:     #FAF9F5;  /* nav hover panel and footer, the warm off-white */
   --status:      #4CC26E;  /* the "Lately" dot on the blog, a soft green */
 
   /* Game tiles on games.html. Each game has a box color and a
      text color picked for contrast on it. Same in both themes. */
   --game-takuzu:      #FFDA03;  /* bright yellow */
-  --game-takuzu-ink:  #0D0D0D;
+  --game-takuzu-ink:  #141413;
   --game-kakuro:      #1E90FF;  /* dodger blue */
-  --game-kakuro-ink:  #0D0D0D;
+  --game-kakuro-ink:  #141413;
   --game-shikaku:     #C41E3A;  /* cardinal red */
-  --game-shikaku-ink: #0D0D0D;
+  --game-shikaku-ink: #141413;
   --game-button-ink:  #FFFFFF;  /* text on the dark game buttons and sliders */
   --game-hint:        #F2B705;  /* golden yellow: numbers revealed by a hint */
   --game-right:       #1E90FF;  /* bright blue: entries marked correct by Check */
@@ -55,14 +57,14 @@
 /* Light theme. Applied when the settings panel sets
    data-theme="light" on <html>. Dark is the default. */
 :root[data-theme="light"] {
-  --paper:       #EDEFEA;
-  --ink:         #24262B;
-  --muted:       #6A6E73;
-  --line:        #CFD2CA;
+  --paper:       #FAF9F5;
+  --ink:         #141413;
+  --muted:       #5E5D59;
+  --line:        #E8E6DC;
   --accent:      #1565C0;
   --accent-soft: #D8E8FA;
   --alert:       #B31E36;
-  --surface:     #2B2B2B;  /* nav hover panel, a neutral dark gray */
+  --surface:     #141413;  /* nav hover panel and footer, the warm near-black */
   --status:      #3E9B5A;
   color-scheme: light;
 }
