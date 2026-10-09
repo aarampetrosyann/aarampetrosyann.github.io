@@ -9,8 +9,9 @@
    nav markup on every page. A tab with no entry gets no panel.
 
    A tab can also list links in a column under the first tab.
-   Each link's path is relative to the site root; it's resolved
-   against the Games tab's href so it works from any page depth.
+   A link's path is either relative to the site root (resolved
+   against the Games tab's href so it works from any page depth) or
+   a full address like mailto: or https:, used as it is.
    ============================================================ */
 (function () {
   var COPY = {
@@ -27,11 +28,11 @@
                       { label: "Projects",   path: "about.html#projects" },
                       { label: "Education",  path: "about.html#education" }
                     ] },
-    "Contact":    { title: "Contact",   desc: "Email, GitHub, LinkedIn, and my resume." },
+    "Contact":    { title: "Contact",   desc: "Email, GitHub, LinkedIn, and my resume.",
                     links: [
-                      { label: "Email", path: "mailto:apetrosyan15@ucla.edu" },
-                      { label: "Github",   path: "https://github.com/aarampetrosyann" },
-                      { label: "LinkedIn",  path: "https://linkedin.com/in/a-petrosyan" }
+                      { label: "Email",    path: "mailto:apetrosyan15@ucla.edu" },
+                      { label: "GitHub",   path: "https://github.com/aarampetrosyann" },
+                      { label: "LinkedIn", path: "https://linkedin.com/in/a-petrosyan" }
                     ] },
     "[...]":      { title: "Settings",  desc: "Switch the theme, or turn the hover effect off." }
   };
@@ -172,7 +173,10 @@
       for (var l = 0; l < items.length; l++) {
         var li = document.createElement("li");
         var a = document.createElement("a");
-        a.href = rootPrefix + items[l].path;
+        // Site paths get the way back to the root; full addresses
+        // (mailto:, https:) are used as they are.
+        var path = items[l].path;
+        a.href = /^[a-z]+:/i.test(path) ? path : rootPrefix + path;
         a.textContent = items[l].label;
         li.appendChild(a);
         linksEl.appendChild(li);
