@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 600" width="1400" height="600">
+  <!-- Stand-in for the wide cover at the top of a post. Neutral
+       gray at low opacity, so it sits on either theme. -->
+  <defs>
+    <pattern id="s" width="32" height="32" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)">
+      <rect width="16" height="32" fill="#808080" fill-opacity="0.09"/>
+    </pattern>
+  </defs>
+  <rect width="1400" height="600" fill="#808080" fill-opacity="0.08"/>
+  <rect width="1400" height="600" fill="url(#s)"/>
+  <text x="700" y="309" text-anchor="middle" font-family="Helvetica Neue, Arial, sans-serif" font-size="26" fill="#808080" fill-opacity="0.85">cover photo (optional)</text>
+</svg>

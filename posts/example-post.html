@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>AP | Starting this thing</title>
-<meta name="description" content="Why I finally built a site, and what I plan to put on it.">
+<title>AP | What I learned building a tiny analytics pipeline</title>
+<meta name="description" content="SQLite, a cron job, and why I stopped reaching for a dashboard first.">
 <link rel="icon" href="../icons/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="../icons/favicon-32.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
@@ -13,51 +13,144 @@
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <!-- ../ because this file sits one folder deep, inside posts/ -->
 <link rel="stylesheet" href="../styles.css">
+
+<!-- Applies saved theme before paint, then builds the settings panel -->
+<script src="../settings.js"></script>
 </head>
 
 <body>
+
+<!-- The two vertical rules of the drafting grid -->
+<div class="page-rules" aria-hidden="true"></div>
 <div class="wrap">
 
 <nav aria-label="Main">
-  <a class="home" href="../index.html">Aram</a>
+  <a class="home" href="../index.html" data-hover-text="[Aram Petrosyan]">[AP]</a>
   <ul>
     <li><a href="../about.html">About</a></li>
     <li><a href="../blog.html">Blog</a></li>
     <li><a href="../games.html">Games</a></li>
     <li><a href="../index.html#contact">Contact</a></li>
+    <li><a href="#" id="settings-btn" class="no-scramble" aria-haspopup="dialog" aria-expanded="false">[...]</a></li>
   </ul>
 </nav>
 
 <!-- ============================================================
      THE POST
-     Everything you write goes between <article> tags.
-     Use <h2> for section headings, <p> for paragraphs,
-     <blockquote> for quotes, and <pre><code> for code.
+     To start a new post, copy this file into posts/, rename it,
+     and change:
+
+     1. <title> and the description in <head>.
+     2. The header: topic tag, title, one-line summary, date and
+        read time. Keep these the same as the post's row in
+        blog.html.
+     3. The cover photo. It's optional: delete the <img
+        class="cover"> line for a post without one. Covers go in
+        posts/covers/ and are cropped to a wide 7:3 strip.
+     4. The writing, inside <article class="prose">. Building
+        blocks, all shown in this post:
+          <h2>              a section, listed in "On this page"
+          <p>, <ul>, <ol>   paragraphs and lists
+          <blockquote>      a pulled-out quote
+          <pre data-file="name.ext"><code>   code, gets a Copy
+                            button; data-file is optional and
+                            <span class="c"> dims a comment
+          <figure>          an image with a caption, images go
+                            in posts/images/
+          <sup> + .footnotes   numbered notes at the end
+     5. The Previous and Next links at the bottom. Leave out
+        Next on the newest post.
+
+     "On this page", the Copy buttons and the share links are
+     filled in by post.js, so there's nothing to edit there.
+
+     PLACEHOLDER: the writing below shows the format. Replace it
+     with a real post.
      ============================================================ -->
-<main>
-<article class="post">
+<main class="post">
 
-  <p class="date"><time datetime="2026-09-23">September 23, 2026</time></p>
-  <h1>Starting this thing</h1>
+  <header class="post-head">
+    <a class="back" href="../blog.html">&larr; Back to blog</a>
+    <span class="tag">Data</span>
+    <h1>What I learned building a tiny analytics pipeline</h1>
+    <p class="dek">SQLite, a cron job, and why I stopped reaching for a dashboard first.</p>
+    <p class="byline">
+      <!-- Swap for a photo: <img class="avatar" src="../files/aram.jpg" alt=""> -->
+      <span class="avatar" aria-hidden="true"></span>
+      <span><b>Aram</b> &middot; <time datetime="2026-09-30">September 30, 2026</time> &middot; 8 min read</span>
+    </p>
+  </header>
 
-  <p>[Open with the point. What made you want to write this?]</p>
+  <img class="cover" src="covers/placeholder-wide.svg" alt="" width="1400" height="600">
 
-  <h2>[A section heading]</h2>
+  <div class="post-body">
+    <div class="post-main">
+      <article class="prose">
 
-  <p>[Body paragraph. Keep lines short and say one thing at a time.]</p>
+        <p>A few months ago I wanted to know one small thing: which pages on this site people actually read. Every tool I tried wanted to be a platform.<sup><a href="#fn1" id="ref1">1</a></sup> I wanted a table.</p>
 
-  <blockquote>
-    <p>[A quote, or a line worth pulling out.]</p>
-  </blockquote>
+        <h2>The whole setup</h2>
 
-  <p>[Another paragraph.]</p>
+        <p>Three pieces: a tiny endpoint that logs a row, a SQLite file, and a nightly job that rolls the rows up. That's genuinely it.</p>
 
-  <pre><code>// Code looks like this
-const hello = () =&gt; console.log("hi");</code></pre>
+<pre data-file="rollup.sql"><code><span class="c">-- daily views per path</span>
+INSERT INTO daily (day, path, views)
+SELECT date(ts), path, count(*)
+FROM hits
+WHERE date(ts) = date('now', '-1 day')
+GROUP BY 1, 2;</code></pre>
 
-  <p>[Wrap up.]</p>
+        <h2>Why not a dashboard</h2>
 
-</article>
+        <p>Dashboards answer questions you haven't asked yet. A query answers the one you have. Writing the SQL by hand made me decide what I actually cared about.</p>
+
+        <blockquote>
+          <p>&ldquo;The smallest tool that answers the question is usually the right one.&rdquo;</p>
+        </blockquote>
+
+        <figure>
+          <img src="images/placeholder.svg" alt="A month of daily page views printed in a terminal" width="800" height="600">
+          <figcaption>A month of daily views, straight from the terminal.</figcaption>
+        </figure>
+
+        <h2>What's next</h2>
+
+        <p>I'll probably add referrers next, then stop. If you've built something similar, I'd love to hear how you kept it small.</p>
+
+        <ol class="footnotes">
+          <li id="fn1">Accounts, a tracking script and a pricing page, for a site with a few hundred visitors. <a href="#ref1" aria-label="Back to the text">&#8617;</a></li>
+        </ol>
+
+      </article>
+
+      <aside class="thanks">
+        <span class="avatar" aria-hidden="true"></span>
+        <div>
+          <p class="side-h">Thanks for reading!</p>
+          <p>I'm Aram, a software engineer who writes about things I'm building, places I visit, and whatever I'm curious about. <a href="../index.html#contact">Say hi.</a></p>
+        </div>
+      </aside>
+
+      <div class="post-nav">
+        <a class="prev" href="example-post.html"><span>&larr; Previous</span>Starting this thing</a>
+        <a class="next" href="example-post.html"><span>Next &rarr;</span>Two weeks in Yerevan</a>
+      </div>
+    </div>
+
+    <aside class="post-side" aria-label="About this post">
+      <div class="toc" role="navigation" aria-label="On this page" hidden>
+        <p class="side-h">On this page</p>
+        <ul></ul>
+      </div>
+      <p class="side-h">Share</p>
+      <div class="share-links">
+        <button type="button" data-share="copy">Copy link</button>
+        <a data-share="linkedin" href="https://www.linkedin.com/" target="_blank" rel="noopener">LinkedIn</a>
+        <a data-share="email" href="mailto:">Email</a>
+      </div>
+    </aside>
+  </div>
+
 </main>
 
 </div>
@@ -97,6 +190,9 @@ const hello = () =&gt; console.log("hi");</code></pre>
 
 <!-- Hover scramble effect on the nav links -->
 <script src="../scramble.js"></script>
+<script src="../navpanel.js"></script>
+<script src="../marks.js"></script>
+<script src="../post.js"></script>
 <script src="../footer.js"></script>
 </body>
 </html>

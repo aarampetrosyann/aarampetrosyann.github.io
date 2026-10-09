@@ -15,6 +15,164 @@
 
 <!-- Applies saved theme before paint, then builds the settings panel -->
 <script src="settings.js"></script>
+<style>
+/* ============================================================
+   BLOG PAGE
+   Header with a "Lately" line, a card for the newest post, then
+   the full list grouped by year with topic filters and pages.
+   Grouping, filtering and paging are done by the script at the
+   bottom of this page; without it the list simply shows in full.
+   ============================================================ */
+/* This page reads as one column, so no grid divider under the header. */
+.page-head::after,
+.page-head > .xmark { display: none; }
+.page-head { padding-bottom: 2.75rem; }
+
+.page-head .lately {
+  margin-top: 1.75rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.lately::before {
+  content: "";
+  display: inline-block;
+  width: 0.45rem;
+  height: 0.45rem;
+  margin-right: 0.6rem;
+  border-radius: 50%;
+  background: var(--status);
+  vertical-align: 0.05rem;
+}
+
+/* Newest post */
+.featured {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 2rem;
+  padding: 1rem;
+  border-radius: 14px;
+  background: var(--card);
+  color: var(--ink);
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+.featured:hover { background: var(--card-over); }
+.featured img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 10px;
+}
+.featured-text { padding: 1rem 1rem 1rem 0; }
+.featured .kicker,
+.featured .meta {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.featured h2 {
+  margin: 0.6rem 0 1rem;
+  font-size: clamp(1.7rem, 4.5vw, 2.25rem);
+  font-weight: 800;
+  line-height: 1.05;
+}
+.featured .desc {
+  margin: 0 0 1rem;
+  font-size: 0.95rem;
+  color: var(--soft-ink);
+}
+
+/* List header: title and topic filters */
+.posts-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+.posts-head h2 { margin: 0; }
+.filters { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+
+.filters button,
+.pager button {
+  font: inherit;
+  font-size: 0.8rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--chip);
+  color: var(--ink);
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+}
+.filters button { padding: 0.3rem 0.85rem; }
+.filters button:hover,
+.pager button:hover { background: var(--card-over); }
+.filters button[aria-pressed="true"],
+.pager button[aria-current="page"] {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+/* The list */
+.posts { list-style: none; margin: 0; padding: 0; }
+.posts .year {
+  margin: 2.25rem 0 0.5rem;
+  padding: 0 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+.posts .year.first { margin-top: 0; }
+.posts .empty { padding: 0 0.75rem; color: var(--muted); }
+
+.entry a {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1.5rem;
+  padding: 0.7rem 0.75rem;
+  border-radius: 10px;
+  color: var(--ink);
+  text-decoration: none;
+  transition: background-color 0.15s;
+}
+.entry a:hover { background: var(--card); }
+.entry h3 { font-size: 1.15rem; }
+.entry p {
+  margin: 0.15rem 0 0;
+  font-size: 0.9rem;
+  color: var(--soft-ink);
+}
+.post-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.3rem;
+  padding-top: 0.15rem;
+  white-space: nowrap;
+}
+.when { font-size: 0.8rem; color: var(--muted); }
+
+/* Pages */
+.pager {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 2.5rem;
+}
+.pager[hidden] { display: none; }
+.pager button { min-width: 2rem; height: 2rem; padding: 0 0.6rem; }
+
+@media (max-width: 560px) {
+  .featured { grid-template-columns: 1fr; gap: 0.5rem; }
+  .featured-text { padding: 0.5rem 0.5rem 0.75rem; }
+  .entry a { grid-template-columns: 1fr; gap: 0.4rem; }
+  .post-info { flex-direction: row-reverse; justify-content: flex-end; align-items: center; gap: 0.6rem; }
+}
+</style>
 </head>
 
 <body>
@@ -39,34 +197,255 @@
 <header class="page-head">
   <h1>Blog</h1>
   <p>Notes on things I'm working on or thinking about: software, data, and the occasional tangent.</p>
+  <!-- Update this line whenever it stops being true. -->
+  <p class="lately">Lately: learning Rust, reading <i>The Mythical Man-Month</i>, and planning a trip to Japan.</p>
 </header>
 
 <main>
 <!-- ============================================================
-     POST LIST
-     Newest post first. To add one, copy this template:
+     LATEST POST
+     Point this card at the newest post. Swap the image for the
+     post's own cover (4:3 works best) once it has one; until then
+     posts/covers/placeholder.svg stands in.
+     ============================================================ -->
+<a class="featured" href="posts/example-post.html">
+  <img src="posts/covers/placeholder.svg" alt="" width="800" height="600">
+  <div class="featured-text">
+    <p class="kicker">Latest &middot; Data</p>
+    <h2>What I learned building a tiny analytics pipeline</h2>
+    <p class="desc">SQLite, a cron job, and why I stopped reaching for a dashboard first.</p>
+    <p class="meta"><time datetime="2026-09-30">September 30</time> &middot; 8 min read</p>
+  </div>
+</a>
 
-     <li>
-       <p class="date"><time datetime="2026-10-04">October 4, 2026</time></p>
-       <h3><a href="posts/short-slug.html">Post title</a></h3>
-       <p>One or two lines on what the post is about.</p>
+<!-- ============================================================
+     POST LIST
+     Newest post first. Year headings, the topic filters and the
+     page buttons are added by the script at the bottom, so each
+     post is just one <li>. To add one, copy this template:
+
+     <li class="entry" data-tag="software">
+       <a href="posts/short-slug.html">
+         <div class="post-text">
+           <h3>Post title</h3>
+           <p>One line on what the post is about.</p>
+         </div>
+         <div class="post-info">
+           <span class="tag">Software</span>
+           <span class="when"><time datetime="2026-10-04">Oct 4</time> &middot; 5 min</span>
+         </div>
+       </a>
      </li>
 
+     data-tag is one of: software, data, travel, tangents. It
+     must match a filter button below.
+
      Then copy posts/example-post.html, rename it to match the
-     link above, and write inside it. Two edits per post: this
-     list, and the post file itself.
+     link above, and write inside it.
+
+     PLACEHOLDERS: every post below is a stand-in to show the
+     layout. They all link to the example post, which shows the
+     post format. Delete them as real posts arrive.
      ============================================================ -->
 <section aria-labelledby="posts-h">
-  <h2 id="posts-h">Posts</h2>
-  <ul class="posts">
+  <div class="posts-head">
+    <h2 id="posts-h">Posts</h2>
+    <div class="filters" role="group" aria-label="Filter by topic">
+      <button type="button" data-tag="all" aria-pressed="true">All</button>
+      <button type="button" data-tag="software" aria-pressed="false">Software</button>
+      <button type="button" data-tag="data" aria-pressed="false">Data</button>
+      <button type="button" data-tag="travel" aria-pressed="false">Travel</button>
+      <button type="button" data-tag="tangents" aria-pressed="false">Tangents</button>
+    </div>
+  </div>
 
-    <li>
-      <p class="date"><time datetime="2026-09-23">September 23, 2026</time></p>
-      <h3><a href="posts/example-post.html">Starting this thing</a></h3>
-      <p>Why I finally built a site, and what I plan to put on it.</p>
+  <ol class="posts">
+
+    <li class="entry" data-tag="data">
+      <a href="posts/example-post.html">
+        <div class="post-text">
+          <h3>What I learned building a tiny analytics pipeline</h3>
+          <p>SQLite, a cron job, and why I stopped reaching for a dashboard first.</p>
+        </div>
+        <div class="post-info">
+          <span class="tag">Data</span>
+          <span class="when"><time datetime="2026-09-30">Sep 30</time> &middot; 8 min</span>
+        </div>
+      </a>
     </li>
 
-  </ul>
+    <li class="entry" data-tag="tangents">
+      <a href="posts/example-post.html">
+        <div class="post-text">
+          <h3>Starting this thing</h3>
+          <p>Why I finally built a site, and what I plan to put on it.</p>
+        </div>
+        <div class="post-info">
+          <span class="tag">Tangents</span>
+          <span class="when"><time datetime="2026-09-23">Sep 23</time> &middot; 4 min</span>
+        </div>
+      </a>
+    </li>
+
+    <li class="entry" data-tag="travel">
+      <a href="posts/example-post.html">
+        <div class="post-text">
+          <h3>Two weeks in Yerevan, by the numbers</h3>
+          <p>Steps walked, coffees drunk, and one spreadsheet I should not have made.</p>
+        </div>
+        <div class="post-info">
+          <span class="tag">Travel</span>
+          <span class="when"><time datetime="2026-09-11">Sep 11</time> &middot; 7 min</span>
+        </div>
+      </a>
+    </li>
+
+    <li class="entry" data-tag="software">
+      <a href="posts/example-post.html">
+        <div class="post-text">
+          <h3>Learning Rust by rewriting a CLI</h3>
+          <p>Fighting the borrow checker, then quietly agreeing with it.</p>
+        </div>
+        <div class="post-info">
+          <span class="tag">Software</span>
+          <span class="when"><time datetime="2026-08-29">Aug 29</time> &middot; 9 min</span>
+        </div>
+      </a>
+    </li>
+
+    <li class="entry" data-tag="tangents">
+      <a href="posts/example-post.html">
+        <div class="post-text">
+          <h3>A rabbit hole on how maps get projected</h3>
+          <p>Why Greenland looks huge, and the math I did not expect to enjoy.</p>
+        </div>
+        <div class="post-info">
+          <span class="tag">Tangents</span>
+          <span class="when"><time datetime="2025-12-30">Dec 30</time> &middot; 11 min</span>
+        </div>
+      </a>
+    </li>
+
+    <li class="entry" data-tag="travel">
+      <a href="posts/example-post.html">
+        <div class="post-text">
+          <h3>A long weekend in the Dolomites</h3>
+          <p>Two huts, one storm, and the best polenta of my life.</p>
+        </div>
+        <div class="post-info">
+          <span class="tag">Travel</span>
+          <span class="when"><time datetime="2025-08-02">Aug 2</time> &middot; 6 min</span>
+        </div>
+      </a>
+    </li>
+
+    <li class="entry" data-tag="data">
+      <a href="posts/example-post.html">
+        <div class="post-text">
+          <h3>Cleaning a messy CSV without losing my mind</h3>
+          <p>A short list of checks I now run before trusting any dataset.</p>
+        </div>
+        <div class="post-info">
+          <span class="tag">Data</span>
+          <span class="when"><time datetime="2025-06-14">Jun 14</time> &middot; 6 min</span>
+        </div>
+      </a>
+    </li>
+
+    <li class="entry" data-tag="tangents">
+      <a href="posts/example-post.html">
+        <div class="post-text">
+          <h3>Why I keep a plain-text todo list</h3>
+          <p>Every app I tried, and the one file that outlasted them all.</p>
+        </div>
+        <div class="post-info">
+          <span class="tag">Tangents</span>
+          <span class="when"><time datetime="2025-05-03">May 3</time> &middot; 3 min</span>
+        </div>
+      </a>
+    </li>
+
+    <li class="entry" data-tag="software">
+      <a href="posts/example-post.html">
+        <div class="post-text">
+          <h3>A first look at FPGA timing</h3>
+          <p>What a timing report is actually telling you, in plain words.</p>
+        </div>
+        <div class="post-info">
+          <span class="tag">Software</span>
+          <span class="when"><time datetime="2025-03-22">Mar 22</time> &middot; 10 min</span>
+        </div>
+      </a>
+    </li>
+
+    <li class="entry" data-tag="travel">
+      <a href="posts/example-post.html">
+        <div class="post-text">
+          <h3>Three days in Lisbon on foot</h3>
+          <p>Hills, trams I did not take, and a lot of pastel de nata.</p>
+        </div>
+        <div class="post-info">
+          <span class="tag">Travel</span>
+          <span class="when"><time datetime="2025-01-18">Jan 18</time> &middot; 5 min</span>
+        </div>
+      </a>
+    </li>
+
+    <li class="entry" data-tag="data">
+      <a href="posts/example-post.html">
+        <div class="post-text">
+          <h3>Predicting bus delays with a tiny model</h3>
+          <p>Public data, a weekend, and a baseline that was hard to beat.</p>
+        </div>
+        <div class="post-info">
+          <span class="tag">Data</span>
+          <span class="when"><time datetime="2024-11-09">Nov 9</time> &middot; 9 min</span>
+        </div>
+      </a>
+    </li>
+
+    <li class="entry" data-tag="software">
+      <a href="posts/example-post.html">
+        <div class="post-text">
+          <h3>Tests I wish I had written sooner</h3>
+          <p>The bugs that taught me where tests actually pay off.</p>
+        </div>
+        <div class="post-info">
+          <span class="tag">Software</span>
+          <span class="when"><time datetime="2024-09-28">Sep 28</time> &middot; 6 min</span>
+        </div>
+      </a>
+    </li>
+
+    <li class="entry" data-tag="travel">
+      <a href="posts/example-post.html">
+        <div class="post-text">
+          <h3>A rainy weekend in Tbilisi</h3>
+          <p>Sulfur baths, khachapuri, and an umbrella I never found again.</p>
+        </div>
+        <div class="post-info">
+          <span class="tag">Travel</span>
+          <span class="when"><time datetime="2024-07-04">Jul 4</time> &middot; 5 min</span>
+        </div>
+      </a>
+    </li>
+
+    <li class="entry" data-tag="tangents">
+      <a href="posts/example-post.html">
+        <div class="post-text">
+          <h3>The surprising math of shuffling cards</h3>
+          <p>Seven riffle shuffles, and why the number is not a guess.</p>
+        </div>
+        <div class="post-info">
+          <span class="tag">Tangents</span>
+          <span class="when"><time datetime="2024-04-12">Apr 12</time> &middot; 7 min</span>
+        </div>
+      </a>
+    </li>
+
+  </ol>
+
+  <div class="pager" role="navigation" aria-label="Pages" hidden></div>
 </section>
 
 </main>
@@ -111,5 +490,74 @@
 <script src="navpanel.js"></script>
 <script src="marks.js"></script>
 <script src="footer.js"></script>
+<script>
+/* Groups the post list by year, filters it by topic and splits it
+   into pages. Posts are read from the list as written above. */
+(function () {
+  var PER_PAGE = 6;
+
+  var list    = document.querySelector(".posts");
+  var posts   = Array.prototype.slice.call(list.querySelectorAll(".entry"));
+  var buttons = document.querySelectorAll(".filters button");
+  var pager   = document.querySelector(".pager");
+  var tag = "all", page = 1;
+
+  function render(scroll) {
+    var extras = list.querySelectorAll(".year, .empty");
+    for (var i = 0; i < extras.length; i++) extras[i].remove();
+
+    var shown = posts.filter(function (p) { return tag === "all" || p.dataset.tag === tag; });
+    var pages = Math.max(1, Math.ceil(shown.length / PER_PAGE));
+    page = Math.min(page, pages);
+    var onPage = shown.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+
+    var year = null;
+    posts.forEach(function (p) { p.hidden = onPage.indexOf(p) < 0; });
+    onPage.forEach(function (p) {
+      var y = p.querySelector("time").getAttribute("datetime").slice(0, 4);
+      if (y === year) return;
+      var li = document.createElement("li");
+      li.className = "year" + (year === null ? " first" : "");
+      li.textContent = year = y;
+      list.insertBefore(li, p);
+    });
+    if (!onPage.length) {
+      var none = document.createElement("li");
+      none.className = "empty";
+      none.textContent = "Nothing here yet.";
+      list.appendChild(none);
+    }
+
+    pager.textContent = "";
+    pager.hidden = pages < 2;
+    for (var n = 1; n <= pages; n++) pager.appendChild(pageButton(String(n), n, n === page));
+    if (page < pages) pager.appendChild(pageButton("Older posts \u2192", page + 1, false));
+
+    if (scroll) document.getElementById("posts-h").scrollIntoView({ block: "start" });
+  }
+
+  function pageButton(label, n, current) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.textContent = label;
+    if (current) b.setAttribute("aria-current", "page");
+    b.addEventListener("click", function () { page = n; render(true); });
+    return b;
+  }
+
+  for (var i = 0; i < buttons.length; i++) {
+    buttons[i].addEventListener("click", function () {
+      tag = this.dataset.tag;
+      page = 1;
+      for (var j = 0; j < buttons.length; j++) {
+        buttons[j].setAttribute("aria-pressed", buttons[j] === this ? "true" : "false");
+      }
+      render(false);
+    });
+  }
+
+  render(false);
+})();
+</script>
 </body>
 </html>
