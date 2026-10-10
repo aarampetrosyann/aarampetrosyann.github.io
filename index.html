@@ -21,28 +21,91 @@
 <script src="settings.js"></script>
 
 <style>
-/* Overview rows for Experience, Projects and Education: name on
-   the left, detail on the right, with a link to the About page. */
-.overview { list-style: none; margin: 0; padding: 0; }
-.overview li {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 0.15rem 1.5rem;
-  padding: 0.85rem 0;
-  border-top: 1px solid var(--line);
-}
-.overview li:first-child { border-top: 0; padding-top: 0; }
-.overview h3 { font-size: 1.1rem; }
-.overview span { color: var(--muted); font-size: 0.95rem; }
-/* Education's school names are long, so they sit under the degree
-   instead of beside it, keeping both rows the same shape. */
-.overview.stacked li { flex-direction: column; }
+/* Home page sections, each pointing somewhere else on the site:
+   a featured project, the toolbox, and the latest posts (read
+   from blog.html). */
 .more {
   display: inline-block;
   margin-top: 1.25rem;
   font-weight: 500;
+}
+
+/* Now, under the intro: small labels beside what's going on this
+   season, quieter than the intro so the name stays the loud part */
+.now {
+  display: grid;
+  grid-template-columns: 6.5rem 1fr;
+  gap: 0.5rem 1rem;
+  max-width: 38rem;
+  margin: 2rem 0 0;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+}
+.now dt { color: var(--muted); }
+.now dd { margin: 0; }
+.hero .updated { margin: 1rem 0 0; font-size: 0.8rem; color: var(--muted); }
+
+/* Featured project: a card with its headline number */
+.feature {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1.5rem 2rem;
+  padding: 1.6rem 1.75rem;
+  border-radius: 14px;
+  background: var(--card);
+}
+.feature h3 { font-size: 1.45rem; }
+.feature p { margin: 0.6rem 0 0; color: var(--soft-ink); }
+.stat { text-align: right; }
+.stat b {
+  display: block;
+  font-family: var(--display);
+  font-size: 3.25rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+.stat span { display: block; max-width: 9rem; margin-top: 0.35rem; font-size: 0.8rem; color: var(--muted); }
+.chips { list-style: none; display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 1.1rem 0 0; padding: 0; }
+.chips li {
+  padding: 0.2rem 0.7rem;
+  border-radius: 999px;
+  background: var(--chip);
+  font-size: 0.8rem;
+}
+.feature .chips li { background: var(--paper); }
+.feature-links { grid-column: 1 / -1; display: flex; gap: 1.5rem; }
+.feature-links .more { margin-top: 0; }
+
+/* Toolbox: a label per group, chips beside it */
+.tools { display: grid; grid-template-columns: 10.5rem 1fr; gap: 1rem; margin: 0; }
+.tools dt { color: var(--muted); padding-top: 0.2rem; }
+.tools dd { margin: 0; }
+.tools .chips { margin: 0; }
+
+/* Latest posts: rows like the blog list */
+.latest { list-style: none; margin: 0; padding: 0; }
+.latest a {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1.5rem;
+  padding: 0.75rem 0;
+  border-top: 1px solid var(--line);
+  color: var(--ink);
+  text-decoration: none;
+}
+.latest li:first-child a { border-top: 0; padding-top: 0; }
+.latest a:hover h3 { color: var(--accent); }
+.latest h3 { font-size: 1.15rem; }
+.latest p { margin: 0.15rem 0 0; font-size: 0.9rem; color: var(--soft-ink); }
+.latest time { font-size: 0.8rem; color: var(--muted); white-space: nowrap; padding-top: 0.2rem; }
+
+@media (max-width: 560px) {
+  .now, .tools { grid-template-columns: 1fr; gap: 0.15rem; }
+  .now dd, .tools dd { margin-bottom: 0.6rem; }
+  .feature { grid-template-columns: 1fr; padding: 1.25rem; }
+  .stat { text-align: left; }
+  .latest a { grid-template-columns: 1fr; gap: 0.2rem; }
 }
 </style>
 </head>
@@ -74,76 +137,78 @@
 
 <!-- ============================================================
      BLOCK 2: HERO
-     Your name and a one-line intro.
+     Your name, who you are in a few lines, and what's going on
+     right now. Change the Now rows whenever they stop being true,
+     and the date under them.
      ============================================================ -->
 <header class="hero">
   <h1>Aram<br>Petrosyan</h1>
-  <p>I'm a UCLA Computer Science graduate who builds software across the stack, from web apps and automation tools to FPGA hardware.</p>
+  <p>I build software across the stack, from web apps and automation tools to FPGA hardware. I like problems where the answer has to hold up in the real world: a site people actually use, a tool that saves a legal team hours, or a model checked against outcomes it didn't see.</p>
+  <dl class="now">
+    <dt>Studying</dt>
+    <dd>M.S. in Data Science Engineering at UCLA, after a B.S. in Computer Science there.</dd>
+    <dt>Building</dt>
+    <dd>A Python and FastAPI platform for patent Office Action analysis, as an intern at an IP law firm.</dd>
+    <dt>Open to</dt>
+    <dd>New grad and internship roles in software and data engineering.</dd>
+  </dl>
+  <p class="updated">Updated October 2026</p>
 </header>
 
 <main>
 
 <!-- ============================================================
-     BLOCK 3: ABOUT
-     Plain paragraphs. Add or remove <p> tags freely.
+     BLOCK 3: FEATURED PROJECT
+     One project in a little more depth. The full list is on
+     about.html; swap this for whichever project you're proudest
+     of right now.
      ============================================================ -->
-<section class="about" aria-labelledby="about-h">
-  <h2 id="about-h">About</h2>
-  <p>My work has spanned software engineering, freelance web development, CAD design, and teaching. I like problems where the answer has to hold up in the real world: a client site people actually use, a tool that saves a legal team hours, or a model that gets checked against outcomes it didn't see.</p>
-  <p>Right now I'm focused on data science and machine learning, and I'm looking for new grad and internship roles in software and data engineering.</p>
+<section aria-labelledby="feature-h">
+  <h2 id="feature-h">Featured project</h2>
+  <article class="feature">
+    <div>
+      <h3>World Cup Match Prediction Engine</h3>
+      <p>A Poisson-based model with Monte Carlo simulation, tested the honest way: every prediction was made before the match was played.</p>
+      <ul class="chips"><li>Python</li><li>Statistical modeling</li><li>Monte Carlo</li></ul>
+    </div>
+    <div class="stat">
+      <b>19/22</b>
+      <span>knockout-stage outcomes called before kickoff</span>
+    </div>
+    <div class="feature-links">
+      <a class="more" href="#">Code &rarr;</a>
+      <a class="more" href="about.html#projects">All projects &rarr;</a>
+    </div>
+  </article>
 </section>
 
 <!-- ============================================================
-     BLOCKS 4-6: EXPERIENCE, PROJECTS, EDUCATION (overview)
-     A short preview of each. The full lists live on about.html;
-     keep the highlights here in step with what's there.
-     Each row is one <li>: name on the left, detail on the right.
+     BLOCK 4: TOOLBOX
+     Languages and tools, from the resume. One <li> per chip.
      ============================================================ -->
-<section aria-labelledby="exp-h">
-  <h2 id="exp-h">Experience</h2>
-  <ul class="overview">
-    <li><h3>Software Engineering Intern</h3><span>ITJ Group</span></li>
-    <li><h3>Patent Office Action Automation</h3><span>IP law firm</span></li>
-    <li><h3>Freelance Web Developer</h3><span>Self-employed</span></li>
-  </ul>
-  <a class="more" href="about.html#experience">All experience &rarr;</a>
-</section>
-
-<section aria-labelledby="proj-h">
-  <h2 id="proj-h">Projects</h2>
-  <ul class="overview">
-    <li><h3>World Cup Match Prediction Engine</h3><span>Python, statistical modeling</span></li>
-    <li><h3>FairShare</h3><span>React, Node, MongoDB</span></li>
-    <li><h3>FPGA Craps Game</h3><span>Verilog, FPGA</span></li>
-  </ul>
-  <a class="more" href="about.html#projects">All projects &rarr;</a>
-</section>
-
-<section aria-labelledby="edu-h">
-  <h2 id="edu-h">Education</h2>
-  <ul class="overview stacked">
-    <li><h3>M.S. Data Science Engineering</h3><span>University of California, Los Angeles (UCLA), 2026&ndash;2028 (expected)</span></li>
-    <li><h3>B.S. Computer Science</h3><span>University of California, Los Angeles (UCLA), 2024&ndash;2026</span></li>
-  </ul>
-  <a class="more" href="about.html#education">All education &rarr;</a>
+<section aria-labelledby="tools-h">
+  <h2 id="tools-h">Toolbox</h2>
+  <dl class="tools">
+    <dt>Languages</dt>
+    <dd><ul class="chips"><li>Python</li><li>C/C++</li><li>SQL</li><li>TypeScript</li><li>JavaScript</li><li>HTML/CSS</li><li>R</li></ul></dd>
+    <dt>Frameworks &amp; data</dt>
+    <dd><ul class="chips"><li>FastAPI</li><li>Node.js</li><li>React</li><li>Next.js</li><li>MongoDB</li><li>Firebase</li><li>PyTorch</li></ul></dd>
+    <dt>Cloud &amp; tools</dt>
+    <dd><ul class="chips"><li>AWS</li><li>Docker</li><li>Linux</li><li>Git</li></ul></dd>
+    <dt>Hardware</dt>
+    <dd><ul class="chips"><li>Verilog</li><li>Vivado</li><li>FPGA</li></ul></dd>
+  </dl>
 </section>
 
 <!-- ============================================================
-     BLOCK 7: CONTACT
-     Each button is one <li>. The same links are in the footer.
-     Resume: the PDF lives in files/. Update this path if
-     you rename the file.
+     BLOCK 5: LATEST WRITING
+     Filled in by the script at the bottom with the newest posts
+     from blog.html, so nothing to edit here when you post.
      ============================================================ -->
-<section id="contact" class="contact" aria-labelledby="contact-h">
-  <h2 id="contact-h">Contact</h2>
-  <p>The fastest way to reach me is email. I'm happy to talk about roles, projects, or anything on this page.</p>
-  <ul>
-    <li><a href="mailto:apetrosyan15@ucla.edu">Email</a></li>
-    <li><a href="https://github.com/aarampetrosyann">GitHub</a></li>
-    <li><a href="https://linkedin.com/in/a-petrosyan">LinkedIn</a></li>
-    <li><a href="files/aram-petrosyan-resume.pdf">Resume</a></li>
-  </ul>
-  <a class="more" href="contact.html#hours">Book a time to talk &rarr;</a>
+<section aria-labelledby="latest-h">
+  <h2 id="latest-h">Latest writing</h2>
+  <ul class="latest" id="latest"></ul>
+  <a class="more" href="blog.html">All posts &rarr;</a>
 </section>
 
 </main>
@@ -188,5 +253,40 @@
 <script src="navpanel.js"></script>
 <script src="marks.js"></script>
 <script src="footer.js"></script>
+<script>
+/* Latest writing: reads the newest two posts from blog.html, so
+   this updates whenever a post is added there. */
+(function () {
+  var list = document.getElementById("latest");
+  fetch("blog.html")
+    .then(function (r) { return r.text(); })
+    .then(function (html) {
+      var doc = new DOMParser().parseFromString(html, "text/html");
+      var posts = doc.querySelectorAll(".posts .entry");
+      for (var i = 0; i < Math.min(2, posts.length); i++) {
+        var p = posts[i], time = p.querySelector("time");
+        var li = document.createElement("li");
+        var a = document.createElement("a");
+        a.href = p.querySelector("a").getAttribute("href");
+        var text = document.createElement("div");
+        var h = document.createElement("h3");
+        h.textContent = p.querySelector("h3").textContent;
+        var d = document.createElement("p");
+        d.textContent = p.querySelector(".post-text p").textContent;
+        text.appendChild(h);
+        text.appendChild(d);
+        var t = document.createElement("time");
+        t.dateTime = time.getAttribute("datetime");
+        t.textContent = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })
+          .format(new Date(t.dateTime));
+        a.appendChild(text);
+        a.appendChild(t);
+        li.appendChild(a);
+        list.appendChild(li);
+      }
+    })
+    .catch(function () {});
+})();
+</script>
 </body>
 </html>
