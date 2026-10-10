@@ -18,8 +18,10 @@
 
 <style>
 /* Game tiles: square boxes, each in its game's color, with the
-   game's icon in the top left and its name in the bottom left.
-   On hover an arrow appears in the bottom right.
+   game's icon in the top left and its name in the bottom left. On
+   hover the name lifts to make room for a short description under
+   it, and an arrow appears in the bottom right. Touch screens
+   show the description always.
    Colors are tokens in styles.css, icons live in icons/. */
 .games {
   list-style: none;
@@ -29,7 +31,8 @@
   grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
 }
-.games a {
+.games a,
+.games .upcoming {
   position: relative;
   aspect-ratio: 1;
   display: flex;
@@ -50,6 +53,38 @@
   width: 45%;
   height: auto;
 }
+.games .label {
+  /* the description's row opens from 0 to its height, which lifts
+     the name; the inner span carries the gap so it collapses too */
+  display: grid;
+  grid-template-rows: auto 0fr;
+  max-width: calc(100% - 2.25rem);  /* clear of the arrow */
+  transition: grid-template-rows 0.25s ease;
+}
+.games .desc {
+  min-height: 0;
+  overflow: hidden;
+  font-family: var(--body);
+  font-size: 0.8rem;
+  font-weight: 400;
+  line-height: 1.4;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+.games .desc span { display: block; padding-top: 0.35rem; }
+.games a:hover .label,
+.games a:focus-visible .label,
+.games .upcoming:hover .label { grid-template-rows: auto 1fr; }
+.games a:hover .desc,
+.games a:focus-visible .desc,
+.games .upcoming:hover .desc { opacity: 1; }
+/* Coming soon: same tile, not a link yet, and "..." for the arrow */
+.games .upcoming { cursor: default; }
+@media (hover: none) {
+  /* no hover, so no arrow either: the line can run full width */
+  .games .label { grid-template-rows: auto 1fr; max-width: none; }
+  .games .desc { opacity: 1; }
+}
 /* Material Symbols "arrow_forward", inlined as SVG */
 .games .arrow {
   position: absolute;
@@ -63,20 +98,142 @@
   transition: opacity 0.2s ease, transform 0.2s ease;
 }
 .games a:hover .arrow,
-.games a:focus-visible .arrow {
+.games a:focus-visible .arrow,
+.games .upcoming:hover .arrow {
   opacity: 1;
   transform: translateX(0);
 }
 @media (prefers-reduced-motion: reduce) {
   .games .arrow { transition: none; transform: none; }
+  .games .label, .games .desc { transition: none; }
 }
 
 .games .takuzu  { --tile: var(--game-takuzu);  --tile-ink: var(--game-takuzu-ink); }
 .games .kakuro  { --tile: var(--game-kakuro);  --tile-ink: var(--game-kakuro-ink); }
 .games .shikaku { --tile: var(--game-shikaku); --tile-ink: var(--game-shikaku-ink); }
+.games .sudoku   { --tile: var(--game-sudoku);   --tile-ink: var(--game-sudoku-ink); }
+.games .gurobaru { --tile: var(--game-gurobaru); --tile-ink: var(--game-gurobaru-ink); }
+
+/* The last square: an invitation to suggest a game. */
+.games .suggest a {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.35rem;
+  aspect-ratio: 1;
+  padding: 1rem;
+  border: 1.5px dashed var(--line);
+  border-radius: 4px;
+  color: var(--muted);
+  text-align: center;
+  text-decoration: none;
+  transition: color 0.15s, border-color 0.15s;
+}
+.games .suggest a:hover { color: var(--ink); border-color: var(--muted); }
+.suggest .plus { font-family: var(--display); font-size: 2.5rem; line-height: 1; }
+.suggest b { font-family: var(--display); font-size: 1.2rem; color: var(--ink); }
+.suggest span { font-size: 0.8rem; }
+
+/* Activity: one square per day for the last year, darker for more
+   puzzles solved that day. Built by the script at the bottom from
+   what board.js saves in this browser. */
+.act-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 0.75rem 1.5rem;
+  margin-bottom: 1.25rem;
+}
+.act-head h2 { margin: 0 0 0.35rem; }
+.act-today { margin: 0; font-size: 0.9rem; color: var(--soft-ink); }
+.act-filter { display: flex; flex-wrap: wrap; gap: 1rem; }
+.act-filter button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.act-filter button::before {
+  content: "";
+  display: inline-block;
+  width: 0.75rem;
+  height: 0.75rem;
+  margin-right: 0.45rem;
+  border-radius: 3px;
+  background: var(--chip);
+  vertical-align: -0.05rem;
+  transition: background-color 0.15s;
+}
+.act-filter button[aria-pressed="true"] { color: var(--ink); }
+.act-filter button[aria-pressed="true"]::before { background: var(--sw); }
+.act-filter .takuzu  { --sw: var(--game-takuzu); }
+.act-filter .kakuro  { --sw: var(--game-kakuro); }
+.act-filter .shikaku { --sw: var(--game-shikaku); }
+
+.heat {
+  --weeks: 53;
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(7, auto);
+  grid-template-columns: repeat(var(--weeks), minmax(0, 1fr));
+  gap: 3px;
+}
+.heat i {
+  aspect-ratio: 1;
+  border-radius: 2px;
+  background: var(--chip);
+}
+.heat i.future { visibility: hidden; }
+.heat .l1, .heat-key .l1 { background: color-mix(in srgb, var(--ink) 22%, var(--paper)); }
+.heat .l2, .heat-key .l2 { background: color-mix(in srgb, var(--ink) 42%, var(--paper)); }
+.heat .l3, .heat-key .l3 { background: color-mix(in srgb, var(--ink) 66%, var(--paper)); }
+.heat .l4, .heat-key .l4 { background: var(--ink); }
+.heat-wrap { position: relative; }
+.heat-tip {
+  position: absolute;
+  z-index: 1;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 0.75rem;
+  white-space: nowrap;
+  pointer-events: none;
+  transform: translate(-50%, calc(-100% - 6px));
+}
+.heat-tip[hidden] { display: none; }
+
+.act-foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem 1.5rem;
+  margin-top: 0.85rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.act-foot p { margin: 0; }
+.heat-key { display: flex; align-items: center; gap: 3px; }
+.heat-key i {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 2px;
+  background: var(--chip);
+}
+.heat-key span:first-child { margin-right: 0.35rem; }
+.heat-key span:last-child { margin-left: 0.35rem; }
 
 @media (max-width: 560px) {
   .games { grid-template-columns: repeat(2, 1fr); }
+  .games img { width: 38%; }
+  .games .desc { font-size: 0.75rem; }
+  .games .desc br { display: none; }   /* no room for the desktop line break */
+  .suggest b { font-size: 1.05rem; }
 }
 </style>
 </head>
@@ -117,26 +274,62 @@
           .games .name { --tile: var(--game-name); --tile-ink: var(--game-name-ink); }
      3. Copy this template:
 
-     <li><a class="name" href="games/name/index.html"><img src="icons/name.png" alt="">Name<svg class="arrow" viewBox="0 -960 960 960" aria-hidden="true"><path d="M647-440H160v-80h487L423-744l57-56 320 320-320 320-57-56 224-224Z"/></svg></a></li>
+     <li><a class="name" href="games/name/index.html"><img src="icons/name.png" alt=""><span class="label"><span class="name">Name</span><span class="desc"><span>One short line on how it plays.</span></span></span><svg class="arrow" viewBox="0 -960 960 960" aria-hidden="true"><path d="M647-440H160v-80h487L423-744l57-56 320 320-320 320-57-56 224-224Z"/></svg></a></li>
 
-     Also add the game to the Games list in navpanel.js (COPY).
+     Also add the game to the Games list in navpanel.js (COPY)
+     and to GAMES in the Activity script at the bottom.
 
      Put each game in its own folder: games/name/index.html
      and its icon (a square PNG) at icons/name.png
+
+     A game that isn't ready yet goes in as a "Coming soon" tile:
+     a <div class="name upcoming"> in place of the <a>, with
+     "Coming soon" as its description and the "..." icon (the
+     Sudoku tile below) in place of the arrow. Turn it into the
+     <a> above when the game ships.
      ============================================================ -->
 <section aria-labelledby="games-h">
   <h2 id="games-h">Play</h2>
   <ul class="games">
-    <li><a class="takuzu" href="games/takuzu/index.html"><img src="icons/takuzu.png" alt="">Takuzu<svg class="arrow" viewBox="0 -960 960 960" aria-hidden="true"><path d="M647-440H160v-80h487L423-744l57-56 320 320-320 320-57-56 224-224Z"/></svg></a></li>
-    <li><a class="kakuro" href="games/kakuro/index.html"><img src="icons/kakuro.png" alt="">Kakuro<svg class="arrow" viewBox="0 -960 960 960" aria-hidden="true"><path d="M647-440H160v-80h487L423-744l57-56 320 320-320 320-57-56 224-224Z"/></svg></a></li>
-    <li><a class="shikaku" href="games/shikaku/index.html"><img src="icons/shikaku.png" alt="">Shikaku<svg class="arrow" viewBox="0 -960 960 960" aria-hidden="true"><path d="M647-440H160v-80h487L423-744l57-56 320 320-320 320-57-56 224-224Z"/></svg></a></li>
+    <li><a class="takuzu" href="games/takuzu/index.html"><img src="icons/takuzu.png" alt=""><span class="label"><span class="name">Takuzu</span><span class="desc"><span>0s and 1s, <br>half and half in every line.</span></span></span><svg class="arrow" viewBox="0 -960 960 960" aria-hidden="true"><path d="M647-440H160v-80h487L423-744l57-56 320 320-320 320-57-56 224-224Z"/></svg></a></li>
+    <li><a class="kakuro" href="games/kakuro/index.html"><img src="icons/kakuro.png" alt=""><span class="label"><span class="name">Kakuro</span><span class="desc"><span>A crossword where every run adds up.</span></span></span><svg class="arrow" viewBox="0 -960 960 960" aria-hidden="true"><path d="M647-440H160v-80h487L423-744l57-56 320 320-320 320-57-56 224-224Z"/></svg></a></li>
+    <li><a class="shikaku" href="games/shikaku/index.html"><img src="icons/shikaku.png" alt=""><span class="label"><span class="name">Shikaku</span><span class="desc"><span>Split the grid into numbered boxes.</span></span></span><svg class="arrow" viewBox="0 -960 960 960" aria-hidden="true"><path d="M647-440H160v-80h487L423-744l57-56 320 320-320 320-57-56 224-224Z"/></svg></a></li>
+    <li><div class="sudoku upcoming"><img src="icons/sudoku.png" alt=""><span class="label"><span class="name">Sudoku</span><span class="desc"><span>Coming soon</span></span></span><svg class="arrow" viewBox="0 -960 960 960" aria-hidden="true"><path d="M240-400q-33 0-56.5-23.5T160-480q0-33 23.5-56.5T240-560q33 0 56.5 23.5T320-480q0 33-23.5 56.5T240-400Zm240 0q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm240 0q-33 0-56.5-23.5T640-480q0-33 23.5-56.5T720-560q33 0 56.5 23.5T800-480q0 33-23.5 56.5T720-400Z"/></svg></div></li>
+    <li><div class="gurobaru upcoming"><img src="icons/gurobaru.png" alt=""><span class="label"><span class="name">Gurobaru</span><span class="desc"><span>Coming soon</span></span></span><svg class="arrow" viewBox="0 -960 960 960" aria-hidden="true"><path d="M240-400q-33 0-56.5-23.5T160-480q0-33 23.5-56.5T240-560q33 0 56.5 23.5T320-480q0 33-23.5 56.5T240-400Zm240 0q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm240 0q-33 0-56.5-23.5T640-480q0-33 23.5-56.5T720-560q33 0 56.5 23.5T800-480q0 33-23.5 56.5T720-400Z"/></svg></div></li>
+    <li class="suggest">
+      <a href="contact.html">
+        <span class="plus" aria-hidden="true">+</span>
+        <b>Suggest a game</b>
+        <span>Got an idea? Send it over.</span>
+      </a>
+    </li>
   </ul>
 </section>
 
-<!-- Delete this section once you have a few games up. -->
-<section aria-labelledby="soon-h">
-  <h2 id="soon-h">In progress</h2>
-  <p class="note">More on the way. If you have an idea for one, <a href="contact.html">send it over</a>.</p>
+<!-- ============================================================
+     ACTIVITY
+     A year of solved puzzles, saved in each visitor's browser by
+     board.js. Built by the script at the bottom; the filter has
+     one button per game in its GAMES list.
+     ============================================================ -->
+<section aria-labelledby="act-h">
+  <div class="act-head">
+    <div>
+      <h2 id="act-h">Activity</h2>
+      <p class="act-today" id="act-today">0 of 3 games played today</p>
+    </div>
+    <div class="act-filter" id="act-filter" role="group" aria-label="Show games"></div>
+  </div>
+  <div class="heat-wrap">
+    <div class="heat" id="heat" role="img" aria-label="Puzzles solved per day over the last year"></div>
+    <div class="heat-tip" id="heat-tip" hidden></div>
+  </div>
+  <div class="act-foot">
+    <p id="act-total">Solve a puzzle and it shows up here &middot; Saved in your browser, no account needed</p>
+    <div class="heat-key" aria-hidden="true">
+      <span>Less</span><i></i><i class="l1"></i><i class="l2"></i><i class="l4"></i><span>More</span>
+    </div>
+  </div>
 </section>
 
 </main>
@@ -181,5 +374,113 @@
 <script src="navpanel.js"></script>
 <script src="marks.js"></script>
 <script src="footer.js"></script>
+<script>
+/* Activity grid: a square per day for the last year, a column per
+   week, darker for more puzzles solved. Reads the "game-activity"
+   log board.js writes:  { "2026-10-09": { "takuzu": 2 }, ... }  */
+(function () {
+  var GAMES = [
+    { key: "takuzu",  name: "Takuzu" },
+    { key: "kakuro",  name: "Kakuro" },
+    { key: "shikaku", name: "Shikaku" }
+  ];
+
+  var log = {};
+  try { log = JSON.parse(localStorage.getItem("game-activity") || "{}"); } catch (err) {}
+
+  var heat = document.getElementById("heat");
+  var filter = document.getElementById("act-filter");
+  var on = {};
+  GAMES.forEach(function (g) {
+    on[g.key] = true;
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = g.key;
+    b.textContent = g.name;
+    b.setAttribute("aria-pressed", "true");
+    b.addEventListener("click", function () {
+      // Keep at least one game showing.
+      var count = GAMES.filter(function (x) { return on[x.key]; }).length;
+      if (on[g.key] && count === 1) return;
+      on[g.key] = !on[g.key];
+      b.setAttribute("aria-pressed", on[g.key] ? "true" : "false");
+      render();
+    });
+    filter.appendChild(b);
+  });
+
+  function key(d) {
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  }
+  function solved(d) {
+    var day = log[key(d)] || {}, n = 0, parts = [];
+    GAMES.forEach(function (g) {
+      if (on[g.key] && day[g.key]) { n += day[g.key]; parts.push(g.name + " " + day[g.key]); }
+    });
+    return { n: n, parts: parts };
+  }
+  function level(n) { return n === 0 ? "" : "l" + Math.min(n, 4); }
+  var fmt = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" });
+
+  function render() {
+    // As many weeks as fit at about 10px a square, up to a year.
+    var weeks = Math.max(8, Math.min(53, Math.floor((heat.clientWidth + 3) / 13)));
+    heat.style.setProperty("--weeks", weeks);
+
+    var now = new Date();
+    var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    var start = new Date(today);
+    start.setDate(today.getDate() - today.getDay() - (weeks - 1) * 7);   // a Sunday
+
+    heat.textContent = "";
+    for (var i = 0; i < weeks * 7; i++) {
+      var d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+      var sq = document.createElement("i");
+      if (d > today) sq.className = "future";
+      else {
+        var s = solved(d);
+        sq.className = level(s.n);
+        sq.dataset.tip = fmt.format(d) + " \u00b7 " +
+          (s.n ? s.n + (s.n === 1 ? " game" : " games") + " played" : "No games played");
+      }
+      heat.appendChild(sq);
+    }
+
+    // Today: which games got played. The year: how many puzzles.
+    var todays = log[key(today)] || {};
+    var playedToday = GAMES.filter(function (g) { return todays[g.key]; }).length;
+    document.getElementById("act-today").textContent =
+      playedToday + " of " + GAMES.length + " games played today";
+
+    var total = 0;
+    for (var k = 0; k < 365; k++) {
+      total += solved(new Date(today.getFullYear(), today.getMonth(), today.getDate() - k)).n;
+    }
+    document.getElementById("act-total").textContent = total
+      ? total + (total === 1 ? " game" : " games") + " played in the last year \u00b7 Saved in your browser, no account needed"
+      : "Solve a puzzle and it shows up here \u00b7 Saved in your browser, no account needed";
+  }
+
+  // Hovering a square shows its date and count just above it.
+  var tip = document.getElementById("heat-tip");
+  heat.addEventListener("mouseover", function (e) {
+    var sq = e.target.closest("i");
+    if (!sq || !sq.dataset.tip) { tip.hidden = true; return; }
+    tip.textContent = sq.dataset.tip;
+    tip.hidden = false;
+    var x = sq.offsetLeft + sq.offsetWidth / 2;
+    var half = tip.offsetWidth / 2;
+    x = Math.max(half, Math.min(heat.clientWidth - half, x));   // keep it inside the panel
+    tip.style.left = x + "px";
+    tip.style.top = sq.offsetTop + "px";
+  });
+  heat.addEventListener("mouseleave", function () { tip.hidden = true; });
+
+  var lastW = 0;
+  new ResizeObserver(function () {
+    if (heat.clientWidth !== lastW) { lastW = heat.clientWidth; render(); }
+  }).observe(heat);
+})();
+</script>
 </body>
 </html>

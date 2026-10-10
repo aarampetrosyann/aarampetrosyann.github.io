@@ -10,7 +10,9 @@
      Show mistakes (remembered per game between visits), and
      Highlight (the selected square's lines; one setting for all),
    - the header above the board: size and level, name, pause, timer,
-   - the Solved window with three stars, built in like How to play.
+   - the Solved window with three stars, built in like How to play,
+   - and a record of each solved puzzle in the browser, for the
+     Activity grid on games.html (see logPlay below).
 
    Usage, from a game's script:
      var shell = Board.create({
@@ -29,6 +31,27 @@
    ============================================================ */
 var Board = (function () {
   var S = window.GameScreen;
+
+  // Solved puzzles per day per game, kept in this browser only:
+  //   { "2026-10-09": { "takuzu": 2, "shikaku": 1 }, ... }
+  // games.html reads it for the Activity grid. Days older than a
+  // year and a bit are dropped so it never grows without end.
+  var ACTIVITY_KEY = "game-activity";
+  function logPlay(game) {
+    try {
+      var log = JSON.parse(localStorage.getItem(ACTIVITY_KEY) || "{}");
+      var d = new Date();
+      var day = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+      log[day] = log[day] || {};
+      log[day][game] = (log[day][game] || 0) + 1;
+      var cutoff = new Date(d.getFullYear(), d.getMonth(), d.getDate() - 400);
+      Object.keys(log).forEach(function (k) {
+        var p = k.split("-");
+        if (new Date(+p[0], p[1] - 1, +p[2]) < cutoff) delete log[k];
+      });
+      localStorage.setItem(ACTIVITY_KEY, JSON.stringify(log));
+    } catch (err) {}
+  }
 
   // Material Symbols Rounded "star", filled, weight 500, as SVG.
   var STAR = '<svg viewBox="0 -960 960 960"><path d="M480-259.91 313.28-159.43q-12.67 7.95-26.35 6.83-13.67-1.12-23.86-9.07-10.2-7.96-15.8-20.01-5.6-12.06-2.12-26.73l44.24-189.72-147.72-127.72q-11.43-10.19-14.29-23.25-2.86-13.05 1.38-25.49 4.24-12.43 13.79-20.63 9.56-8.19 25.23-10.19l194.72-17 75.48-178.96q5.72-13.91 17.53-20.63 11.82-6.72 24.49-6.72 12.67 0 24.49 6.72 11.81 6.72 17.53 20.63l75.48 178.96 194.72 17q15.67 2 25.23 10.19 9.55 8.2 13.79 20.63 4.24 12.44 1.38 25.49-2.86 13.06-14.29 23.25L670.61-398.13l44.24 189.72q3.48 14.67-2.12 26.73-5.6 12.05-15.8 20.01-10.19 7.95-23.86 9.07-13.68 1.12-26.35-6.83L480-259.91Z"/></svg>';
@@ -198,7 +221,9 @@ var Board = (function () {
     if (o.onCheck) q(".gb-check").addEventListener("click", function () { setMenu(false); o.onCheck(); });
     q(".gb-reset").addEventListener("click", function () { setMenu(false); o.onReset(); });
     q(".gb-hint").addEventListener("click", function () { setMenu(false); o.onHint(); });
-    if (o.onSolve) q(".gb-solve").addEventListener("click", function () { setMenu(false); o.onSolve(); });
+    // A puzzle finished by Solve isn't counted as played.
+    var usedSolve = false;
+    if (o.onSolve) q(".gb-solve").addEventListener("click", function () { setMenu(false); usedSolve = true; o.onSolve(); });
     els.mistakes.addEventListener("click", function () {
       showMistakes = !showMistakes;
       try { localStorage.setItem(o.storageKey, showMistakes ? "1" : "0"); } catch (err) {}
@@ -237,6 +262,7 @@ var Board = (function () {
 
       // Back to zero and running, e.g. after Reset board.
       resetClock: function () {
+        usedSolve = false;
         base = 0;
         since = Date.now();
         setPaused(false);
@@ -257,6 +283,7 @@ var Board = (function () {
         els.again.hidden = false;
         els.grid.classList.add("solved");
         q(".gb-time").textContent = n + "×" + n + " · " + o.level + " · " + elapsed();
+        if (!usedSolve) logPlay(o.name.toLowerCase());
         setTimeout(function () { if (alive) openWin(true); }, 700);
       },
 

@@ -20,12 +20,16 @@
 
   /* Game tiles on games.html. Each game has a box color and a
      text color picked for contrast on it. Same in both themes. */
-  --game-takuzu:      #FFDA03;  /* bright yellow */
+  --game-takuzu:      #FFBF00;  /* amber */
   --game-takuzu-ink:  #141413;
   --game-kakuro:      #1E90FF;  /* dodger blue */
   --game-kakuro-ink:  #141413;
   --game-shikaku:     #C41E3A;  /* cardinal red */
   --game-shikaku-ink: #141413;
+  --game-sudoku:      #E7415D;  /* rose red, coming soon */
+  --game-sudoku-ink:  #141413;
+  --game-gurobaru:    #0047AB;  /* cobalt blue, coming soon */
+  --game-gurobaru-ink: #FAF9F5;
   --game-button-ink:  #FFFFFF;  /* text on the dark game buttons and sliders */
   --game-hint:        #F2B705;  /* golden yellow: numbers revealed by a hint */
   --game-right:       #1E90FF;  /* bright blue: entries marked correct by Check */
