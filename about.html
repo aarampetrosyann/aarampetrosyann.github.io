@@ -33,6 +33,26 @@
   .edu-meta { grid-template-columns: 1fr; gap: 0; }
   .edu-meta dd { margin-bottom: 0.4rem; }
 }
+
+/* Experience: each role has its title with the dates beside it,
+   the employer under it, then a few highlights. */
+.role-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0 1rem;
+}
+.when { font-size: 0.85rem; color: var(--muted); white-space: nowrap; }
+.points {
+  list-style: disc;   /* nested in the timeline, so it'd default to circles */
+  margin: 0.4rem 0 0;
+  padding-left: 1.1rem;
+  font-size: 0.95rem;
+  color: var(--soft-ink);
+}
+.points li { padding: 0; margin-bottom: 0.3rem; }
+.points li::before { content: none; }   /* no timeline dot on bullets */
 </style>
 </head>
 
@@ -67,9 +87,12 @@
      Each job is one <li>. To add one, copy this template:
 
      <li>
-       <h3>Job title</h3>
-       <p class="org">Company, 2026</p>
-       <p>One sentence on what you built and its impact.</p>
+       <div class="role-head"><h3>Job title</h3><span class="when">Month Year &ndash; Present</span></div>
+       <p class="org">Company, City</p>
+       <ul class="points">
+         <li>A highlight: what you built and its impact.</li>
+         <li>Another, ideally with a number.</li>
+       </ul>
      </li>
 
      Newest first. Anything in [brackets] is yours to fill in.
@@ -79,33 +102,50 @@
   <ol class="timeline">
 
     <li>
-      <h3>Software Engineering Intern</h3>
-      <p class="org">ITJ Group</p>
-      <p>[One sentence on what you built and its impact.]</p>
+      <div class="role-head"><h3>Software Engineering Intern</h3><span class="when">June 2026 &ndash; Present</span></div>
+      <p class="org">IP law firm, Los Angeles</p>
+      <ul class="points">
+        <li>Co-developing a Python and FastAPI platform on OpenAI that cuts hours of patent Office Action analysis and strategy drafting.</li>
+        <li>Automated patent parsing, OCR, and Outlook drafting, saving up to an hour of manual review and correspondence per case.</li>
+        <li>Built secure attorney-in-the-loop workflows with input validation, protected credentials, and short-lived case storage.</li>
+      </ul>
     </li>
 
     <li>
-      <h3>Patent Office Action Automation</h3>
-      <p class="org">IP law firm, 3-person team</p>
-      <p>Building a Python and FastAPI tool that automates patent Office Action workflows using OCR, LLMs, and Microsoft Graph integration.</p>
+      <div class="role-head"><h3>Software Engineering Intern</h3><span class="when">Jan 2025 &ndash; Apr 2025</span></div>
+      <p class="org">ITJ Group, Los Angeles</p>
+      <ul class="points">
+        <li>Owned SEO strategy end to end, with schema markup, redirect rules, and request optimizations that grew organic traffic 45%.</li>
+        <li>Cut page load times 30% by tracing bottlenecks in internal API calls, network requests, and component structure.</li>
+      </ul>
     </li>
 
     <li>
-      <h3>Freelance Web Developer</h3>
-      <p class="org">Self-employed</p>
-      <p>Build and maintain live client sites for businesses in the jewelry and legal services industries.</p>
+      <div class="role-head"><h3>Freelance Web Developer</h3><span class="when">Feb 2024 &ndash; Present</span></div>
+      <p class="org">Self-employed, Los Angeles</p>
+      <ul class="points">
+        <li>Design, build, host, and maintain WordPress sites for small businesses, including their SEO.</li>
+        <li>A legal services site (<a href="https://ana-legal-services.com">ana-legal-services.com</a>) that brings in about 3 inbound leads a day.</li>
+        <li>A custom jewelry site (<a href="https://aramisjewelry.com">aramisjewelry.com</a>) that helped win 10+ long-term clients.</li>
+      </ul>
     </li>
 
     <li>
-      <h3>CAD Engineer</h3>
-      <p class="org">Nik Diamond Setting</p>
-      <p>[One sentence on the CAD work you did.]</p>
+      <div class="role-head"><h3>CAD Engineer</h3><span class="when">Sept 2017 &ndash; Dec 2025</span></div>
+      <p class="org">Nik Diamond Setting, Los Angeles</p>
+      <ul class="points">
+        <li>Turned client specifications into 1,000+ custom jewelry designs, iterating with customers to refine concepts and solve structural constraints.</li>
+        <li>Built 2D and 3D models in Matrix so clients could see a design before it went to production.</li>
+      </ul>
     </li>
 
     <li>
-      <h3>Student Instructor</h3>
-      <p class="org">Glendale Community College</p>
-      <p>[One sentence on what you taught.]</p>
+      <div class="role-head"><h3>Student Instructor</h3><span class="when">Feb 2022 &ndash; June 2024</span></div>
+      <p class="org">Glendale Community College, Glendale</p>
+      <ul class="points">
+        <li>Led weekly help sessions and mentored 100+ STEM students across six math and computer science courses, with test scores up 150% on average.</li>
+        <li>Worked with professors to design and hand out coursework and ran student-led discussions after lectures, making course delivery 30% more efficient.</li>
+      </ul>
     </li>
 
   </ol>
