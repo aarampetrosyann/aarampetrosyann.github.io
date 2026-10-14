@@ -262,6 +262,8 @@ body.nav-open nav ul [aria-current="page"] { color: var(--paper); }
   color: var(--accent);
   text-decoration-thickness: 2px;
 }
+/* A project whose code isn't public yet: plain text, not a link */
+.projects .links.soon { font-size: 0.85rem; color: var(--muted); }
 .stack {
   grid-column: 1 / -1;
   margin-top: 0.4rem;
