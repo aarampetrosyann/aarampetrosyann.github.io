@@ -101,6 +101,11 @@
 .latest p { margin: 0.15rem 0 0; font-size: 0.9rem; color: var(--soft-ink); }
 .latest time { font-size: 0.8rem; color: var(--muted); white-space: nowrap; padding-top: 0.2rem; }
 
+/* While Latest writing is hidden, the section above it is the
+   last one showing, so it drops its divider and grid marks too. */
+section:has(+ section[hidden])::after,
+section:has(+ section[hidden]) > .xmark { display: none; }
+
 @media (max-width: 560px) {
   .now, .tools { grid-template-columns: 1fr; gap: 0.15rem; }
   .now dd, .tools dd { margin-bottom: 0.6rem; }
@@ -204,9 +209,10 @@
 <!-- ============================================================
      BLOCK 5: LATEST WRITING
      Filled in by the script at the bottom with the newest posts
-     from blog.html, so nothing to edit here when you post.
+     from blog.html, so nothing to edit here when you post. Hidden
+     until blog.html has posts (it's a coming-soon page for now).
      ============================================================ -->
-<section aria-labelledby="latest-h">
+<section id="latest-section" aria-labelledby="latest-h" hidden>
   <h2 id="latest-h">Latest writing</h2>
   <ul class="latest" id="latest"></ul>
   <a class="more" href="blog.html">All posts &rarr;</a>
@@ -256,7 +262,8 @@
 <script src="footer.js"></script>
 <script>
 /* Latest writing: reads the newest two posts from blog.html, so
-   this updates whenever a post is added there. */
+   this updates whenever a post is added there. The section stays
+   hidden while blog.html has none. */
 (function () {
   var list = document.getElementById("latest");
   fetch("blog.html")
@@ -264,6 +271,7 @@
     .then(function (html) {
       var doc = new DOMParser().parseFromString(html, "text/html");
       var posts = doc.querySelectorAll(".posts .entry");
+      if (posts.length) document.getElementById("latest-section").hidden = false;
       for (var i = 0; i < Math.min(2, posts.length); i++) {
         var p = posts[i], time = p.querySelector("time");
         var li = document.createElement("li");
