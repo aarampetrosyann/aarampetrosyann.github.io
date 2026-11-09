@@ -515,7 +515,7 @@ body.nav-open nav ul [aria-current="page"] { color: var(--paper); }
   background: var(--chip);
 }
 .prose pre,
-.code {
+.prose .code {   /* scoped to posts: the 404 page has its own .code */
   margin: 1.75rem 0;
   border-radius: 12px;
   background: var(--surface);
@@ -527,7 +527,7 @@ body.nav-open nav ul [aria-current="page"] { color: var(--paper); }
   font-size: 0.85rem;
   line-height: 1.6;
 }
-.code pre { margin: 0; padding-top: 0.25rem; background: none; }
+.prose .code pre { margin: 0; padding-top: 0.25rem; background: none; }
 .prose pre .c { opacity: 0.55; }  /* wrap comments in <span class="c"> */
 .code-bar {
   display: flex;
