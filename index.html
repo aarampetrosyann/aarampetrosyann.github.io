@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>AP | Portfolio</title>
+<title>AP | Coming soon</title>
 <meta name="description" content="Aram Petrosyan, UCLA Computer Science graduate and M.S. Data Science Engineering student. Software, web, and hardware projects.">
 <link rel="icon" href="icons/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="icons/favicon-32.png" type="image/png" sizes="32x32">
@@ -21,280 +21,216 @@
 <script src="settings.js"></script>
 
 <style>
-/* Home page sections, each pointing somewhere else on the site:
-   a featured project, the toolbox, and the latest posts (read
-   from blog.html). */
-.more {
-  display: inline-block;
-  margin-top: 1.25rem;
-  font-weight: 500;
+/* ============================================================
+   COMING SOON
+   The whole home page while the site is rebuilt (the full page
+   waits in home-draft.html). A field of ASCII characters drifts
+   and fades behind the text, brightest near the top center; the
+   script at the bottom draws it on a canvas.
+   ============================================================ */
+html, body { height: 100%; }
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+.ascii {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -2;           /* behind everything, even the patch behind the words */
 }
 
-/* Now, under the intro: small labels beside what's going on this
-   season, quieter than the intro so the name stays the loud part */
-.now {
-  display: grid;
-  grid-template-columns: 6.5rem 1fr;
-  gap: 0.5rem 1rem;
-  max-width: 38rem;
-  margin: 2rem 0 0;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--line);
+/* Top left: name, a bar, the logo */
+.cs-top {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 1.75rem 2rem;
 }
-.now dt { color: var(--muted); }
-.now dd { margin: 0; }
-.hero .updated { margin: 1rem 0 0; font-size: 0.8rem; color: var(--muted); }
-
-/* Featured project: a card with its headline number */
-.feature {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 1.5rem 2rem;
-  padding: 1.6rem 1.75rem;
-  border-radius: 14px;
-  background: var(--card);
-}
-.feature h3 { font-size: 1.45rem; }
-.feature p { margin: 0.6rem 0 0; color: var(--soft-ink); }
-.stat { text-align: right; }
-.stat b {
-  display: block;
+.cs-top b {
   font-family: var(--display);
-  font-size: 3.25rem;
-  font-weight: 800;
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: -0.01em;
+}
+.cs-bar { width: 1px; height: 1.1rem; background: var(--muted); }
+/* the logo is a mask over the text color, so it follows the theme */
+.cs-logo {
+  width: 1.6rem;
+  aspect-ratio: 100 / 98;
+  background: var(--ink);
+  -webkit-mask: url("icons/logo.svg") no-repeat center / contain;
+          mask: url("icons/logo.svg") no-repeat center / contain;
+}
+
+/* Center: the message and the contact links */
+.cs {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.5rem 5rem;
+  text-align: center;
+}
+/* a soft patch of page color behind the words, so the characters
+   never fight with the text */
+.cs::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(44rem, 100vw);
+  height: 24rem;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(closest-side, var(--paper) 35%, transparent);
+  z-index: -1;
+}
+.cs h1 {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(3rem, 11vw, 6rem);
   line-height: 1;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.035em;
 }
-.stat span { display: block; max-width: 9rem; margin-top: 0.35rem; font-size: 0.8rem; color: var(--muted); }
-.chips { list-style: none; display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 1.1rem 0 0; padding: 0; }
-.chips li {
-  padding: 0.2rem 0.7rem;
-  border-radius: 999px;
-  background: var(--chip);
-  font-size: 0.8rem;
-}
-.feature .chips li { background: var(--paper); }
-.feature-links { grid-column: 1 / -1; display: flex; align-items: baseline; gap: 1.5rem; }
-.code-soon { font-size: 0.9rem; color: var(--muted); }   /* until the repo is public */
-.feature-links .more { margin-top: 0; }
-
-/* Toolbox: a label per group, chips beside it */
-.tools { display: grid; grid-template-columns: 10.5rem 1fr; gap: 1rem; margin: 0; }
-.tools dt { color: var(--muted); padding-top: 0.2rem; }
-.tools dd { margin: 0; }
-.tools .chips { margin: 0; }
-
-/* Latest posts: rows like the blog list */
-.latest { list-style: none; margin: 0; padding: 0; }
-.latest a {
+.cs-sub { margin: 1rem 0 0; font-size: 1.1rem; color: var(--muted); }
+.cs-rule { width: 1px; height: 2.75rem; margin: 2.25rem 0; background: var(--line); }
+.cs-reach { margin: 0 0 1rem; font-size: 1.05rem; }
+.cs-links { list-style: none; display: flex; gap: 0.6rem; margin: 0; padding: 0; }
+.cs-links a {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 1.5rem;
-  padding: 0.75rem 0;
-  border-top: 1px solid var(--line);
+  place-items: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--paper);
   color: var(--ink);
-  text-decoration: none;
+  transition: border-color 0.15s, transform 0.15s;
 }
-.latest li:first-child a { border-top: 0; padding-top: 0; }
-.latest a:hover h3 { color: var(--accent); }
-.latest h3 { font-size: 1.15rem; }
-.latest p { margin: 0.15rem 0 0; font-size: 0.9rem; color: var(--soft-ink); }
-.latest time { font-size: 0.8rem; color: var(--muted); white-space: nowrap; padding-top: 0.2rem; }
-
-/* While Latest writing is hidden, the section above it is the
-   last one showing, so it drops its divider and grid marks too. */
-section:has(+ section[hidden])::after,
-section:has(+ section[hidden]) > .xmark { display: none; }
+.cs-links a:hover { border-color: var(--ink); transform: translateY(-2px); }
+.cs-links svg { width: 1.05rem; height: 1.05rem; fill: currentColor; }
 
 @media (max-width: 560px) {
-  .now, .tools { grid-template-columns: 1fr; gap: 0.15rem; }
-  .now dd, .tools dd { margin-bottom: 0.6rem; }
-  .feature { grid-template-columns: 1fr; padding: 1.25rem; }
-  .stat { text-align: left; }
-  .latest a { grid-template-columns: 1fr; gap: 0.2rem; }
+  .cs-top { padding: 1.25rem 1.25rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cs-links a { transition: none; }
 }
 </style>
 </head>
 
 <body>
 
-<!-- The two vertical rules of the drafting grid -->
-<div class="page-rules" aria-hidden="true"></div>
-<div class="wrap">
+<canvas class="ascii" id="ascii" aria-hidden="true"></canvas>
 
-<!-- ============================================================
-     BLOCK 1: NAV
-     Add a menu item by copying one <li> line.
-     Links starting with # jump to a section on this page.
-     Links ending in .html go to another page.
-     This nav is repeated on every page. If you change it here,
-     change it on the others too.
-     ============================================================ -->
-<nav aria-label="Main">
-  <a class="home" href="#" data-hover-text="[Aram Petrosyan]">[AP]</a>
-  <ul>
-    <li><a href="about.html">About</a></li>
-    <li><a href="blog.html">Blog</a></li>
-    <li><a href="games.html">Games</a></li>
-    <li><a href="contact.html">Contact</a></li>
-    <li><a href="#" id="settings-btn" class="no-scramble" aria-haspopup="dialog" aria-expanded="false">[...]</a></li>
-  </ul>
-</nav>
-
-<!-- ============================================================
-     BLOCK 2: HERO
-     Your name, who you are in a few lines, and what's going on
-     right now. Change the Now rows whenever they stop being true,
-     and the date under them.
-     ============================================================ -->
-<header class="hero">
-  <h1>Aram<br>Petrosyan</h1>
-  <p>I build software across the stack, from web apps and automation tools to FPGA hardware. I like problems where the answer has to hold up in the real world: a site people actually use, a tool that saves a legal team hours, or a model checked against outcomes it didn't see.</p>
-  <dl class="now">
-    <dt>Studying</dt>
-    <dd>M.S. in Data Science Engineering at UCLA, after a B.S. in Computer Science there.</dd>
-    <dt>Building</dt>
-    <dd>A Python and FastAPI platform for patent Office Action analysis, as an intern at an IP law firm.</dd>
-    <dt>Open to</dt>
-    <dd>New grad and internship roles in software and data engineering.</dd>
-  </dl>
-  <p class="updated">Updated October 2026</p>
+<header class="cs-top">
+  <b>Aram Petrosyan</b>
+  <span class="cs-bar" aria-hidden="true"></span>
+  <span class="cs-logo" role="img" aria-label="AP logo"></span>
 </header>
 
-<main>
-
-<!-- ============================================================
-     BLOCK 3: FEATURED PROJECT
-     One project in a little more depth. The full list is on
-     about.html; swap this for whichever project you're proudest
-     of right now.
-     ============================================================ -->
-<section aria-labelledby="feature-h">
-  <h2 id="feature-h">Featured project</h2>
-  <article class="feature">
-    <div>
-      <h3>World Cup Match Prediction Engine</h3>
-      <p>A Poisson-based model with Monte Carlo simulation, tested the honest way: every prediction was made before the match was played.</p>
-      <ul class="chips"><li>Python</li><li>Statistical modeling</li><li>Monte Carlo</li></ul>
-    </div>
-    <div class="stat">
-      <b>19/22</b>
-      <span>knockout-stage outcomes called before kickoff</span>
-    </div>
-    <div class="feature-links">
-      <span class="code-soon">Code coming soon</span>
-      <a class="more" href="about.html#projects">All projects &rarr;</a>
-    </div>
-  </article>
-</section>
-
-<!-- ============================================================
-     BLOCK 4: TOOLBOX
-     Languages and tools, from the resume. One <li> per chip.
-     ============================================================ -->
-<section aria-labelledby="tools-h">
-  <h2 id="tools-h">Toolbox</h2>
-  <dl class="tools">
-    <dt>Languages</dt>
-    <dd><ul class="chips"><li>Python</li><li>C/C++</li><li>SQL</li><li>TypeScript</li><li>JavaScript</li><li>HTML/CSS</li><li>R</li></ul></dd>
-    <dt>Frameworks &amp; data</dt>
-    <dd><ul class="chips"><li>FastAPI</li><li>Node.js</li><li>React</li><li>Next.js</li><li>MongoDB</li><li>Firebase</li><li>PyTorch</li></ul></dd>
-    <dt>Cloud &amp; tools</dt>
-    <dd><ul class="chips"><li>AWS</li><li>Docker</li><li>Linux</li><li>Git</li></ul></dd>
-    <dt>Hardware</dt>
-    <dd><ul class="chips"><li>Verilog</li><li>Vivado</li><li>FPGA</li></ul></dd>
-  </dl>
-</section>
-
-<!-- ============================================================
-     BLOCK 5: LATEST WRITING
-     Filled in by the script at the bottom with the newest posts
-     from blog.html, so nothing to edit here when you post. Hidden
-     until blog.html has posts (it's a coming-soon page for now).
-     ============================================================ -->
-<section id="latest-section" aria-labelledby="latest-h" hidden>
-  <h2 id="latest-h">Latest writing</h2>
-  <ul class="latest" id="latest"></ul>
-  <a class="more" href="blog.html">All posts &rarr;</a>
-</section>
-
+<main class="cs">
+  <h1>Coming soon</h1>
+  <p class="cs-sub">This site is under construction.</p>
+  <span class="cs-rule" aria-hidden="true"></span>
+  <p class="cs-reach">In the meantime, get in touch.</p>
+  <ul class="cs-links">
+    <li><a href="mailto:apetrosyan15@ucla.edu" aria-label="Email" title="Email"><svg viewBox="0 -960 960 960" aria-hidden="true"><path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm320-280L160-640v400h640v-400L480-440Zm0-80 320-200H160l320 200Z"/></svg></a></li>
+    <li><a href="https://github.com/aarampetrosyann" aria-label="GitHub" title="GitHub"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg></a></li>
+    <li><a href="https://linkedin.com/in/a-petrosyan" aria-label="LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5.5" cy="5.6" r="2.1"/><rect x="3.7" y="9" width="3.6" height="11.5"/><path d="M10 9h3.5v1.6c.6-1 1.9-1.9 3.8-1.9 3.8 0 4.6 2.5 4.6 5.8v6h-3.6v-5.3c0-1.4-.1-3.1-2-3.1-1.9 0-2.2 1.5-2.2 3v5.4H10z"/></svg></a></li>
+    <li><a href="files/aram-petrosyan-resume.pdf" aria-label="Resume" title="Resume"><svg viewBox="0 -960 960 960" aria-hidden="true"><path d="M320-240h320v-80H320v80Zm0-160h320v-80H320v80ZM240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H240Zm280-520v-200H240v640h480v-440H520Z"/></svg></a></li>
+  </ul>
 </main>
 
-</div>
-
-<!-- FOOTER: same on every page. Keep the copies on every page in sync.
-     Links use this page's path back to the site root. -->
-<footer class="site-footer">
-  <div class="footer-inner">
-    <div class="footer-cols">
-      <div class="footer-id">
-        <a class="footer-name" href="index.html">Aram Petrosyan</a>
-        <p>Software Engineer</p>
-        <span class="footer-logo" aria-hidden="true"></span>
-      </div>
-      <div>
-        <p class="footer-h">Site</p>
-        <ul>
-          <li><a href="index.html">Home</a></li>
-          <li><a href="about.html">About</a></li>
-          <li><a href="blog.html">Blog</a></li>
-          <li><a href="games.html">Games</a></li>
-        </ul>
-      </div>
-      <div>
-        <p class="footer-h">Contact</p>
-        <ul>
-          <li><a href="mailto:apetrosyan15@ucla.edu">Email</a></li>
-          <li><a href="https://github.com/aarampetrosyann">GitHub</a></li>
-          <li><a href="https://linkedin.com/in/a-petrosyan">LinkedIn</a></li>
-          <li><a href="files/aram-petrosyan-resume.pdf">Resume</a></li>
-        </ul>
-      </div>
-    </div>
-    <p class="footer-copy">&copy; <span class="yr">2026</span> Aram Petrosyan. All rights reserved.</p>
-  </div>
-</footer>
-
-<!-- Hover scramble effect on the nav links -->
-<script src="scramble.js"></script>
-<script src="navpanel.js"></script>
-<script src="marks.js"></script>
-<script src="footer.js"></script>
 <script>
-/* Latest writing: reads the newest two posts from blog.html, so
-   this updates whenever a post is added there. The section stays
-   hidden while blog.html has none. */
+/* ASCII field: a grid of characters, each fading in and out on its
+   own slow rhythm, brightest in a glow near the top center and gone
+   by the edges. A character swaps for another while it's faded out,
+   so the field keeps changing. Drawn in the page's text color, so it
+   follows the theme; holds still for reduced motion. */
 (function () {
-  var list = document.getElementById("latest");
-  fetch("blog.html")
-    .then(function (r) { return r.text(); })
-    .then(function (html) {
-      var doc = new DOMParser().parseFromString(html, "text/html");
-      var posts = doc.querySelectorAll(".posts .entry");
-      if (posts.length) document.getElementById("latest-section").hidden = false;
-      for (var i = 0; i < Math.min(2, posts.length); i++) {
-        var p = posts[i], time = p.querySelector("time");
-        var li = document.createElement("li");
-        var a = document.createElement("a");
-        a.href = p.querySelector("a").getAttribute("href");
-        var text = document.createElement("div");
-        var h = document.createElement("h3");
-        h.textContent = p.querySelector("h3").textContent;
-        var d = document.createElement("p");
-        d.textContent = p.querySelector(".post-text p").textContent;
-        text.appendChild(h);
-        text.appendChild(d);
-        var t = document.createElement("time");
-        t.dateTime = time.getAttribute("datetime");
-        t.textContent = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })
-          .format(new Date(t.dateTime));
-        a.appendChild(text);
-        a.appendChild(t);
-        li.appendChild(a);
-        list.appendChild(li);
+  var canvas = document.getElementById("ascii");
+  var ctx = canvas.getContext("2d");
+  var CHARS = ".:-=+*~^<>/\\|()[]{}#%&@$";
+  var FONT = 13, CELL_W = 11, CELL_H = 16;
+  var cols, rows, w, h, cells;
+  var still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function size() {
+    var dpr = window.devicePixelRatio || 1;
+    w = window.innerWidth; h = window.innerHeight;
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    cols = Math.ceil(w / CELL_W);
+    rows = Math.ceil(h / CELL_H);
+
+    // Each cell: how strong the glow is there, and its own speed,
+    // phase and character.
+    var cx = w / 2, cy = h * 0.38, reach = Math.max(w * 0.4, h * 0.5);
+    cells = [];
+    for (var r = 0; r < rows; r++) {
+      for (var c = 0; c < cols; c++) {
+        var x = c * CELL_W, y = r * CELL_H;
+        var d = Math.hypot((x - cx) * 0.85, (y - cy) * 1.2) / reach;
+        var glow = Math.max(0, 1 - d);
+        if (glow < 0.02) continue;
+        cells.push({
+          x: x, y: y,
+          glow: glow * glow * glow,
+          speed: 0.25 + Math.random() * 0.9,
+          phase: Math.random() * Math.PI * 2,
+          ch: CHARS[Math.floor(Math.random() * CHARS.length)],
+          wasLow: false
+        });
       }
-    })
-    .catch(function () {});
+    }
+  }
+
+  function draw(t) {
+    ctx.clearRect(0, 0, w, h);
+    ctx.font = FONT + "px ui-monospace, 'SF Mono', Menlo, Consolas, monospace";
+    ctx.textBaseline = "top";
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--ink").trim();
+    for (var i = 0; i < cells.length; i++) {
+      var q = cells[i];
+      var wave = 0.5 + 0.5 * Math.sin(t * q.speed + q.phase);
+      var a = q.glow * wave * wave * 0.42;
+      if (a < 0.015) {
+        if (!q.wasLow) {               // faded out: come back as a new character
+          q.ch = CHARS[Math.floor(Math.random() * CHARS.length)];
+          q.wasLow = true;
+        }
+        continue;
+      }
+      q.wasLow = false;
+      ctx.globalAlpha = a;
+      ctx.fillText(q.ch, q.x, q.y);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  // About 20 frames a second is plenty for a slow fade, and cheap.
+  var last = 0;
+  function frame(now) {
+    if (now - last > 50) { last = now; draw(now / 1000); }
+    requestAnimationFrame(frame);
+  }
+
+  size();
+  window.addEventListener("resize", function () { size(); if (still) draw(2); });
+  // Redraw when the theme changes, since the color comes from it.
+  new MutationObserver(function () { if (still) draw(2); })
+    .observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  if (still) draw(2); else requestAnimationFrame(frame);
 })();
 </script>
 </body>
